@@ -1,0 +1,8 @@
+Layout/LineLength:
+  Max: 100
+
+Metrics/AbcSize:
+  Max: 21
+
+Metrics/MethodLength:
+  Max: 25

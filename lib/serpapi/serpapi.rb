@@ -1,119 +1,127 @@
-
-
-module SerpApi
-
-# SerpApi.com search client
+# SerpApi module provides serpapi.com client
 #
-class Client
-
-  VERSION = "1.0.0"
-  BACKEND = "serpapi.com"
-
-  attr_accessor :parameter
-
-  # constructor
+module SerpApi
+  # Client for SerpApi.com
   #
-  # Example:
-  # ```ruby
-  # require 'google_search'
-  # client = SerpApi::Client.new(api_key: "secure API key", engine: "google")
-  # result = client.search(q: "coffee")
-  # ```
-  #
-  #  read_timeout is additional
-  #
-  # @param [Hash] parameter default 
-  def initialize(parameter = {})
-    # set default paramter
-    @default = parameter || {}
+  class Client
+    VERSION = '1.0.0'.freeze
+    BACKEND = 'serpapi.com'.freeze
 
-    # set default read timeout
-    @read_timeout = parameter[:read_timeout] || 100
-  end
+    # search parameter
+    attr_accessor :parameter
+    # HTTP read timeout
+    attr_accessor :read_timeout
 
-  # search against serpapi.com
-  #
-  # @param [Hash] parameter search includes engine, api_key, search fields..
-  # @param [String] decoder select :json or :html decoder (optional)
-  # @return [Hash] search results formatted as JSON by SerpApi.com
-  #
-  def search(parameter = {}, decoder = :json)
-    run('/search', decoder, parameter)
-  end
+    # constructor
+    #
+    # Example:
+    # ```ruby
+    # require 'serpapi'
+    # client = SerpApi::Client.new(api_key: "secure API key", engine: "google")
+    # result = client.search(q: "coffee")
+    # ```
+    # parameter:
+    #  engine [String] search enginge selected
+    #  api_key [String] user secret API key
+    #  read_timeout [Integer] HTTP read max timeout 
+    #
+    # @param [Hash] parameter default
+    def initialize(parameter = {})
+      # set default paramter
+      @default = parameter || {}
 
-  # html search 
-  #
-  # @return [String] raw html search results directly from the search engine
-  def html(parameter = {})
-    run('/search', :html, parameter)
-  end
+      # set default read timeout
+      @read_timeout = parameter[:read_timeout] || 100
+    end
 
-  # Get location using Location API
-  #
-  # 
-  def location(parameter = {})
-    run('/locations.json', :json, parameter)
-  end
+    # perform a search using serpapi.com
+    #
+    # @param [Hash] parameter search includes engine, api_key, search fields (override the default parameter set at initialization)
+    # @return [Hash] search results formatted as a Hash (raw HTML response from the search engine is converted to JSON by SerpApi.com)
+    #
+    def search(parameter = {})
+      run('/search', :json, parameter)
+    end
 
-  # Retrieve search result from the Search Archive API
-  # 
-  def search_archive(search_id, format = :json, parameter = {})
-    raise SerpApiException.new('format must be json or html') if format !~ /^(html|json)$/
-    run("/searches/#{search_id}.#{format}", :json, nil)
-  end
+    # html search
+    #
+    # @return [String] raw html search results directly from the search engine
+    def html(parameter = {})
+      run('/search', :html, parameter)
+    end
 
-   # Get account information using Account API
-   # @param [String] optional api_key secret key
-  def account(api_key = nil)
-    parameter = (api_key == nil ? {} : {api_key: api_key} )
-    run('/account', :json, parameter)
-  end
+    # Get location using Location API
+    #
+    # @param [Hash] parameter must includes fields q, limit
+    # @return [Array<Hash>] list of matching location
+    # 
+    # example: spec/serpapi/location_api_spec.rb
+    def location(parameter = {})
+      run('/locations.json', :json, parameter)
+    end
 
-  # @return [String] default search engine
-  def engine
-    @default['engine'] || @default[:engine]
-  end
+    # Retrieve search result from the Search Archive API
+    #
+    # @param [String|Integer] search_id is returned 
+    # @param [Symbol] format :json or :html (default: json, optional)
+    # @return [String|Hash] raw html or 
+    # 
+    def search_archive(search_id, format = :json)
+      raise SerpApiException, 'format must be json or html' unless %i(json html).include?(format)
+      run("/searches/#{search_id}.#{format}", format, nil)
+    end
 
-  # @return [Hash] default parameter
-  def parameter
-    @default
-  end
+    # Get account information using Account API
+    # @param [String] optional api_key secret key
+    def account(api_key = nil)
+      parameter = (api_key.nil? ? {} : { api_key: api_key })
+      run('/account', :json, parameter)
+    end
 
-  # api_key
-  # @param [String] api_key set user secret API key (copy/paste from https://serpapi.com/dashboard)
-  def self.api_key=(api_key)
-    @default[:api_key] = api_key
-  end
+    # @return [String] default search engine
+    def engine
+      @default['engine'] || @default[:engine]
+    end
 
-  # @return [String] api_key default search key
-  def api_key
-    @default[:api_key]
-  end
+    # @return [Hash] default parameter
+    def parameter
+      @default
+    end
 
-  private
+    # api_key
+    # @param [String] api_key set user secret API key (copy/paste from https://serpapi.com/dashboard)
+    def self.api_key=(api_key)
+      @default[:api_key] = api_key
+    end
 
-  # build url
-  #
-  def build_url(path, parameter)
-    # force default
-    param = (@default || {}).merge(parameter || {})
+    # @return [String] api_key default search key
+    def api_key
+      @default[:api_key]
+    end
 
-    # set ruby client
-    param[:source] = 'ruby'
+    private
 
-    # delete empty key/value
-    param.delete_if { |_, value| value.nil? }
+    # build url
+    #
+    def build_url(path, parameter)
+      # force default
+      param = (@default || {}).merge(parameter || {})
 
-    # HTTP parameter encoding
-    q = URI.encode_www_form(param)
+      # set ruby client
+      param[:source] = 'ruby'
 
-    # return URL
-    URI::HTTPS.build(host: BACKEND, path: path, query: q)
-  end
+      # delete empty key/value
+      param.delete_if { |_, value| value.nil? }
 
-  # run HTTP query
-  def run(path, decoder = :json, parameter)
-    begin
+      # HTTP parameter encoding
+      q = URI.encode_www_form(param)
+
+      # return URL
+      URI::HTTPS.build(host: BACKEND, path: path, query: q)
+    end
+
+    # run HTTP query
+    def run(path, decoder = :json, parameter = {})
       url = build_url(path, parameter)
       payload = URI(url).open(read_timeout: @read_timeout).read
 
@@ -123,14 +131,13 @@ class Client
       when :html
         return payload
       else
-        raise SerpApiException("not supported decoder #{decoder}. should be: :html, :json")
+        raise SerpApiException, "not supported decoder #{decoder}. should be: :html or :json (Symbol)"
       end
-
     rescue OpenURI::HTTPError => e
-      data = JSON.load(e.io.read)
-      if err = data["error"]
+      data = JSON.parse(e.io.read)
+      if data.key?('error')
         puts "server returns an error for url: #{url}"
-        raise SerpApiException(err)
+        raise SerpApiException, data['error']
       else
         puts "fail: fetch url: #{url}"
         raise e
@@ -140,6 +147,5 @@ class Client
       raise e
     end
   end
-
-end
+  
 end

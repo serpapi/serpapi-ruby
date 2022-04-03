@@ -3,10 +3,14 @@ require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
 require 'yard'
 
+task readme: ['README.md.erb'] do
+  `erb -T '-' README.md.erb > README.md`
+end
+
 YARD::Rake::YardocTask.new(:doc) do |t|
- t.files   = ['lib/search/*.rb']
- t.options = ['--markup=markdown']
- t.stats_options = ['--list-undoc']
+  t.files   = ['lib/search/*.rb']
+  t.options = ['--markup=markdown']
+  t.stats_options = ['--list-undoc']
 end
 
 RSpec::Core::RakeTask.new(:test) do |t|
@@ -18,4 +22,4 @@ RuboCop::RakeTask.new(:lint) do |t|
   t.options = ['--display-cop-names']
 end
 
-task :default => [:doc, :test]
+task default: %i[readme doc test]

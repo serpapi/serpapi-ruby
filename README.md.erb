@@ -1,9 +1,17 @@
+<%-
+def snippet(format, path, start, stop) 
+ slice = File.new(path).readlines[start..stop]
+ slice.reject! { |l| l =~ /expect\(/ }
+ %Q(```#{format}\n#{slice.join}```\n see: #{path})
+end
+-%>
 # Scrape Google and other search engines from our fast, easy, and complete API using SerpApi.com
 #
 [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi)
 
 This Ruby Gem is meant to scrape and parse results from all major search engine available world wide including Google, Bing, Baidu, Yandex, Yahoo, Ebay, Apple and more using [SerpApi](https://serpapi.com).
+SerpApi.com returns JSON or HTML results. This library does automatically convert JSON in Hash using the json standard library from shipped with Ruby.
 
 SerpApi.com provides a [script builder](https://serpapi.com/demo) to get you started quickly.
 
@@ -142,10 +150,10 @@ Now let retrieve the previous client from the archive.
 
 ```ruby
 client = SerpApi::Client.new(api_key: ENV['API_KEY'])
-archive_search = client.search_archive(search_id)
-pp archive_search
+archive_results = client.search_archive(search_id)
+pp archive_results
 ```
-it prints the client from the archive.
+it prints the search results from archive.
 
 ### Account API
 ```ruby
@@ -156,33 +164,13 @@ it prints your account information.
 
 ## Basic example per search engine
 ### Search Google Images
-```ruby
-    client = SerpApi::Client.new(tbm: 'isch', api_key: ENV['API_KEY'], engine: 'google')
-    image_results_list = client.search(q: 'coffee')[:images_results]
-    image_results_list[0..2].each do |image_result|
-      puts image_result[:original]
-    end
-```
- see: spec/serpapi/example_search_google_images_spec.rb
+<%= snippet('ruby', 'spec/serpapi/example_search_google_images_spec.rb', 2, 7) %>
 
 This code prints the first 3 images links.
 To download the image on Linux you could do: `wget #{image_result[:original]}`
 
 ### Search youtube
-```ruby
-    client = SerpApi::Client.new(api_key: ENV['API_KEY'])
-    query = {
-      engine: "youtube",
-      search_query: "Coffee"
-    }
-    hash = client.search(query)
-    hash[:video_results][0..2].each do |video|
-      puts video[:link]
-    end
-  end
-end
-```
- see: spec/serpapi/example_search_youtube_spec.rb
+<%= snippet('ruby', 'spec/serpapi/example_search_youtube_spec.rb', 2, 132) %>
 
 ## Advanced search API usage
 
@@ -193,7 +181,7 @@ Search API enables to search `async`.
  - Blocking - async=false - it's more compute intensive because the client would need to hold many connections.
 
 ```ruby
-# MAANG company
+# target MAANG companies
 company_list = %w(meta amazon apple netflix google)
 client = SerpApi::Client.new({async: true, api_key: "secret_api_key"})
 search_queue = Queue.new
@@ -238,8 +226,7 @@ This code shows a simple implementation to run a batch of asynchronously searche
 ## Change log
  * [2022-03-20] 1.0.0 Full API support
 
-## Developer
-
+## Developer's note
 We love true open source, continuous integration and Test Drive Development (TDD).
  We are using RSpec to test [our infrastructure around the clock]) using github action in order to achieve the best QoS (Quality Of Service).
 
@@ -266,4 +253,5 @@ rake test
 ```
 
 Contributions are welcome, feel to submit a pull request!
+
 
