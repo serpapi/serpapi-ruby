@@ -23,7 +23,7 @@ module SerpApi
     # parameter:
     #  engine [String] search enginge selected
     #  api_key [String] user secret API key
-    #  read_timeout [Integer] HTTP read max timeout 
+    #  read_timeout [Integer] HTTP read max timeout
     #
     # @param [Hash] parameter default
     def initialize(parameter = {})
@@ -36,8 +36,12 @@ module SerpApi
 
     # perform a search using serpapi.com
     #
-    # @param [Hash] parameter search includes engine, api_key, search fields (override the default parameter set at initialization)
-    # @return [Hash] search results formatted as a Hash (raw HTML response from the search engine is converted to JSON by SerpApi.com)
+    # @param [Hash] parameter search includes engine, api_key, search fields and more..
+    #                this override the default parameter set in the constructor.
+    # @return [Hash] search results formatted as a Hash.
+    #                 note that the raw response
+    #                 from the search engine is converted to JSON by SerpApi.com backend.
+    #                 thus, most of the compute power is not pass on the client.
     #
     def search(parameter = {})
       run('/search', :json, parameter)
@@ -54,7 +58,7 @@ module SerpApi
     #
     # @param [Hash] parameter must includes fields q, limit
     # @return [Array<Hash>] list of matching location
-    # 
+    #
     # example: spec/serpapi/location_api_spec.rb
     def location(parameter = {})
       run('/locations.json', :json, parameter)
@@ -62,12 +66,12 @@ module SerpApi
 
     # Retrieve search result from the Search Archive API
     #
-    # @param [String|Integer] search_id is returned 
+    # @param [String|Integer] search_id is returned
     # @param [Symbol] format :json or :html (default: json, optional)
-    # @return [String|Hash] raw html or 
-    # 
+    # @return [String|Hash] raw html or
+    #
     def search_archive(search_id, format = :json)
-      raise SerpApiException, 'format must be json or html' unless %i(json html).include?(format)
+      raise SerpApiException, 'format must be json or html' unless %i[json html].include?(format)
       run("/searches/#{search_id}.#{format}", format, nil)
     end
 
@@ -131,7 +135,8 @@ module SerpApi
       when :html
         return payload
       else
-        raise SerpApiException, "not supported decoder #{decoder}. should be: :html or :json (Symbol)"
+        msg = "not supported decoder #{decoder}. should be: :html or :json (Symbol)"
+        raise SerpApiException, msg
       end
     rescue OpenURI::HTTPError => e
       data = JSON.parse(e.io.read)
@@ -147,5 +152,4 @@ module SerpApi
       raise e
     end
   end
-  
 end

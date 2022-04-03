@@ -23,7 +23,7 @@ describe 'basic google search using SerpApi.com' do
     rescue SerpApi::SerpApiException => e
       expect(e.message).to include('Missing query `q` parameter')
     rescue => e
-      fail("wrong exception: #{e}")
+      raise("wrong exception: #{e}")
     end
   end
 end
