@@ -1,0 +1,9 @@
+describe 'search google scholar' do
+  it 'prints organic results' do
+    client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_scholar')
+    results = client.search(q: 'coffee')
+    expect(results[:organic_results]).not_to be_nil
+    # pp results[:organic_results]
+    # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+  end
+end
