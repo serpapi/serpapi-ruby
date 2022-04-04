@@ -2,7 +2,9 @@
 def snippet(format, path, start, stop) 
  slice = File.new(path).readlines[start..stop]
  slice.reject! { |l| l =~ /expect\(/ }
- %Q(```#{format}\n#{slice.join}```\n see: #{path})
+ buf = slice.map { |l| l.gsub(/(^\s+)/, '')}.join
+ buf.gsub!('# pp ', 'pp ')
+ %Q(```#{format}\nrequire 'serpapi'\n#{buf}```\n see: #{path})
 end
 -%>
 # Scrape Google and other search engines from our fast, easy, and complete API using SerpApi.com
@@ -164,13 +166,81 @@ it prints your account information.
 
 ## Basic example per search engine
 ### Search Google Images
-<%= snippet('ruby', 'spec/serpapi/example_search_google_images_spec.rb', 2, 7) %>
+<%= snippet('ruby', 'spec/serpapi/example_search_google_images_spec.rb', 2, 6) %>
 
 This code prints the first 3 images links.
 To download the image on Linux you could do: `wget #{image_result[:original]}`
 
 ### Search youtube
-<%= snippet('ruby', 'spec/serpapi/example_search_youtube_spec.rb', 2, 132) %>
+<%= snippet('ruby', 'spec/serpapi/example_search_youtube_spec.rb', 2, 6) %>
+
+### Search bing
+<%= snippet('ruby', 'spec/serpapi/example_search_bing_spec.rb', 2, 6) %>
+(see https://serpapi.com/bing)[https://serpapi.com/bing]
+
+### Search baidu
+<%= snippet('ruby', 'spec/serpapi/example_search_baidu_spec.rb', 2, 6) %>
+(see https://serpapi.com/baidu)[https://serpapi.com/baidu]
+
+### Search yahoo
+<%= snippet('ruby', 'spec/serpapi/example_search_yahoo_spec.rb', 2, 6) %>
+(see https://serpapi.com/yahoo)[https://serpapi.com/yahoo]
+
+### Search walmart
+<%= snippet('ruby', 'spec/serpapi/example_search_walmart_spec.rb', 2, 6) %>
+(see https://serpapi.com/wallmart)[https://serpapi.com/walmart]
+
+### Search ebay
+<%= snippet('ruby', 'spec/serpapi/example_search_ebay_spec.rb', 2, 6) %>
+(see https://serpapi.com/ebay)[https://serpapi.com/ebay]
+
+### Search homedepot
+<%= snippet('ruby', 'spec/serpapi/example_search_homedepot_spec.rb', 2, 6) %>
+(see https://serpapi.com/homedepot)[https://serpapi.com/homedepot]
+
+### Search apple app store
+<%= snippet('ruby', 'spec/serpapi/example_search_apple_app_store_spec.rb', 2, 6) %>
+(see https://serpapi.com/apple_app_store)[https://serpapi.com/apple_app_store]
+
+### Search duckduckgo
+<%= snippet('ruby', 'spec/serpapi/example_search_duckduckgo_spec.rb', 2, 6) %>
+(see https://serpapi.com/duckduckgo)[https://serpapi.com/duckduckgo]
+
+### Search naver
+<%= snippet('ruby', 'spec/serpapi/example_search_naver_spec.rb', 2, 6) %>
+(see https://serpapi.com/naver)[https://serpapi.com/naver]
+
+### Search google scholar
+<%= snippet('ruby', 'spec/serpapi/example_search_google_scholar_spec.rb', 2, 6) %>
+(see https://serpapi.com/google_scholar)[https://serpapi.com/google_scholar]
+
+### Search google play
+<%= snippet('ruby', 'spec/serpapi/example_search_google_play_spec.rb', 2, 6) %>
+(see https://serpapi.com/google_play)[https://serpapi.com/google_play]
+
+### Search google product
+<%= snippet('ruby', 'spec/serpapi/example_search_google_product_spec.rb', 2, 6) %>
+(see https://serpapi.com/google_product)[https://serpapi.com/google_product]
+
+### Search google reverse image
+<%= snippet('ruby', 'spec/serpapi/example_search_google_reverse_image_spec.rb', 2, 6) %>
+(see https://serpapi.com/google_reverse_image)[https://serpapi.com/google_reverse_image]
+
+### Search google events
+<%= snippet('ruby', 'spec/serpapi/example_search_google_events_spec.rb', 2, 6) %>
+(see https://serpapi.com/google_events)[https://serpapi.com/google_events]
+
+### Search google local services
+<%= snippet('ruby', 'spec/serpapi/example_search_google_local_services_spec.rb', 2, 6) %>
+(see https://serpapi.com/google_local_services)[https://serpapi.com/google_local_services]
+
+### Search google maps
+<%= snippet('ruby', 'spec/serpapi/example_search_google_maps_spec.rb', 2, 6) %>
+(see https://serpapi.com/google_maps)[https://serpapi.com/google_maps]
+
+### Search google jobs
+<%= snippet('ruby', 'spec/serpapi/example_search_google_jobs_spec.rb', 2, 6) %>
+(see https://serpapi.com/google_jobs)[https://serpapi.com/google_jobs]
 
 ## Advanced search API usage
 
@@ -227,6 +297,28 @@ This code shows a simple implementation to run a batch of asynchronously searche
  * [2022-03-20] 1.0.0 Full API support
 
 ## Developer's note
+### Key goals
+ - Brand centric instead of search engine based
+   - No hard coded logic per search engine
+ - Simple HTTP client (lightweight, reduced dependency)
+   - No magic default values
+   - Thread safe
+ - Easy to extends
+ - Defensive code style (raise cutsom exception)
+ - TDD
+ - Best API coding pratice per platform
+
+### Design
+To write this Ruby code we learn from the most favous Ruby available on rubygems.
+ - Nokogiri
+ - Cloudfare
+ - rest-client\
+ 
+### Quality expectation
+ - 0 lint issues using pylint `make lint`
+ - 99% code coverage running `make test`
+
+### CI
 We love true open source, continuous integration and Test Drive Development (TDD).
  We are using RSpec to test [our infrastructure around the clock]) using github action in order to achieve the best QoS (Quality Of Service).
 
@@ -241,17 +333,19 @@ Install testing dependency
 ```bash
 gem install rspec
 ```
-
-To run the test:
+Check code quality using lint 
 ```bash
-rspec test
+rake lint
 ```
 
-or if you prefer Rake
+Run regression
 ```bash
 rake test
 ```
-
 Contributions are welcome, feel to submit a pull request!
 
 
+# TODO
+ - [] release
+ - [] code coverage
+ - [] CI integration
