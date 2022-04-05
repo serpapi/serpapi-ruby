@@ -1,20 +1,15 @@
 name: serpapi-ruby 
-
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
     branches: [ master ]
-
 jobs:
   test:
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        ruby-version: [3.0.0, 2.5.2, 2.2]
-
+        ruby-version: [3.0.3, 2.5.2, 2.7.5]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby ${{ matrix.ruby-version }}

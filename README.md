@@ -472,5 +472,4 @@ Contributions are welcome, feel to submit a pull request!
 
 # TODO
  - [] release
- - [] code coverage
- - [] CI integration
+ - [] CI integration with code coverage report
