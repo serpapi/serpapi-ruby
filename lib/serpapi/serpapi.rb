@@ -44,14 +44,14 @@ module SerpApi
     #                 thus, most of the compute power is not pass on the client.
     #
     def search(parameter = {})
-      run('/search', :json, parameter)
+      start('/search', :json, parameter)
     end
 
     # html search
     #
     # @return [String] raw html search results directly from the search engine
     def html(parameter = {})
-      run('/search', :html, parameter)
+      start('/search', :html, parameter)
     end
 
     # Get location using Location API
@@ -61,7 +61,7 @@ module SerpApi
     #
     # example: spec/serpapi/location_api_spec.rb
     def location(parameter = {})
-      run('/locations.json', :json, parameter)
+      start('/locations.json', :json, parameter)
     end
 
     # Retrieve search result from the Search Archive API
@@ -72,14 +72,14 @@ module SerpApi
     #
     def search_archive(search_id, format = :json)
       raise SerpApiException, 'format must be json or html' unless %i[json html].include?(format)
-      run("/searches/#{search_id}.#{format}", format, nil)
+      start("/searches/#{search_id}.#{format}", format, nil)
     end
 
     # Get account information using Account API
     # @param [String] optional api_key secret key
     def account(api_key = nil)
       parameter = (api_key.nil? ? {} : { api_key: api_key })
-      run('/account', :json, parameter)
+      start('/account', :json, parameter)
     end
 
     # @return [String] default search engine
@@ -90,12 +90,6 @@ module SerpApi
     # @return [Hash] default parameter
     def parameter
       @default
-    end
-
-    # api_key
-    # @param [String] api_key set user secret API key (copy/paste from https://serpapi.com/dashboard)
-    def self.api_key=(api_key)
-      @default[:api_key] = api_key
     end
 
     # @return [String] api_key default search key
@@ -124,32 +118,37 @@ module SerpApi
       URI::HTTPS.build(host: BACKEND, path: path, query: q)
     end
 
-    # run HTTP query
-    def run(path, decoder = :json, parameter = {})
+    # start HTTP query
+    def start(path, decoder = :json, parameter = {})
       url = build_url(path, parameter)
-      payload = URI(url).open(read_timeout: @read_timeout).read
+      payload = get(url)
+      return decode(payload, decoder)
+    rescue OpenURI::HTTPError => e
+      data = JSON.parse(e.io.read)
+      if data.key?('error')
+        raise SerpApiException, "error: #{data['error']} from url: #{url}"
+      end
+      raise SerpApiException, "fail: get url: #{url} response: #{data}"
+    rescue => e
+      raise SerpApiException, "fail: get url: #{url} caused by: #{e}"
+    end
 
+    # get URL content
+    def get(url)
+      URI(url).open(read_timeout: read_timeout).read
+    end
+
+    # decode payload using json or html
+    def decode(payload, decoder)
       case decoder
       when :json
-        return JSON.parse(payload, symbolize_names: true)
+        JSON.parse(payload, symbolize_names: true)
       when :html
-        return payload
+        payload
       else
         msg = "not supported decoder #{decoder}. should be: :html or :json (Symbol)"
         raise SerpApiException, msg
       end
-    rescue OpenURI::HTTPError => e
-      data = JSON.parse(e.io.read)
-      if data.key?('error')
-        puts "server returns an error for url: #{url}"
-        raise SerpApiException, data['error']
-      else
-        puts "fail: fetch url: #{url}"
-        raise e
-      end
-    rescue => e
-      puts "fail: fetch url: #{url}"
-      raise e
     end
   end
 end

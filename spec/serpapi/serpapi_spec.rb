@@ -6,10 +6,10 @@ describe 'basic google search using SerpApi.com' do
   end
 
   it 'search for coffee in Austin, TX and receive json results' do
-    json = @search.search(q: 'Coffee', location: 'Austin, TX')
-    expect(json.size).to be > 7
-    expect(json.class).to be Hash
-    expect(json.keys.size).to be > 5
+    data = @search.search(q: 'Coffee', location: 'Austin, TX')
+    expect(data.size).to be > 5
+    expect(data.class).to be Hash
+    expect(data.keys.size).to be > 5
   end
 
   it 'search fir coffee in Austin, TX and receive raw HTML' do
@@ -22,6 +22,33 @@ describe 'basic google search using SerpApi.com' do
       @search.search({})
     rescue SerpApi::SerpApiException => e
       expect(e.message).to include('Missing query `q` parameter')
+    rescue => e
+      raise("wrong exception: #{e}")
+    end
+  end
+
+  it 'get parameter' do
+    expect(@search.parameter[:api_key]).to eq(ENV['API_KEY'])
+    expect(@search.api_key).to eq(ENV['API_KEY'])
+    expect(@search.parameter[:engine]).to eq('google')
+  end
+
+  it 'start bad decoder' do
+    begin
+      @search.send(:start, '/search', :bad, {q: 'hello'})
+    rescue SerpApi::SerpApiException => e
+      expect(e.message).to include('not supported decoder')
+    rescue => e
+      raise("wrong exception: #{e}")
+    end
+  end
+
+  it 'fail: get url' do
+    allow(JSON).to receive(:parse) { {} }
+    begin
+      @search.search({})
+    rescue SerpApi::SerpApiException => e
+      expect(e.message).to include('fail: get url')
     rescue => e
       raise("wrong exception: #{e}")
     end
