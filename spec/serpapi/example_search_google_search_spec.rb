@@ -1,8 +1,9 @@
-describe 'search yahoo' do
+describe 'search google search' do
   it 'prints organic_results' do
-    client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'yahoo')
+    client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_search')
     results = client.search({
-      "p": "coffee"
+      "q": "coffee",
+      "engine": "google"
     })
     expect(results[:organic_results]).not_to be_nil
     # pp results[:organic_results]

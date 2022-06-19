@@ -156,37 +156,17 @@ pp client.account
 it prints your account information.
 
 ## Basic example per search engine
-### Search Google Images
-```ruby
-require 'serpapi'
-client = SerpApi::Client.new(tbm: 'isch', api_key: ENV['API_KEY'], engine: 'google')
-image_results_list = client.search(q: 'coffee')[:images_results]
-image_results_list[0..2].each do |image_result|
-puts image_result[:original]
-```
- see: spec/serpapi/example_search_google_images_spec.rb
-
-This code prints the first 3 images links.
-To download the image on Linux you could do: `wget #{image_result[:original]}`
-
-### Search youtube
-```ruby
-require 'serpapi'
-client = SerpApi::Client.new(api_key: ENV['API_KEY'])
-query = {
-engine: 'youtube',
-search_query: 'Coffee'
-}
-```
- see: spec/serpapi/example_search_youtube_spec.rb
 
 ### Search bing
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'bing')
-results = client.search(q: 'coffee')
+results = client.search({
+"q": "coffee"
+})
 pp results[:organic_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
  see: spec/serpapi/example_search_bing_spec.rb
 (see https://serpapi.com/bing)[https://serpapi.com/bing]
@@ -195,9 +175,12 @@ pp results[:organic_results]
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'baidu')
-results = client.search(q: 'coffee')
+results = client.search({
+"q": "coffee"
+})
 pp results[:organic_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
  see: spec/serpapi/example_search_baidu_spec.rb
 (see https://serpapi.com/baidu)[https://serpapi.com/baidu]
@@ -206,53 +189,96 @@ pp results[:organic_results]
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'yahoo')
-results = client.search(p: 'coffee')
+results = client.search({
+"p": "coffee"
+})
 pp results[:organic_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
  see: spec/serpapi/example_search_yahoo_spec.rb
 (see https://serpapi.com/yahoo)[https://serpapi.com/yahoo]
+
+### Search youtube
+```ruby
+require 'serpapi'
+client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'youtube')
+results = client.search({
+"search_query": "coffee"
+})
+pp results[:video_results]
+# ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
+```
+ see: spec/serpapi/example_search_youtube_spec.rb
+(see https://serpapi.com/youtube)[https://serpapi.com/youtube]
 
 ### Search walmart
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'walmart')
-results = client.search(query: 'coffee')
+results = client.search({
+"query": "coffee"
+})
 pp results[:organic_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
  see: spec/serpapi/example_search_walmart_spec.rb
-(see https://serpapi.com/wallmart)[https://serpapi.com/walmart]
+(see https://serpapi.com/walmart)[https://serpapi.com/walmart]
 
 ### Search ebay
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'ebay')
-results = client.search(_nkw: 'coffee')
+results = client.search({
+"_nkw": "coffee"
+})
 pp results[:organic_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
  see: spec/serpapi/example_search_ebay_spec.rb
 (see https://serpapi.com/ebay)[https://serpapi.com/ebay]
 
-### Search homedepot
+### Search naver
+```ruby
+require 'serpapi'
+client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'naver')
+results = client.search({
+"query": "coffee"
+})
+pp results[:ads_results]
+# ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
+```
+ see: spec/serpapi/example_search_naver_spec.rb
+(see https://serpapi.com/naver)[https://serpapi.com/naver]
+
+### Search home depot
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'home_depot')
-results = client.search(q: 'table')
+results = client.search({
+"q": "table"
+})
 pp results[:products]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
- see: spec/serpapi/example_search_homedepot_spec.rb
-(see https://serpapi.com/homedepot)[https://serpapi.com/homedepot]
+ see: spec/serpapi/example_search_home_depot_spec.rb
+(see https://serpapi.com/home_depot)[https://serpapi.com/home_depot]
 
 ### Search apple app store
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'apple_app_store')
-results = client.search(term: 'coffee')
+results = client.search({
+"term": "coffee"
+})
 pp results[:organic_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
  see: spec/serpapi/example_search_apple_app_store_spec.rb
 (see https://serpapi.com/apple_app_store)[https://serpapi.com/apple_app_store]
@@ -261,51 +287,66 @@ pp results[:organic_results]
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'duckduckgo')
-results = client.search(q: 'coffee')
+results = client.search({
+"q": "coffee"
+})
 pp results[:organic_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
  see: spec/serpapi/example_search_duckduckgo_spec.rb
 (see https://serpapi.com/duckduckgo)[https://serpapi.com/duckduckgo]
 
-### Search naver
+### Search google search
 ```ruby
 require 'serpapi'
-client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'naver')
-results = client.search(query: 'coffee')
-pp results[:ads_results]
+client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_search')
+results = client.search({
+"q": "coffee",
+"engine": "google"
+})
+pp results[:organic_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
 ```
- see: spec/serpapi/example_search_naver_spec.rb
-(see https://serpapi.com/naver)[https://serpapi.com/naver]
+ see: spec/serpapi/example_search_google_search_spec.rb
+(see https://serpapi.com/google_search)[https://serpapi.com/google_search]
 
 ### Search google scholar
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_scholar')
-results = client.search(q: 'coffee')
+results = client.search({
+"q": "coffee"
+})
 pp results[:organic_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
  see: spec/serpapi/example_search_google_scholar_spec.rb
 (see https://serpapi.com/google_scholar)[https://serpapi.com/google_scholar]
 
-### Search google play
+### Search google autocomplete
 ```ruby
 require 'serpapi'
-client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_play', store: 'apps')
-results = client.search(q: 'coffee')
-pp results[:organic_results]
+client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_autocomplete')
+results = client.search({
+"q": "coffee"
+})
+pp results[:suggestions]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
- see: spec/serpapi/example_search_google_play_spec.rb
-(see https://serpapi.com/google_play)[https://serpapi.com/google_play]
+ see: spec/serpapi/example_search_google_autocomplete_spec.rb
+(see https://serpapi.com/google_autocomplete)[https://serpapi.com/google_autocomplete]
 
 ### Search google product
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_product')
-results = client.search(product_id: '4172129135583325756')
+results = client.search({
+"q": "coffee",
+"product_id": "4172129135583325756"
+})
 pp results[:product_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
 ```
@@ -316,9 +357,12 @@ pp results[:product_results]
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_reverse_image')
-results = client.search(image_url: 'https://i.imgur.com/5bGzZi7.jpg')
+results = client.search({
+"image_url": "https://i.imgur.com/5bGzZi7.jpg"
+})
 pp results[:image_sizes]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
  see: spec/serpapi/example_search_google_reverse_image_spec.rb
 (see https://serpapi.com/google_reverse_image)[https://serpapi.com/google_reverse_image]
@@ -327,9 +371,12 @@ pp results[:image_sizes]
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_events')
-results = client.search(q: 'Events in Austin')
+results = client.search({
+"q": "coffee"
+})
 pp results[:events_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
  see: spec/serpapi/example_search_google_events_spec.rb
 (see https://serpapi.com/google_events)[https://serpapi.com/google_events]
@@ -338,7 +385,10 @@ pp results[:events_results]
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_local_services')
-results = client.search(q: 'Electrician', place_id: 'ChIJOwg_06VPwokRYv534QaPC8g')
+results = client.search({
+"q": "Electrician",
+"place_id": "ChIJOwg_06VPwokRYv534QaPC8g"
+})
 pp results[:local_ads]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
 ```
@@ -349,9 +399,12 @@ pp results[:local_ads]
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_maps')
-results = client.search(q: 'pizza',
-ll: '@40.7455096,-74.0083012,15.1z',
-type: 'search')
+results = client.search({
+"q": "pizza",
+"ll": "@40.7455096,-74.0083012,15.1z",
+"type": "search"
+})
+pp results[:local_results]
 ```
  see: spec/serpapi/example_search_google_maps_spec.rb
 (see https://serpapi.com/google_maps)[https://serpapi.com/google_maps]
@@ -360,15 +413,45 @@ type: 'search')
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_jobs')
-results = client.search(q: 'barista new york')
+results = client.search({
+"q": "coffee"
+})
 pp results[:jobs_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+end
 ```
  see: spec/serpapi/example_search_google_jobs_spec.rb
 (see https://serpapi.com/google_jobs)[https://serpapi.com/google_jobs]
 
-## Advanced search API usage
+### Search google play
+```ruby
+require 'serpapi'
+xit 'prints organic_results' do
+client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_play')
+results = client.search({
+"q": "kite",
+"store": "apps"
+})
+pp results[:organic_results]
+```
+ see: spec/serpapi/example_search_google_play_spec.rb
+(see https://serpapi.com/google_play)[https://serpapi.com/google_play]
 
+### Search google images
+```ruby
+require 'serpapi'
+client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_images')
+results = client.search({
+"engine": "google",
+"tbm": "isch",
+"q": "coffee"
+})
+pp results[:images_results]
+```
+ see: spec/serpapi/example_search_google_images_spec.rb
+(see https://serpapi.com/google_images)[https://serpapi.com/google_images]
+
+## Advanced search API usage
 ### Batch Asynchronous client
 
 Search API enables to search `async`.
@@ -443,7 +526,32 @@ To write this Ruby code we learn from the most favous Ruby available on rubygems
  - 0 lint issues using pylint `make lint`
  - 99% code coverage running `make test`
 
-### CI
+# Developer Guide
+## Design : UML diagram
+```mermaid
+classDiagram
+  CustomClient *-- Client
+  class Client {
+    engine: String
+    api_key: String
+    parameter: Hash
+    search()
+    html()
+    location()
+    search_archive()
+    account()
+  }
+```
+## search() : Sequence diagram
+```mermaid
+sequenceDiagram
+    Client->>SerpApi.com: search() : http request 
+    SerpApi.com-->>SerpApi.com: query search engine
+    SerpApi.com-->>SerpApi.com: parse HTML into JSON
+    SerpApi.com-->>Client: JSON string payload
+    Client-->>Client: decode JSON into Hash
+```
+## Continuous integration
 We love true open source, continuous integration and Test Drive Development (TDD).
  We are using RSpec to test [our infrastructure around the clock]) using github action in order to achieve the best QoS (Quality Of Service).
 
@@ -456,8 +564,9 @@ export API_KEY="your secret key"
 
 Install testing dependency
 ```bash
-gem install rspec
+bundle install
 ```
+
 Check code quality using lint 
 ```bash
 rake lint
@@ -469,7 +578,7 @@ rake test
 ```
 Contributions are welcome, feel to submit a pull request!
 
-
 # TODO
- - [] release
- - [] CI integration with code coverage report
+ - [] Release
+ - [] code coverage
+ - [] CI integration
