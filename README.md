@@ -1,5 +1,6 @@
-# Scrape Google and other search engines from our fast, easy, and complete API using SerpApi.com
-#
+# serpapi-ruby : User Guide
+Scrape Google and other search engines from our fast, easy, and complete API using SerpApi.com
+
 [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi)
 
@@ -18,12 +19,12 @@ $ gem install serpapi
 
 [Link to the gem page](https://rubygems.org/gems/serpapi/)
 
-Tested Ruby versions:
- - 2.2
- - 2.5.2
- - 3.0.0
+Ruby versions validated by Github action:
+ - 3.1.2
+ - 2.7.5
+ - 2.6.9
 
-see: Git hub actions.
+see: (https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)[Git hub actions.]
 
 ## Quick start
 
@@ -49,27 +50,7 @@ Et voila..
 
 See the [playground to generate your code.](https://serpapi.com/playground)
 
-### Summary
-- [Installation](#installation)
-- [Quick start](#quick-start)
-- [API Guide](#guide)
-  - [Search API overview](#search-api-overview)
-  - [Example by specification](#example-by-specification)
-  - [Location API](#location-api)
-  - [Search Archive API](#client-archive-api)
-  - [Account API](#account-api)'
-- [Basic example per search engine](#basic-example-per-search-engine)
-  - [Search Google Images](#search-google-images)
-- [Advanced search API usage](#advanced-search-api-usage)
-  - [SerpApi client](#serpapi-client)
-  - [Batch Asynchronous client](#batch-asynchronous-client)
-- [Change log](#change-log)
-- [Roadmap](#roadmap)
-- [Conclusion](#conclusion)
-- [Contributing](#contributing)
-
 ## API Guide
-
 ### Search API overview
 ```ruby
 # initialize the client
@@ -169,7 +150,7 @@ pp results[:organic_results]
 end
 ```
  see: spec/serpapi/example_search_bing_spec.rb
-(see https://serpapi.com/bing)[https://serpapi.com/bing]
+see: [https://serpapi.com/bing-search-api(https://serpapi.com/bing-search-api)
 
 ### Search baidu
 ```ruby
@@ -183,7 +164,7 @@ pp results[:organic_results]
 end
 ```
  see: spec/serpapi/example_search_baidu_spec.rb
-(see https://serpapi.com/baidu)[https://serpapi.com/baidu]
+see: [https://serpapi.com/baidu-search-api(https://serpapi.com/baidu-search-api)
 
 ### Search yahoo
 ```ruby
@@ -197,7 +178,7 @@ pp results[:organic_results]
 end
 ```
  see: spec/serpapi/example_search_yahoo_spec.rb
-(see https://serpapi.com/yahoo)[https://serpapi.com/yahoo]
+see: [https://serpapi.com/yahoo-search-api(https://serpapi.com/yahoo-search-api)
 
 ### Search youtube
 ```ruby
@@ -211,7 +192,7 @@ pp results[:video_results]
 end
 ```
  see: spec/serpapi/example_search_youtube_spec.rb
-(see https://serpapi.com/youtube)[https://serpapi.com/youtube]
+see: [https://serpapi.com/youtube-search-api(https://serpapi.com/youtube-search-api)
 
 ### Search walmart
 ```ruby
@@ -225,7 +206,7 @@ pp results[:organic_results]
 end
 ```
  see: spec/serpapi/example_search_walmart_spec.rb
-(see https://serpapi.com/walmart)[https://serpapi.com/walmart]
+see: [https://serpapi.com/walmart-search-api(https://serpapi.com/walmart-search-api)
 
 ### Search ebay
 ```ruby
@@ -239,7 +220,7 @@ pp results[:organic_results]
 end
 ```
  see: spec/serpapi/example_search_ebay_spec.rb
-(see https://serpapi.com/ebay)[https://serpapi.com/ebay]
+see: [https://serpapi.com/ebay-search-api(https://serpapi.com/ebay-search-api)
 
 ### Search naver
 ```ruby
@@ -253,7 +234,7 @@ pp results[:ads_results]
 end
 ```
  see: spec/serpapi/example_search_naver_spec.rb
-(see https://serpapi.com/naver)[https://serpapi.com/naver]
+see: [https://serpapi.com/naver-search-api(https://serpapi.com/naver-search-api)
 
 ### Search home depot
 ```ruby
@@ -267,7 +248,7 @@ pp results[:products]
 end
 ```
  see: spec/serpapi/example_search_home_depot_spec.rb
-(see https://serpapi.com/home_depot)[https://serpapi.com/home_depot]
+see: [https://serpapi.com/home-depot-search-api(https://serpapi.com/home-depot-search-api)
 
 ### Search apple app store
 ```ruby
@@ -281,7 +262,7 @@ pp results[:organic_results]
 end
 ```
  see: spec/serpapi/example_search_apple_app_store_spec.rb
-(see https://serpapi.com/apple_app_store)[https://serpapi.com/apple_app_store]
+see: [https://serpapi.com/apple-app-store(https://serpapi.com/apple-app-store)
 
 ### Search duckduckgo
 ```ruby
@@ -295,7 +276,7 @@ pp results[:organic_results]
 end
 ```
  see: spec/serpapi/example_search_duckduckgo_spec.rb
-(see https://serpapi.com/duckduckgo)[https://serpapi.com/duckduckgo]
+see: [https://serpapi.com/duckduckgo-search-api(https://serpapi.com/duckduckgo-search-api)
 
 ### Search google search
 ```ruby
@@ -309,7 +290,7 @@ pp results[:organic_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
 ```
  see: spec/serpapi/example_search_google_search_spec.rb
-(see https://serpapi.com/google_search)[https://serpapi.com/google_search]
+see: [https://serpapi.com/search-api(https://serpapi.com/search-api)
 
 ### Search google scholar
 ```ruby
@@ -323,7 +304,7 @@ pp results[:organic_results]
 end
 ```
  see: spec/serpapi/example_search_google_scholar_spec.rb
-(see https://serpapi.com/google_scholar)[https://serpapi.com/google_scholar]
+see: [https://serpapi.com/google-scholar-api(https://serpapi.com/google-scholar-api)
 
 ### Search google autocomplete
 ```ruby
@@ -337,7 +318,7 @@ pp results[:suggestions]
 end
 ```
  see: spec/serpapi/example_search_google_autocomplete_spec.rb
-(see https://serpapi.com/google_autocomplete)[https://serpapi.com/google_autocomplete]
+see: [https://serpapi.com/google-autocomplete-api(https://serpapi.com/google-autocomplete-api)
 
 ### Search google product
 ```ruby
@@ -351,7 +332,7 @@ pp results[:product_results]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
 ```
  see: spec/serpapi/example_search_google_product_spec.rb
-(see https://serpapi.com/google_product)[https://serpapi.com/google_product]
+see: [https://serpapi.com/google-product-api(https://serpapi.com/google-product-api)
 
 ### Search google reverse image
 ```ruby
@@ -365,7 +346,7 @@ pp results[:image_sizes]
 end
 ```
  see: spec/serpapi/example_search_google_reverse_image_spec.rb
-(see https://serpapi.com/google_reverse_image)[https://serpapi.com/google_reverse_image]
+see: [https://serpapi.com/google-reverse-image(https://serpapi.com/google-reverse-image)
 
 ### Search google events
 ```ruby
@@ -379,7 +360,7 @@ pp results[:events_results]
 end
 ```
  see: spec/serpapi/example_search_google_events_spec.rb
-(see https://serpapi.com/google_events)[https://serpapi.com/google_events]
+see: [https://serpapi.com/google-events-api(https://serpapi.com/google-events-api)
 
 ### Search google local services
 ```ruby
@@ -393,7 +374,7 @@ pp results[:local_ads]
 # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
 ```
  see: spec/serpapi/example_search_google_local_services_spec.rb
-(see https://serpapi.com/google_local_services)[https://serpapi.com/google_local_services]
+see: [https://serpapi.com/google-local-services-api(https://serpapi.com/google-local-services-api)
 
 ### Search google maps
 ```ruby
@@ -407,7 +388,7 @@ results = client.search({
 pp results[:local_results]
 ```
  see: spec/serpapi/example_search_google_maps_spec.rb
-(see https://serpapi.com/google_maps)[https://serpapi.com/google_maps]
+see: [https://serpapi.com/google-maps-api(https://serpapi.com/google-maps-api)
 
 ### Search google jobs
 ```ruby
@@ -421,21 +402,21 @@ pp results[:jobs_results]
 end
 ```
  see: spec/serpapi/example_search_google_jobs_spec.rb
-(see https://serpapi.com/google_jobs)[https://serpapi.com/google_jobs]
+see: [https://serpapi.com/google-jobs-api(https://serpapi.com/google-jobs-api)
 
 ### Search google play
 ```ruby
 require 'serpapi'
-xit 'prints organic_results' do
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_play')
 results = client.search({
 "q": "kite",
 "store": "apps"
 })
 pp results[:organic_results]
+# ENV['API_KEY'] captures the secret user API available from http://serpapi.com
 ```
  see: spec/serpapi/example_search_google_play_spec.rb
-(see https://serpapi.com/google_play)[https://serpapi.com/google_play]
+see: [https://serpapi.com/google-play-api(https://serpapi.com/google-play-api)
 
 ### Search google images
 ```ruby
@@ -449,7 +430,7 @@ results = client.search({
 pp results[:images_results]
 ```
  see: spec/serpapi/example_search_google_images_spec.rb
-(see https://serpapi.com/google_images)[https://serpapi.com/google_images]
+see: [https://serpapi.com/images-results(https://serpapi.com/images-results)
 
 ## Advanced search API usage
 ### Batch Asynchronous client
@@ -504,7 +485,7 @@ This code shows a simple implementation to run a batch of asynchronously searche
 ## Change log
  * [2022-03-20] 1.0.0 Full API support
 
-## Developer's note
+## Developer Guide
 ### Key goals
  - Brand centric instead of search engine based
    - No hard coded logic per search engine
@@ -515,17 +496,18 @@ This code shows a simple implementation to run a batch of asynchronously searche
  - Defensive code style (raise cutsom exception)
  - TDD
  - Best API coding pratice per platform
+ - KiSS principles
 
-### Design
-To write this Ruby code we learn from the most favous Ruby available on rubygems.
+### Inspirations
+This project source code was inspired by the most awesome Ruby Gems:
  - Nokogiri
  - Cloudfare
- - rest-client\
+ - rest-client
  
-### Quality expectation
- - 0 lint issues using pylint `make lint`
- - 99% code coverage running `make test`
-
+### Quality expectations
+ - 0 lint offense: `make lint`
+ - 100% tests passing: `make test`
+ - 100% code coverage: `make test` (simple-cov)
 # Developer Guide
 ## Design : UML diagram
 ```mermaid
@@ -561,24 +543,32 @@ Set your api key to allow the tests to run.
 ```bash
 export API_KEY="your secret key"
 ```
-
 Install testing dependency
 ```bash
-bundle install
+$ bundle install
+#or
+$ rake dependency
 ```
 
 Check code quality using lint 
 ```bash
-rake lint
+$ rake lint
 ```
 
 Run regression
 ```bash
-rake test
+$ rake test
 ```
+
+To flush the flow.
+```bash
+$ rake
+```
+
+open Rakefile for more information.
+
 Contributions are welcome, feel to submit a pull request!
 
 # TODO
  - [] Release
- - [] code coverage
- - [] CI integration
+ - [] CI integration issues

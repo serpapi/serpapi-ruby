@@ -32,3 +32,6 @@ test.rb
 
 Gemfile.lock
 build_table.rb
+
+# local script only
+/script

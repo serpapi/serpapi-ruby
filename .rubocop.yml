@@ -11,3 +11,4 @@ AllCops:
   Exclude:
     - 'serpapi.gemspec'
     - 'spec/serpapi/*_spec.rb'
+    - 'script/*'
