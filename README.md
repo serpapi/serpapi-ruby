@@ -53,11 +53,14 @@ See the [playground to generate your code.](https://serpapi.com/playground)
 ## API Guide
 ### Search API overview
 ```ruby
-# initialize the client
+# load gem
+require 'serpapi'
+
+# serpapi client initialization with default parameter
 client = SerpApi::Client.new(api_key: "private key")
 
-# search query
-query = {
+# search query overview (more fields available depending on search engine)
+parameter = {
   engine: "google", # full list: https://serpapi.com/search-api
   q: "client",
   google_domain: "Google Domain",
@@ -75,20 +78,21 @@ query = {
 
 # formated search results as a Hash
 #  serpapi.com converts HTML -> JSON 
-results = client.search(query)
+results = client.search(parameter)
 
-# raw html as a String
-#  serpapi.com acts a proxy to provive high throughputs
-doc = client.html(query)
+# raw search engine html as a String
+#  serpapi.com acts a proxy to provive high throughputs, no search limit and more.
+raw_html = client.html(parameter)
 ```
 
-(The full documentation)[https://serpapi.com/client-api].
+(The full documentation)[https://serpapi.com/search-api].
 More hands on examples are available belows.
 
 
 ### Location API
 
 ```ruby
+require 'serpapi'
 client = SerpApi::Client.new() 
 location_list = client.location(q: "Austin", limit: 3)
 puts "number of location: #{location_list.size}"
@@ -115,6 +119,7 @@ it prints the first 3 location matching Austin (Texas, Texas, Rochester)
 This API allows to retrieve previous client.
 To do so run a client to save a search_id.
 ```ruby
+require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google')
 original_search = client.search(q: "Coffee", location: "Portland")
 search_id = original_search[:search_metadata][:id]
@@ -123,6 +128,7 @@ search_id = original_search[:search_metadata][:id]
 Now let retrieve the previous client from the archive.
 
 ```ruby
+require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'])
 archive_results = client.search_archive(search_id)
 pp archive_results
@@ -131,6 +137,7 @@ it prints the search results from archive.
 
 ### Account API
 ```ruby
+require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'])
 pp client.account
 ```
@@ -440,6 +447,7 @@ Search API enables to search `async`.
  - Blocking - async=false - it's more compute intensive because the client would need to hold many connections.
 
 ```ruby
+require 'serpapi'
 # target MAANG companies
 company_list = %w(meta amazon apple netflix google)
 client = SerpApi::Client.new({async: true, api_key: "secret_api_key"})
