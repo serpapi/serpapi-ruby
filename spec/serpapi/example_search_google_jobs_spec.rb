@@ -1,5 +1,5 @@
 describe 'search google jobs' do
-  it 'prints jobs_results' do
+  xit 'prints jobs_results' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_jobs')
     results = client.search({
       "q": "coffee"
