@@ -24,7 +24,7 @@ Ruby versions validated by Github action:
  - 2.7.5
  - 2.6.9
 
-see: (https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)[Git hub actions.]
+see: (https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)[Github actions.]
 
 ## Quick start
 
