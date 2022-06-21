@@ -66,7 +66,10 @@ See the [playground to generate your code.](https://serpapi.com/playground)
 require 'serpapi'
 
 # serpapi client initialization with default parameter
-client = SerpApi::Client.new(api_key: "private key")
+client = SerpApi::Client.new(api_key: ENV['API_KEY'])
+# We recommend that you keep your keys safe.
+# At least, don't commit them in plain text.
+# More about configuration via environment variables: https://12factor.net/config
 
 # search query overview (more fields available depending on search engine)
 parameter = {
@@ -122,6 +125,8 @@ it prints the first 3 location matching Austin (Texas, Texas, Rochester)
   :keys=>["austin", "tx", "texas", "united", "states"]},
   ...]
 ```
+
+NOTE: API_KEY is not required for this endpoint.
 
 ### Search Archive API
 
@@ -249,7 +254,7 @@ Search API enables to search `async`.
 require 'serpapi'
 # target MAANG companies
 company_list = %w(meta amazon apple netflix google)
-client = SerpApi::Client.new({async: true, api_key: "secret_api_key"})
+client = SerpApi::Client.new({async: true, api_key: ENV['API_KEY']})
 search_queue = Queue.new
 company_list.each do |company|
   # set client
