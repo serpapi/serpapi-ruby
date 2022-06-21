@@ -2,7 +2,7 @@
 def snippet(format, path, start, stop) 
  slice = File.new(path).readlines[start..stop]
  slice.reject! { |l| l =~ /expect\(/ }
- buf = slice.map { |l| l.gsub(/(^\s+)/, '')}.join
+ buf = slice.map { |l| l.gsub(/(^\s\s\s\s)/, '')}.join
  buf.gsub!('# pp ', 'pp ')
  %Q(```#{format}\nrequire 'serpapi'\n#{buf}```\n see: #{path})
 end
