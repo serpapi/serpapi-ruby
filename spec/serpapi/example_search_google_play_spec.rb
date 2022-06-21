@@ -1,5 +1,5 @@
 describe 'search google play' do
-  it 'prints organic_results' do
+  xit 'prints organic_results' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_play')
     results = client.search({
       "q": "kite",
