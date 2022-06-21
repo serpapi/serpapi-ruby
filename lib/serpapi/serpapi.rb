@@ -94,7 +94,7 @@ module SerpApi
 
     # @return [String] api_key default search key
     def api_key
-      @default[:api_key]
+      @default['api_key'] || @default[:api_key]
     end
 
     private
