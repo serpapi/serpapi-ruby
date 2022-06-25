@@ -20,7 +20,7 @@ module SerpApi
     # client = SerpApi::Client.new(api_key: "secure API key", engine: "google")
     # result = client.search(q: "coffee")
     # ```
-    # parameter:
+    # The parameter hash should contains the following:
     #  engine [String] search enginge selected
     #  api_key [String] user secret API key
     #  read_timeout [Integer] HTTP read max timeout
