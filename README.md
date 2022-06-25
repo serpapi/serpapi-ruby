@@ -119,7 +119,7 @@ it prints the first 3 location matching Austin (Texas, Texas, Rochester)
 ]
 ```
 
-NOTE: API_KEY is not required for this endpoint.
+NOTE: api_key is not required for this endpoint.
 
 ### Search Archive API
 
@@ -149,7 +149,8 @@ require 'serpapi'
 client = SerpApi::Client.new(api_key: 'secret_api_key')
 pp client.account
 ```
-it prints your account information.
+
+It prints your account information.
 
 ## Basic example per search engine
 
