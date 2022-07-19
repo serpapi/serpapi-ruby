@@ -40,8 +40,12 @@ task :build do
   sh 'gem build serpapi'
 end
 
-task oobt: %i[check build] do
-  sh 'gem install `ls -t1 *.gem | head -1`'
+
+task :install do
+  sh "gem install ./serpapi-#{SerpApi::Client::VERSION}.gem"
+end
+
+task :demo do
   sh 'ruby oobt/demo.rb'
 end
 
@@ -61,4 +65,8 @@ task :release do
   puts 'release public on: https://rubygems.org/gems/serpapi/versions'
 end
 
+desc "run out of box testing using the gem file"
+task oobt: %i[check build install demo]
+
+desc "execute all the steps"
 task default: %i[dependency version readme doc build test oobt]
