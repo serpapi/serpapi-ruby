@@ -10,5 +10,8 @@ Metrics/MethodLength:
 AllCops:
   Exclude:
     - 'serpapi.gemspec'
-    - 'spec/serpapi/*_spec.rb'
+    - 'spec/**/*_spec.rb'
+    - 'spec/spec_helper.rb'
     - 'script/*'
+    - 'Gemfile'
+    - 'Rakefile'
