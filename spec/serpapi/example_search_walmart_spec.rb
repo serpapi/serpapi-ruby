@@ -1,5 +1,5 @@
 describe 'search walmart' do
-  it 'prints organic_results' do
+  xit 'prints organic_results' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'walmart')
     results = client.search({
       "query": "coffee"
