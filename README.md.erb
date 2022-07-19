@@ -10,15 +10,14 @@ def snippet(format, path)
 end
 -%>
 # serpapi-ruby : User Guide
-Scrape Google and other search engines from our fast, easy, and complete API using SerpApi.com
+
+Scrape Google and other search engines from our fast, easy, and complete API using SerpApi.com.
 
 [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi)
 
-This Ruby Gem is meant to scrape and parse results from all major search engine available world wide including Google, Bing, Baidu, Yandex, Yahoo, Ebay, Apple and more using [SerpApi](https://serpapi.com).
-SerpApi.com returns JSON or HTML results. This library does automatically convert JSON in Hash using the json standard library from shipped with Ruby.
-
-SerpApi.com provides a [script builder](https://serpapi.com/demo) to get you started quickly.
+SerpApi Gem is meant to scrape and parse results from all major search engines including Google, Bing, Baidu, Yandex, Yahoo, Ebay, Apple and more using [SerpApi](https://serpapi.com).
+The service SerpApi.com returns JSON or HTML results. This library does automatically convert JSON in Hash using the json standard library from shipped with Ruby.
 
 ## Installation
 
@@ -139,8 +138,8 @@ To do so run a client to save a search_id.
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: 'secret_api_key', engine: 'google')
-original_search = client.search(q: "Coffee", location: "Portland")
-search_id = original_search[:search_metadata][:id]
+results = client.search(q: "Coffee", location: "Portland")
+search_id = results[:search_metadata][:id]
 ```
 
 Now let's retrieve the previous search results from the archive.
@@ -148,8 +147,8 @@ Now let's retrieve the previous search results from the archive.
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: 'secret_api_key')
-archive_results = client.search_archive(search_id)
-pp archive_results
+results = client.search_archive(search_id)
+pp results
 ```
 
 It prints the search results from archive. :)
@@ -330,10 +329,8 @@ This project source code was inspired by the most awesome Ruby Gems:
 ## Design : UML diagram
 ```mermaid
 classDiagram
-  CustomClient *-- Client
-  class Client {
-    engine: String
-    api_key: String
+  Application *-- SerpApiClient
+  class SerpApiClient {
     parameter: Hash
     search()
     html()
@@ -341,6 +338,10 @@ classDiagram
     search_archive()
     account()
   }
+  openuri <.. SerpApiClient
+  json <.. SerpApiClient
+  Ruby <.. openuri
+  Ruby <.. json
 ```
 ## search() : Sequence diagram
 ```mermaid
