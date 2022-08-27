@@ -11,17 +11,17 @@ end
 -%>
 # serpapi-ruby : User Guide
 
-Scrape Google and other search engines from our fast, easy, and complete API using SerpApi.com.
-
 [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi)
 
-SerpApi Gem is meant to scrape and parse results from all major search engines including Google, Bing, Baidu, Yandex, Yahoo, Ebay, Apple and more using [SerpApi](https://serpapi.com).
-The service SerpApi.com returns JSON or HTML results. This library does automatically convert JSON in Hash using the json standard library from shipped with Ruby.
+SerpApi makes it ridiculously easy to scrape data. 
+Build better search engine scrapers in Python.
+
+//TODO add image with app and list of engine supported.
 
 ## Installation
 
-A modern version of Ruby must be already installed.
+Ruby must be already installed.
 
 ```bash
 $ gem install serpapi
@@ -29,14 +29,9 @@ $ gem install serpapi
 
 [Link to the gem page](https://rubygems.org/gems/serpapi/)
 
-Ruby versions validated by Github action:
- - 3.1.2
- - 2.7.5
- - 2.6.9
-
-see: [Github actions.](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
-
 ## Quick start
+
+Let's run a search on Google about Coffee.
 
 ```ruby
 require 'serpapi'
@@ -45,18 +40,18 @@ results = client.search(q: "coffee")
 pp results
  ```
 
-This example runs a client about "coffee" using your secret api key 
+This example runs a client about "coffee" using your secret API key 
  and get a result in dynamic Hash.
 
 The SerpApi.com service (backend)
  - searches on Google using the client: q = "coffee"
  - parses the messy HTML responses
- - return a standardizes JSON response
+ - return a formatted JSON response
 The class SerpApi::Client
  - Format the request to SerpApi.com server
- - Execute GET http request
+ - Execute GET HTTP 1.1 request
  - Parse JSON into Ruby Hash using JSON standard library provided by Ruby
-Et voila..
+Et voila...
 
 See the [playground to generate your code.](https://serpapi.com/playground)
 
@@ -249,11 +244,16 @@ It prints your account information.
  * doc: [https://serpapi.com/images-results](https://serpapi.com/images-results)
 
 ## Advanced search API usage
-### Batch Asynchronous client
+### Highly scalable batching
 
-Search API enables to search `async`.
- - Non-blocking - async=true : more complex code but 
- - Blocking - async=false - it's more compute intensive because the client would need to hold many connections.
+Search API features non-blocking search using the option: `async=true`.
+ - Non-blocking - async=true - a single parent process can handle an unlimited amount of concurrent searches.
+ - Blocking - async=false - many processes must be forked and synchronized to handle concurrent searches. this strategy is compute-intensive mostly I/O usage because each client would hold a network connection.
+
+The `blocking`` is the standard solution described in the examples so far in this documentation.
+ Mainly because the code is easier to implement.
+The `non-blocking` solution is a lot more efficient but it requires a more elaborated implementation.
+Here is basic proposal
 
 ```ruby
 require 'serpapi'
@@ -290,14 +290,14 @@ while !search_queue.empty?
     next
   end
 
-  # add result to the client queue
+  # add a result to the client queue
   search_queue.push(result)
 end
 
 search_queue.close
 puts 'all searches completed'
   ```
-This code shows a simple implementation to run a batch of asynchronously searches.
+This code shows a simple implementation to run a batch of searches.
 
 ## Change log
  * [2022-03-20] 1.0.0 Full API support
@@ -305,14 +305,14 @@ This code shows a simple implementation to run a batch of asynchronously searche
 ## Developer Guide
 ### Key goals
  - Brand centric instead of search engine based
-   - No hard coded logic per search engine
+   - No hard-coded logic per search engine
  - Simple HTTP client (lightweight, reduced dependency)
    - No magic default values
    - Thread safe
- - Easy to extends
- - Defensive code style (raise cutsom exception)
+ - Open for extension
+ - Defensive code style (raise a custom exception: SerpApiException)
  - TDD
- - Best API coding pratice per platform
+ - Best API coding practice
  - KiSS principles
 
 ### Inspirations
@@ -325,6 +325,7 @@ This project source code was inspired by the most awesome Ruby Gems:
  - 0 lint offense: `make lint`
  - 100% tests passing: `make test`
  - 100% code coverage: `make test` (simple-cov)
+
 # Developer Guide
 ## Design : UML diagram
 ```mermaid
