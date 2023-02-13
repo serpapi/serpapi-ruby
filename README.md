@@ -19,6 +19,12 @@ SerpApi.com provides a simple REST service over HTTP 1.1 that returns JSON or ra
 ## Installation
 
 A modern version of Ruby must be already installed.
+This includes Ruby 2.5.3, 2.6 and 3.0.
+
+### Bundler
+```ruby
+gem 'serpapi', '~> 1.0.0'
+```
 
 ### Gem 
 ```bash
