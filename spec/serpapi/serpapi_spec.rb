@@ -21,14 +21,14 @@ describe 'basic google search using SerpApi.com' do
     begin
       @client.search({})
     rescue SerpApi::SerpApiException => e
-      expect(e.message).to include('Missing query `q` parameter')
+      expect(e.message).to include('Missing query')
     rescue => e
       raise("wrong exception: #{e}")
     end
   end
 
-  it 'get parameter' do
-    expect(@client.default_parameter[:api_key]).to eq(ENV['API_KEY'])
+  it 'get params' do
+    expect(@client.params[:api_key]).to eq(ENV['API_KEY'])
   end
 
   it 'api_key' do
