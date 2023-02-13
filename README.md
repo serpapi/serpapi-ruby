@@ -189,7 +189,7 @@ results = client.search({
   "p": "coffee"
 })
 pp results[:organic_results]
-# ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+# ENV['API_KEY'] captures the secret user API. You can find yours here: https://serpapi.com/manage-api-key
 ```
 
  * source code: [spec/serpapi/example_search_yahoo_spec.rb](https://github.com/serpapi/serpapi-ruby/blob/master/spec/serpapi/example_search_yahoo_spec.rb)
