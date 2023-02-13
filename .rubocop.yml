@@ -1,0 +1,17 @@
+Layout/LineLength:
+  Max: 100
+
+Metrics/AbcSize:
+  Max: 21
+
+Metrics/MethodLength:
+  Max: 25
+
+AllCops:
+  Exclude:
+    - 'serpapi.gemspec'
+    - 'spec/**/*_spec.rb'
+    - 'spec/spec_helper.rb'
+    - 'script/*'
+    - 'Gemfile'
+    - 'Rakefile'
