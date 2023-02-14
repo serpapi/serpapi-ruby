@@ -8,8 +8,10 @@ module SerpApi
     VERSION = '1.0.0'.freeze
     BACKEND = 'serpapi.com'.freeze
 
-    # HTTP read timeout in seconds (default: 60s)
-    attr_accessor :read_timeout, :params
+    # HTTP read timeout in seconds (default: 60)
+    attr_reader :read_timeout
+    # Default parameters provided in the constructor (hash)
+    attr_reader :params
 
     # Constructor
     #
@@ -30,6 +32,7 @@ module SerpApi
     def initialize(params = {})
       # set default read timeout
       @read_timeout = params[:timeout] || params['timeout'] || 60
+      @read_timeout.freeze
 
       # set default paramter
       @params = params.clone || {}
@@ -91,11 +94,6 @@ module SerpApi
     # @return [String] api_key user secret api_key as supplied in the constructor params[:api_key]
     def api_key
       @params['api_key'] || @params[:api_key]
-    end
-
-    # @return [Integer] timeout in millisecond HTTP read
-    def timeout
-      @read_timeout
     end
 
     private
