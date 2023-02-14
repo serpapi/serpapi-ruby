@@ -39,8 +39,8 @@ describe 'basic google search using SerpApi.com' do
     expect(@client.engine).to eq('google')
   end
 
-  it 'read_timeout' do
-    expect(@client.read_timeout).to eq(30)
+  it 'timeout' do
+    expect(@client.timeout).to eq(30)
   end
 
   it 'get bad decoder' do
