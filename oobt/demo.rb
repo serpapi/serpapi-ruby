@@ -1,6 +1,5 @@
-# basic application implementing the serpapi client.
-# for Out Of Box Testing
-
+# this demo demonstrates a simple implementation of serpapi client.
+#
 require 'serpapi'
 
 raise 'API_KEY environment variable must be set' if ENV['API_KEY'].nil?
@@ -17,6 +16,11 @@ params = {
   q: 'coffee'
 }
 results = client.search(params)
+puts 'print suggestions'
+if !results[:suggestions] || results[:suggestions].empty?
+  puts 'demo failed because no suggestions were found'
+  exit 1
+end
 pp results[:suggestions]
 puts 'demo passed'
 exit 0
