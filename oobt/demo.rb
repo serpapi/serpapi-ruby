@@ -1,5 +1,5 @@
-# basic application using serpapi
-#
+# basic application implementing the serpapi client.
+# for Out Of Box Testing
 
 require 'serpapi'
 
@@ -12,7 +12,6 @@ default_params = {
   gl: 'us',
   api_key: ENV['API_KEY']
 }
-
 client = SerpApi::Client.new(default_params)
 params = {
   q: 'coffee'

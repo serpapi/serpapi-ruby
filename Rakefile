@@ -6,9 +6,9 @@ require_relative 'lib/serpapi'
 
 task :check do
   if ENV['API_KEY']
-    puts 'found $API_KEY'
+    puts 'check: found $API_KEY'
   else
-    puts 'API_KEY must be defined'
+    puts 'check: API_KEY must be defined'
     exit 1
   end
 end
@@ -60,13 +60,13 @@ task :tag do
   puts "now publish the tag:\n$ git push origin #{version}"
 end
 
-task :release do
+task release: [:oobt] do
   sh 'gem push `ls -t1 *.gem | head -1`'
   puts 'release public on: https://rubygems.org/gems/serpapi/versions'
 end
 
 desc "run out of box testing using the gem file"
-task oobt: %i[check build install demo]
+task oobt: %i[readme doc check build install demo]
 
 desc "execute all the steps"
 task default: %i[dependency version readme doc build test oobt]
