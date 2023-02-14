@@ -7,19 +7,20 @@ Scrape any major search engine from our easy, fast, scalable and feature rich AP
 
 SerpApi Gem allows unlimited searches from major search engines likes: Google, Bing, Baidu, Yandex, Yahoo, Ebay, Apple and more. The full list is available on [SerpApi](https://serpapi.com).
 
-This library is REST client for [SerpApi](https://serpapi.com).
-It does feature:
- - Expose one method per end point (search, account...)
- - Encode user parameters as HTTP request.
- - Decode HTTP response JSON payload in a Hash using Ruby's 'json' standard library.
- - Error handling (throw SerpApiException).
+This library is a client for [SerpApi](https://serpapi.com).
+[SerpApi](https://serpapi.com) is a highly scalable REST service over HTTP 1.1 that returns JSON or raw HTML results per search query. 
 
-SerpApi.com provides a simple REST service over HTTP 1.1 that returns JSON or raw HTML results per search query. 
+This library features:
+ - Tons of pratical examples.
+ - Encode parameters into HTTP request.
+ - Decode HTTP response JSON payload into a Hash using Ruby's 'json' standard library.
+ - Expose one Ruby method per service end point: search, account, html, search_archive, location)
+ - Adds a simple error handling by throwing SerpApiException.
+
 
 ## Installation
 
-A modern version of Ruby must be already installed.
-This includes Ruby 2.5.3, 2.6 and 3.0.
+Ruby >= 2.6 must be already installed.
 
 ### Bundler
 ```ruby
@@ -32,6 +33,8 @@ $ gem install serpapi
 ```
 
 [Link to the gem page](https://rubygems.org/gems/serpapi/)
+
+[API documentation](https://rubydoc.info/github/serpapi/serpapi-ruby/master)
 
 ## Quick start
 
@@ -202,7 +205,7 @@ results = client.search({
   "p": "coffee"
 })
 pp results[:organic_results]
-# ENV['API_KEY'] captures the secret user API. You can find yours here: https://serpapi.com/manage-api-key
+# ENV['API_KEY'] captures the secret user API available from http://serpapi.com
 ```
 
  * source code: [spec/serpapi/example_search_yahoo_spec.rb](https://github.com/serpapi/serpapi-ruby/blob/master/spec/serpapi/example_search_yahoo_spec.rb)
@@ -529,10 +532,8 @@ It can take a few seconds for the search to be completed.
 
 ## Supported Ruby version.
 Ruby versions validated by Github Actions:
- - 3.1.2
- - 2.7.5
- - 2.6.9
-
+ - 3.1
+ - 2.6
 see: [Github Actions.](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 
 ## Change log
@@ -563,6 +564,7 @@ This project source code and coding style was inspired by the most awesome Ruby 
  - 0 lint offense: `make lint`
  - 100% tests passing: `make test`
  - 100% code coverage: `make test` (simple-cov)
+
 # Developer Guide
 ## Design : UML diagram
 ```mermaid
@@ -636,5 +638,4 @@ Open ./Rakefile for more information.
 Contributions are welcome, feel to submit a pull request!
 
 # TODO
- - [] Release
- - [] CI integration issues
+ - [] Release version 1.0.0
