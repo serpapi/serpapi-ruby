@@ -17,7 +17,6 @@ This library features:
  - Expose one Ruby method per service end point: search, account, html, search_archive, location)
  - Adds a simple error handling by throwing SerpApiException.
 
-
 ## Installation
 
 Ruby >= 2.6 must be already installed.
@@ -32,9 +31,7 @@ gem 'serpapi', '~> 1.0.0'
 $ gem install serpapi
 ```
 
-[Link to the gem page](https://rubygems.org/gems/serpapi/)
-
-[API documentation](https://rubydoc.info/github/serpapi/serpapi-ruby/master)
+[Ruby GEM page](https://rubygems.org/gems/serpapi/)
 
 ## Quick start
 
@@ -66,6 +63,13 @@ Et voila...
 See the [playground to generate your code.](https://serpapi.com/playground)
 
 ## API Guide
+### Documentation
+[API documentation](https://rubydoc.info/github/serpapi/serpapi-ruby/master)
+[API health status](Ehttps://serpapi.com/status)
+[Full documentation on SerpApi.com](https://serpapi.com)
+[Library Github page](https://github.com/serpapi/serpapi-ruby)
+[Library GEM page](https://rubygems.org/gems/serpapi/)
+
 ### Search API overview
 ```ruby
 # load gem
@@ -73,14 +77,18 @@ require 'serpapi'
 
 # serpapi client initialization with default parameter
 client = SerpApi::Client.new(api_key: "secret_key")
+
 # We recommend that you keep your keys safe.
 # At least, don't commit them in plain text.
-# More about configuration via environment variables: https://12factor.net/config
+# More about configuration via environment variables: 
+# https://hackernoon.com/all-the-secrets-of-encrypting-api-keys-in-ruby-revealed-5qf3t5l
 
 # search query overview (more fields available depending on search engine)
 params = {
-  engine: "google",   # full list: https://serpapi.com/search-api
-  q: "client",
+  engine: "google",   # full list: https://serpapi.com/
+  # actual search
+  q: "Coffee",
+  # Google specific parameters: https://serpapi.com/search-api
   google_domain: "Google Domain",
   location: "Location Requested", # example: Portland,Oregon,United States [see: Location API](#Location-API)
   device: "desktop|mobile|tablet",
@@ -92,6 +100,7 @@ params = {
   tbm: "nws|isch|shop",
   tbs: "custom to be client criteria",
   async: false # true when async call enabled.
+  timeout: 60 # HTTP timeout in seconds on the client side only.
 }
 
 # formated search results as a Hash
@@ -536,8 +545,8 @@ Ruby versions validated by Github Actions:
  - 2.6
 see: [Github Actions.](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 
-## Change log
- * [2022-03-20] 1.0.0 Full API support
+## Change logs
+ * [2023-02-20] 1.0.0 Full API support
 
 ## Developer Guide
 ### Key goals
@@ -560,10 +569,10 @@ This project source code and coding style was inspired by the most awesome Ruby 
  - rest-client
  - stripe-ruby
  
-### Quality expectations
- - 0 lint offense: `make lint`
- - 100% tests passing: `make test`
- - 100% code coverage: `make test` (simple-cov)
+### Code quality expectations
+ - 0 lint offense: `rake lint`
+ - 100% tests passing: `rake test`
+ - 100% code coverage: `rake test` (simple-cov)
 
 # Developer Guide
 ## Design : UML diagram
