@@ -1,4 +1,4 @@
-# Client for SerpApi.com
+# Ruby client for SerpApi.com
 #  Scrape results for all major search engines from our fast, easy, and complete API.
 module SerpApi
   # see serpapi/serpapi for implementation

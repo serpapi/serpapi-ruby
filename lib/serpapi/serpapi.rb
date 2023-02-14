@@ -1,7 +1,6 @@
-# Client implementation for SerpApi.com 
+# Client implementation for SerpApi.com
 #
 module SerpApi
-
   # Client for SerpApi.com
   #
   class Client
@@ -80,6 +79,7 @@ module SerpApi
     # @return [String|Hash] raw html or JSON / Hash
     def search_archive(search_id, format = :json)
       raise SerpApiException, 'format must be json or html' unless %i[json html].include?(format)
+
       get("/searches/#{search_id}.#{format}", format, nil)
     end
 
@@ -102,7 +102,7 @@ module SerpApi
 
     private
 
-    # build url from user params 
+    # build url from the search params
     #
     # @param [String] endpoint HTTP service uri
     # @param [Hash] params custom search inputs
@@ -112,7 +112,7 @@ module SerpApi
       query = (@params || {}).merge(params || {})
 
       # set ruby client
-      query[:source] = 'serpapi-ruby:' + VERSION
+      query[:source] = 'serpapi-ruby:' << VERSION
 
       # delete empty key/value
       query.delete_if { |_, value| value.nil? }
@@ -129,16 +129,15 @@ module SerpApi
     # @param [String] endpoint HTTP service uri
     # @param [Symbol] decoder type :json or :html
     # @param [Hash] params custom search inputs
-    # @return decoded payload as JSON / Hash or String 
+    # @return decoded payload as JSON / Hash or String
     def get(endpoint, decoder = :json, params = {})
       url = build_url(endpoint, params)
       payload = URI(url).open(read_timeout: @read_timeout).read
-      return decode(payload, decoder)
+      decode(payload, decoder)
     rescue OpenURI::HTTPError => e
       data = JSON.parse(e.io.read)
-      if data.key?('error')
-        raise SerpApiException, "error: #{data['error']} from url: #{url}"
-      end
+      raise SerpApiException, "error: #{data['error']} from url: #{url}" if data.key?('error')
+
       raise SerpApiException, "fail: get url: #{url} response: #{data}"
     rescue => e
       raise SerpApiException, "fail: get url: #{url} caused by: #{e}"
@@ -148,7 +147,7 @@ module SerpApi
     #
     # @param [String] payload to decode
     # @param [Symbol] decoder type :json or :html
-    # @return decoded payload as JSON / Hash or HTML / String 
+    # @return decoded payload as JSON / Hash or HTML / String
     def decode(payload, decoder)
       case decoder
       when :json

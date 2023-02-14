@@ -1,11 +1,8 @@
-# Module includes all exception
+# Module includes SerpApi exception
 #
 module SerpApi
-  # Standard SerpApiException for anything related to the client
+  #  SerpApiException wraps anything related to the SerpApi client
   #
   class SerpApiException < StandardError
-    def initialize(message)
-      super(message)
-    end
   end
 end
