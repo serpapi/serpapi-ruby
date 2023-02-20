@@ -14,6 +14,7 @@ Style/RescueStandardError:
   Enabled: false
 
 AllCops:
+  NewCops: enable
   Exclude:
     - 'serpapi.gemspec'
     - 'spec/**/*_spec.rb'
