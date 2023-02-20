@@ -1,8 +1,8 @@
-describe 'search google events' do
+describe 'example: google_events search' do
   it 'prints events_results' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_events')
     results = client.search({
-      "q": "coffee"
+      'q': 'coffee'
     })
     expect(results[:events_results]).not_to be_nil
     # pp results[:events_results]

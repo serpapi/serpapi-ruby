@@ -1,8 +1,8 @@
-describe 'search home depot' do
+describe 'example: home_depot search' do
   it 'prints products' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'home_depot')
     results = client.search({
-      "q": "table"
+      'q': 'table'
     })
     expect(results[:products]).not_to be_nil
     # pp results[:products]

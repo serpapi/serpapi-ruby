@@ -1,6 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
 
-describe 'basic google search using SerpApi.com' do
+describe 'client full coverage' do
   before(:all) do
     @client = SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 30)
   end

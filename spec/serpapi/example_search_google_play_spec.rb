@@ -1,9 +1,9 @@
-describe 'search google play' do
-  xit 'prints organic_results' do
+describe 'example: google_play search' do
+  it 'prints organic_results' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_play')
     results = client.search({
-      "q": "kite",
-      "store": "apps"
+      'q': 'kite',
+      'store': 'apps'
     })
     expect(results[:organic_results]).not_to be_nil
     # pp results[:organic_results]
