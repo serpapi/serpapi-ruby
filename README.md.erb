@@ -1,12 +1,16 @@
 <%-
-def snippet(format, path) 
+def snippet(format, path, demo = false) 
  lines = File.new(path).readlines
- stop = lines.find_index { |line| line =~ /pp results/}
- slice = File.new(path).readlines[2..stop+1]
- slice.reject! { |l| l =~ /expect\(/ }
- buf = slice.map { |l| l.gsub(/(^\s\s\s\s)/, '')}.join
- buf.gsub!('# pp ', 'pp ')
- %Q(```#{format}\nrequire 'serpapi'\n#{buf}```\n\n * source code: [#{path}](https://github.com/serpapi/serpapi-ruby/blob/master/#{path}))
+ if demo
+  buf = lines[1..-1].join
+ else
+  stop = lines.find_index { |line| line =~ /pp results/}
+  slice = File.new(path).readlines[2..stop+1]
+  slice.reject! { |l| l =~ /expect\(/ }
+  buf = slice.map { |l| l.gsub(/(^\s\s\s\s)/, '')}.join
+  buf.gsub!('# pp ', 'pp ')
+ end
+ %Q(```#{format}\nrequire 'serpapi'\n#{buf}\n```\n\n * source code: [#{path}](https://github.com/serpapi/serpapi-ruby/blob/master/#{path}))
 end
 -%>
 # serpapi-ruby : User Guide
@@ -16,16 +20,15 @@ Scrape any major search engine from our easy, fast, scalable and feature rich AP
 [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi)
 
-SerpApi Gem allows unlimited searches from major search engines likes: Google, Bing, Baidu, Yandex, Yahoo, Ebay, Apple and more. The full list is available on [SerpApi](https://serpapi.com).
+SerpApi Gem allows unlimited searches from major search engines likes: Google, Bing, Baidu, Yandex, Yahoo, Ebay, Apple and more... The full list is available on [SerpApi](https://serpapi.com).
 
-This library is a client for [SerpApi](https://serpapi.com).
-[SerpApi](https://serpapi.com) is a highly scalable REST service over HTTP 1.1 that returns JSON or raw HTML results per search query. 
+This library is a powerful client for the [SerpApi service](https://serpapi.com), designed for seamless integration with your Ruby-based application. [SerpApi service](https://serpapi.com) is a highly scalable service that delivers lightning-fast search results in JSON or raw HTML format, all accessible via simple HTTP 1.1 requests.
 
 This library features:
  - Tons of pratical examples.
- - Encode parameters into HTTP request.
+ - Encode search parameters into HTTP request.
  - Decode HTTP response JSON payload into a Hash using Ruby's 'json' standard library.
- - Expose one Ruby method per service end point: search, account, html, search_archive, location)
+ - Expose one Ruby method per service end point: search, account, html, search_archive, location.
  - Adds a simple error handling by throwing SerpApiException.
 
 ## Installation
@@ -61,16 +64,6 @@ pp SerpApi::Client.new.search(q: "coffee", engine: 'google', api_key: "secret_ap
 This example runs a search about "coffee" using your `secret_api_key`
  then returns the results as a dynamic Hash.
 
-The SerpApi.com service (backend)
- - executes a scalable search on `engine: "google"` using the search query: `q: "coffee"`.
- - parses the messy HTML responses from Google on the backend.
- - returns a standardized JSON response.
-The class SerpApi::Client (client side / ruby):
- - Format the request to SerpApi.com server.
- - Execute HTTP Get request.
- - Parse JSON into Ruby Hash using standard JSON library.
-Et voila...
-
 See the [playground to generate your code.](https://serpapi.com/playground)
 
 ## API Guide
@@ -79,8 +72,8 @@ See the [playground to generate your code.](https://serpapi.com/playground)
 # load gem
 require 'serpapi'
 
-# serpapi client initialization with default parameter
-client = SerpApi::Client.new(api_key: "secret_key")
+# serpapi client created with default parameters
+client = SerpApi::Client.new(api_key: "secret_key", engine: "google")
 
 # We recommend that you keep your keys safe.
 # At least, don't commit them in plain text.
@@ -103,8 +96,8 @@ params = {
   start: "Pagination Offset",
   tbm: "nws|isch|shop",
   tbs: "custom to be client criteria",
-  async: false # true when async call enabled.
-  timeout: 60 # HTTP timeout in seconds on the client side only.
+  async: false, # true when async call enabled.
+  timeout: 60, # HTTP timeout in seconds on the client side only.
 }
 
 # formated search results as a Hash
@@ -116,10 +109,10 @@ results = client.search(params)
 raw_html = client.html(parameter)
 ```
 
-[The full documentation](https://serpapi.com/search-api).
-More hand on examples are available below.
+[Google search documentation](https://serpapi.com/search-api).
+More hands on examples are available below.
 
-#### Documentation
+#### Documentations
 
  * [API documentation](https://rubydoc.info/github/serpapi/serpapi-ruby/master)
  * [Full documentation on SerpApi.com](https://serpapi.com)
@@ -286,47 +279,7 @@ Search API enables `async` search.
  - Blocking (`async=false`) : it's easy to write the code but more compute-intensive when the parent process needs to hold many connections.
 
 Here is an example of asynchronous searches using Ruby 
-```ruby
-require 'serpapi'
-# target MAANG companies
-company_list = %w(meta amazon apple netflix google)
-client = SerpApi::Client.new({engine: 'google', async: true, api_key: 'secret_api_key'})
-search_queue = Queue.new
-company_list.each do |company|
-  # set client
-  client.params[:q] = company
-
-  # store request into a search_queue - no-blocker
-  result = client.search()
-  if result[:search_metadata][:status] =~ /Cached|Success/
-    puts "#{company}: client done"
-    next
-  end
-
-  # add results to the client queue
-  search_queue.push(result)
-end
-
-puts "wait until all searches are cached or success"
-while !search_queue.empty?
-  result = search_queue.pop
-  # extract client id
-  search_id = result[:search_metadata][:id]
-
-  # retrieve client from the archive - blocker
-  search_archived = client.search_archive(search_id)
-  if search_archived[:search_metadata][:status] =~ /Cached|Success/
-    puts "#{search_archived[:search_parameters][:q]}: client done"
-    next
-  end
-
-  # add results to the client queue
-  search_queue.push(result)
-end
-
-search_queue.close
-puts 'all searches completed'
-```
+<%= snippet('ruby', 'oobt/demo_async.rb', true) %>
 
 This code shows a simple solution to batch searches asynchronous.
 This example relies on the fact that the search is slow
@@ -357,11 +310,11 @@ see: [Github Actions.](https://github.com/serpapi/serpapi-ruby/actions/workflows
 
 ### Inspirations
 This project source code and coding style was inspired by the most awesome Ruby Gems:
- - [https://github.com/bcrypt-ruby/bcrypt-ruby]
- - Nokogiri
- - Cloudfare
- - rest-client
- - stripe-ruby
+ - [bcrypt](https://github.com/bcrypt-ruby/bcrypt-ruby)
+ - [Nokogiri](https://nokogiri.org)
+ - [Cloudfare](https://rubygems.org/gems/cloudflare/versions/2.1.0)
+ - [rest-client](https://rubygems.org/gems/rest-client)
+ - [stripe](https://rubygems.org/gems/stripe)
  
 ### Code quality expectations
  - 0 lint offense: `rake lint`
@@ -370,6 +323,7 @@ This project source code and coding style was inspired by the most awesome Ruby 
 
 # Developer Guide
 ## Design : UML diagram
+### Class diagram
 ```mermaid
 classDiagram
   Application *-- serpapi 
@@ -389,7 +343,7 @@ classDiagram
   Ruby <.. openuri
   Ruby <.. json
 ```
-## search() : Sequence diagram
+### search() : Sequence diagram
 ```mermaid
 sequenceDiagram
     Client->>SerpApi.com: search() : http request 
@@ -403,6 +357,16 @@ where:
   - Client refers to SerpApi:Client.
   - SerpApi.com is the backend REST service.
   - Engine like Google, Baidu, Bing and more...
+
+The SerpApi.com service (backend)
+ - executes a scalable search on `engine: "google"` using the search query: `q: "coffee"`.
+ - parses the messy HTML responses from Google on the backend.
+ - returns a standardized JSON response.
+The class SerpApi::Client (client side / ruby):
+ - Format the request to SerpApi.com server.
+ - Execute HTTP Get request.
+ - Parse JSON into Ruby Hash using standard JSON library.
+Et voila...
 
 ## Continuous integration
 We love true open source, continuous integration and Test Drive Development (TDD).
@@ -434,6 +398,11 @@ $ rake test
 To flush the flow.
 ```bash
 $ rake
+```
+
+Open coverage report generated by `rake test`
+```sh
+open coverage/index.html
 ```
 
 Open ./Rakefile for more information.

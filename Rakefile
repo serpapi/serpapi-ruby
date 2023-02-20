@@ -40,7 +40,6 @@ task :build do
   sh 'gem build serpapi'
 end
 
-
 task :install do
   sh "gem install ./serpapi-#{SerpApi::Client::VERSION}.gem"
 end
