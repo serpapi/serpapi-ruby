@@ -15,7 +15,7 @@ end
 -%>
 # serpapi-ruby : User Guide
 
-Scrape any major search engine from our easy, fast, scalable and feature rich API powered [SerpApi](https://serpapi.com).
+Scrape any major search engine from our easy, fast, scalable and feature rich API powered by [SerpApi](https://serpapi.com).
 
 [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi)
@@ -82,10 +82,12 @@ client = SerpApi::Client.new(api_key: "secret_key", engine: "google")
 
 # search query overview (more fields available depending on search engine)
 params = {
-  engine: "google",   # full list: https://serpapi.com/
-  # actual search
+  # select the search engine (full list: https://serpapi.com/)
+  engine: "google",
+  # actual search query
   q: "Coffee",
-  # Google specific parameters: https://serpapi.com/search-api
+  # then adds search engine specific options.
+  # for example: google specific parameters: https://serpapi.com/search-api
   google_domain: "Google Domain",
   location: "Location Requested", # example: Portland,Oregon,United States [see: Location API](#Location-API)
   device: "desktop|mobile|tablet",
@@ -96,6 +98,7 @@ params = {
   start: "Pagination Offset",
   tbm: "nws|isch|shop",
   tbs: "custom to be client criteria",
+  # tweak HTTP client behavior
   async: false, # true when async call enabled.
   timeout: 60, # HTTP timeout in seconds on the client side only.
 }
@@ -267,6 +270,68 @@ It prints your account information.
 <%= snippet('ruby', 'spec/serpapi/example_search_google_images_spec.rb') %>
  * doc: [https://serpapi.com/images-results](https://serpapi.com/images-results)
 
+## Migration quick guide
+
+if you were already using (google-search-results-ruby gem)[https://github.com/serpapi/google-search-results-ruby], here are the changes.
+
+```
+# load library
+# old way 
+require 'google_search_results'
+# new way
+require 'serpapi'
+
+# define a search
+# old way to define the search
+search = GoogleSearch.new(search_params)
+# new way 
+default_parameter = {api_key: "secret_key", engine: "google"}
+client = SerpApi::Client.new(default_parameter)
+# an instance of the serpapi client is created
+# where the default parameters are stored in the client.
+#   like api_key, engine
+#  then each subsequent API call can be made with additional parameters.
+
+# override an existing parameter
+# old way
+search.params[:location] = "Portland,Oregon,United States"
+# new way
+# just provided the search call with the parameters.
+results = client.search({location: "Portland,Oregon,United States", q: "Coffe"})
+
+# search format return as raw html
+# old way
+html_results = search.get_html
+# new way
+raw_html = client.html(params)
+# where params is Hash containing additional key / value
+
+# search format returns a Hash
+# old way
+hash_results = search.get_hash
+# new way
+results = client.search(params)
+# where params is the search parameters (override the default search parameters in the constructor). 
+
+# search as raw JSON format
+# old way
+json_results = search.get_json
+# new way
+results = client.search(params)
+
+# The prefix get_ was removed from all other methods.
+#  Because it's obvious that a method returns something.
+# old -> new way
+search.get_search_archive -> client.search_archive
+search.get_account -> client.account
+search.get_location -> client.location
+```
+
+Most notable improvements:
+ - Removing parameters check on the client side. (most of the bug)
+ - Reduce logic complexity in our implementation. (faster performance)
+ - Better documentation.
+
 ## Advanced search API usage
 ### Highly scalable batching
 
@@ -353,10 +418,10 @@ sequenceDiagram
     Client-->>Client: decode JSON into Hash
 ```
 where:
-  - Application is created by end user.
+  - Application is implemented by the end user.
   - Client refers to SerpApi:Client.
-  - SerpApi.com is the backend REST service.
-  - Engine like Google, Baidu, Bing and more...
+  - SerpApi.com is the backend HTTP / REST service.
+  - Engine refers to Google, Baidu, Bing and more...
 
 The SerpApi.com service (backend)
  - executes a scalable search on `engine: "google"` using the search query: `q: "coffee"`.
