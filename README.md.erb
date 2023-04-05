@@ -15,20 +15,20 @@ end
 -%>
 # serpapi-ruby : User Guide
 
-Scrape any major search engine from our easy, fast, scalable and feature rich API powered by [SerpApi](https://serpapi.com).
+Scrape any significant search engine from our easy, fast, scalable, and feature-rich API powered by [SerpApi](https://serpapi.com).
 
 [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi)
 
-SerpApi Gem allows unlimited searches from major search engines likes: Google, Bing, Baidu, Yandex, Yahoo, Ebay, Apple and more... The full list is available on [SerpApi](https://serpapi.com).
+SerpApi Gem allows unlimited searches from significant search engines like Google, Bing, Baidu, Yandex, Yahoo, eBay, and Apple. The complete list is available on [SerpApi](https://serpapi.com).
 
-This library is a powerful client for the [SerpApi service](https://serpapi.com), designed for seamless integration with your Ruby-based application. [SerpApi service](https://serpapi.com) is a highly scalable service that delivers lightning-fast search results in JSON or raw HTML format, all accessible via simple HTTP 1.1 requests.
+This library is a robust client for the [SerpApi service](https://serpapi.com), designed for seamless integration with your Ruby-based application. [SerpApi service](https://serpapi.com) is a highly scalable service that delivers lightning-fast search results in JSON or raw HTML format, accessible via simple HTTP 1.1 requests.
 
 This library features:
- - Tons of pratical examples.
- - Encode search parameters into HTTP request.
+ - Tons of practical examples.
+ - Encode search parameters into HTTP requests.
  - Decode HTTP response JSON payload into a Hash using Ruby's 'json' standard library.
- - Expose one Ruby method per service end point: search, account, html, search_archive, location.
+ - Expose one Ruby method per service endpoint: search, account, HTML, search_archive, location.
  - Adds a simple error handling by throwing SerpApiException.
 
 ## Installation
@@ -156,7 +156,9 @@ NOTE: api_key is not required for this endpoint.
 ### Search Archive API
 
 This API allows retrieving previous search results.
-To fetch previous results from the search_id.
+To fetch earlier results from the search_id.
+
+First, you need to run a search and save the search id.
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: 'secret_api_key', engine: 'google')
@@ -282,7 +284,7 @@ require 'google_search_results'
 require 'serpapi'
 
 # define a search
-# old way to define the search
+# old way to describe the search
 search = GoogleSearch.new(search_params)
 # new way 
 default_parameter = {api_key: "secret_key", engine: "google"}
@@ -319,8 +321,8 @@ json_results = search.get_json
 # new way
 results = client.search(params)
 
-# The prefix get_ was removed from all other methods.
-#  Because it's obvious that a method returns something.
+# The prefix get_ is removed from all other methods.
+#  Because it's evident that a method returns something.
 # old -> new way
 search.get_search_archive -> client.search_archive
 search.get_account -> client.account
@@ -328,7 +330,7 @@ search.get_location -> client.location
 ```
 
 Most notable improvements:
- - Removing parameters check on the client side. (most of the bug)
+ - Removing parameters check on the client side. (most of the bugs)
  - Reduce logic complexity in our implementation. (faster performance)
  - Better documentation.
 
@@ -336,20 +338,18 @@ Most notable improvements:
 ### Highly scalable batching
 
 Search API features non-blocking search using the option: `async=true`.
- - Non-blocking - async=true - a single parent process can handle an unlimited amount of concurrent searches.
- - Blocking - async=false - many processes must be forked and synchronized to handle concurrent searches. this strategy is compute-intensive mostly I/O usage because each client would hold a network connection.
+ - Non-blocking - async=true - a single parent process can handle unlimited concurrent searches.
+ - Blocking - async=false - many processes must be forked and synchronized to handle concurrent searches. This strategy is I/O usage because each client would hold a network connection.
 
 Search API enables `async` search.
- - Non-blocking (`async=true`) : the development is more complex but this allows to handle many simultaneous connections.
+ - Non-blocking (`async=true`) : the development is more complex, but this allows handling many simultaneous connections.
  - Blocking (`async=false`) : it's easy to write the code but more compute-intensive when the parent process needs to hold many connections.
 
 Here is an example of asynchronous searches using Ruby 
 <%= snippet('ruby', 'oobt/demo_async.rb', true) %>
 
-This code shows a simple solution to batch searches asynchronous.
-This example relies on the fact that the search is slow
- while fetching the search results from the archive is expensive. 
-It can take a few seconds for the search to be completed.
+This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). 
+Each search takes a few seconds before completion by SerpApi service and the search engine. By the time the first element pops out of the queue. The search result might be already available in the archive. If not, the `search_archive` method blocks until the search results are available. 
 
 ## Supported Ruby version.
 Ruby versions validated by Github Actions:
@@ -368,7 +368,7 @@ see: [Github Actions.](https://github.com/serpapi/serpapi-ruby/actions/workflows
    - No magic default values
    - Thread safe
  - Easy extension
- - Defensive code style (raise custom exception)
+ - Defensive code style (raise a custom exception)
  - TDD
  - Best API coding practice per platform
  - KiSS principles
@@ -418,10 +418,10 @@ sequenceDiagram
     Client-->>Client: decode JSON into Hash
 ```
 where:
-  - Application is implemented by the end user.
+  - The end user implements the application.
   - Client refers to SerpApi:Client.
   - SerpApi.com is the backend HTTP / REST service.
-  - Engine refers to Google, Baidu, Bing and more...
+  - Engine refers to Google, Baidu, Bing, and more.
 
 The SerpApi.com service (backend)
  - executes a scalable search on `engine: "google"` using the search query: `q: "coffee"`.
@@ -430,16 +430,16 @@ The SerpApi.com service (backend)
 The class SerpApi::Client (client side / ruby):
  - Format the request to SerpApi.com server.
  - Execute HTTP Get request.
- - Parse JSON into Ruby Hash using standard JSON library.
-Et voila...
+ - Parse JSON into Ruby Hash using a standard JSON library.
+Et voila!
 
 ## Continuous integration
-We love true open source, continuous integration and Test Drive Development (TDD).
+We love "true open source" and "continuous integration", and Test Drive Development (TDD).
  We are using RSpec to test [our infrastructure around the clock]) using Github Action to achieve the best QoS (Quality Of Service).
 
 The directory spec/ includes specification which serves the dual purposes of examples and functional tests.
 
-Set your API Key to allow the tests to run.
+Set your secret API key in your shell before running a test.
 ```bash
 export API_KEY="your_secret_key"
 ```
@@ -472,7 +472,7 @@ open coverage/index.html
 
 Open ./Rakefile for more information.
 
-Contributions are welcome, feel to submit a pull request!
+Contributions are welcome. Feel to submit a pull request!
 
 # TODO
  - [] Release version 1.0.0

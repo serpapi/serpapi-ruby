@@ -22,7 +22,7 @@ while !search_queue.empty?
   search_id = result[:search_metadata][:id]
 
   # retrieve client from the archive - blocker
-  search_archived = client.search_archive(search_id)
+  search_archived = client.2(search_id)
   if search_archived[:search_metadata][:status] =~ /Cached|Success/
     puts "#{search_archived[:search_parameters][:q]}: client done"
     next
