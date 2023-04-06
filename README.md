@@ -34,8 +34,8 @@ pp results
 
 This example runs a search for "coffee" on Google. It then returns the results as a regular Ruby Hash. See the [playground](https://serpapi.com/playground) to generate your own code.
 
-## API Guide
-### Search API overview
+## Advanced Usage
+### Search API
 ```ruby
 # load gem
 require 'serpapi'
