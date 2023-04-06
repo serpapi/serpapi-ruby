@@ -27,7 +27,7 @@ $ gem install serpapi
 
 ```ruby
 require 'serpapi'
-client = SerpApi::Client.new api_key: "secret_api_key"
+client = SerpApi::Client.new api_key: "serpapi_api_key"
 results = client.search q: "coffee", engine: "google"
 pp results
  ```
