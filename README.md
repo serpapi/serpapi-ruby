@@ -1,24 +1,15 @@
-# serpapi-ruby : User Guide
-
-Scrape any significant search engine from our easy, fast, scalable, and feature-rich API powered by [SerpApi](https://serpapi.com).
+# SerpApi Ruby Library
 
 [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi)
 
-SerpApi Gem allows unlimited searches from significant search engines like Google, Bing, Baidu, Yandex, Yahoo, eBay, and Apple. The complete list is available on [SerpApi](https://serpapi.com).
+Integrate search data into your Ruby application. This library is the official wrapper for SerpApi (https://serpapi.com).
 
-This library is a robust client for the [SerpApi service](https://serpapi.com), designed for seamless integration with your Ruby-based application. [SerpApi service](https://serpapi.com) is a highly scalable service that delivers lightning-fast search results in JSON or raw HTML format, accessible via simple HTTP 1.1 requests.
-
-This library features:
- - Tons of practical examples.
- - Encode search parameters into HTTP requests.
- - Decode HTTP response JSON payload into a Hash using Ruby's 'json' standard library.
- - Expose one Ruby method per service endpoint: search, account, HTML, search_archive, location.
- - Adds a simple error handling by throwing SerpApiException.
+SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and more.
 
 ## Installation
 
-Ruby >= 2.6 must be already installed.
+Ruby 1.9.3 (or more recent), JRuby 9.1.17 (or more recent), or TruffleRuby 19.3.0 (or more recent) is required. 
 
 ### Bundler
 ```ruby
@@ -30,26 +21,18 @@ gem 'serpapi', '~> 1.0.0'
 $ gem install serpapi
 ```
 
-[Ruby GEM page](https://rubygems.org/gems/serpapi/)
+[Ruby Gem page](https://rubygems.org/gems/serpapi/)
 
-## Quick start
-
-Let's run a search on Google about Coffee.
+## Simple Usage
 
 ```ruby
 require 'serpapi'
-client = SerpApi::Client.new(engine: 'google', api_key: "secret_api_key")
-results = client.search(q: "coffee")
+client = SerpApi::Client.new api_key: "secret_api_key"
+results = client.search q: "coffee", engine: "google"
 pp results
-
-# oneliner option: all parameters are in the search method argument.
-pp SerpApi::Client.new.search(q: "coffee", engine: 'google', api_key: "secret_api_key")
  ```
 
-This example runs a search about "coffee" using your `secret_api_key`
- then returns the results as a dynamic Hash.
-
-See the [playground to generate your code.](https://serpapi.com/playground)
+This example runs a search for "coffee" on Google. It then returns the results as a regular Ruby Hash. See the [playground](https://serpapi.com/playground) to generate your own code.
 
 ## API Guide
 ### Search API overview
