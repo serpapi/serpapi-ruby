@@ -7,10 +7,11 @@ module SerpApi
     VERSION = '1.0.0'.freeze
     BACKEND = 'serpapi.com'.freeze
 
-    # HTTP timeout in seconds (default: 60)
-    attr_reader :timeout
+    # HTTP timeout in seconds (default: 120)
+    attr_accessor :timeout
+
     # Default parameters provided in the constructor (hash)
-    attr_reader :params
+    attr_accessor :params
 
     # Constructor
     #
@@ -30,7 +31,7 @@ module SerpApi
     # @param [Hash] params default for the search
     def initialize(params = {})
       # set default read timeout
-      @timeout = params[:timeout] || params['timeout'] || 60
+      @timeout = params[:timeout] || params['timeout'] || 120
       @timeout.freeze
 
       # delete this client only configuration keys
@@ -49,7 +50,7 @@ module SerpApi
     # @return [Hash] search results formatted as a Hash.
     #                 note that the raw response
     #                 from the search engine is converted to JSON by SerpApi.com backend.
-    #                 thus, most of the compute power is not pass on the client.
+    #                 thus, most of the compute power is on the backkend and not on the client side.
     #
     def search(params = {})
       get('/search', :json, params)
@@ -57,7 +58,7 @@ module SerpApi
 
     # html search
     #
-    # @return [String] raw html search results directly from the search engine
+    # @return [String] raw html search results directly from the search engine.
     def html(params = {})
       get('/search', :html, params)
     end
