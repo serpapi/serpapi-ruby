@@ -13,10 +13,10 @@ Style/FrozenStringLiteralComment:
 Style/RescueStandardError:
   Enabled: false
 
-# Ruby 2.0 only rule
-Lint/RescueWithoutErrorClass:
-  Enabled: false
-  
+# # Ruby 2.0 only rule. do work for new versions
+# Lint/RescueWithoutErrorClass:
+#   Enabled: false
+
 AllCops:
   NewCops: enable
   Exclude:
