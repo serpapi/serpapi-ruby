@@ -1,5 +1,5 @@
 # validate Ruby 1.9
-name: serpapi-ruby 
+name: serpapi-ruby-1.9
 on:
   push:
     branches: [ master ]

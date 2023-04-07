@@ -1,4 +1,5 @@
-name: serpapi-ruby
+# alternative ruby implementation
+name: serpapi-ruby-alternative
 on:
   push:
     branches: [ master, dev ]
@@ -9,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: [ '2.1.9', '2.2', '2.6', '3.1']
+        # 'truffleruby' - git action is broken
+        ruby-version: [ 'jruby', 'truffleruby+graalvm']
     steps:
       - uses: actions/checkout@v3
       - name: Set up Ruby ${{ matrix.ruby-version }}
@@ -18,12 +20,6 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
       - name: Install dependencies
         run: bundle install
-      - name: lint
-        run: bundle exec rake lint
-      - name: tests
-        env:
-          API_KEY: ${{ secrets.API_KEY }}
-        run: bundle exec rake test
       - name: oobt
         env:
           API_KEY: ${{ secrets.API_KEY }}
