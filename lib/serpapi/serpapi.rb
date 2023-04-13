@@ -79,7 +79,8 @@ module SerpApi
     # @param [Symbol] format :json or :html (default: json, optional)
     # @return [String|Hash] raw html or JSON / Hash
     def search_archive(search_id, format = :json)
-      raise SerpApiException, 'format must be json or html' unless [:json,:html].include?(format)
+      raise SerpApiException, 'format must be json or html' unless [:json, :html].include?(format)
+
       get("/searches/#{search_id}.#{format}", format, nil)
     end
 
