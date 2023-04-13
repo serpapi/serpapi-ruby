@@ -13,9 +13,9 @@ Style/FrozenStringLiteralComment:
 Style/RescueStandardError:
   Enabled: false
 
-# # Ruby 2.0 only rule. do work for new versions
-# Lint/RescueWithoutErrorClass:
-#   Enabled: false
+# %i is not supported by older languages
+Style/SymbolArray:
+  Enabled: false
 
 AllCops:
   NewCops: enable
