@@ -10,8 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # 'truffleruby' - git action is broken
-        ruby-version: [ 'jruby', 'truffleruby+graalvm']
+        # 'truffleruby' - git action is broken - april 2023
+        # 'truffleruby+graalvm - git action is broken - april 2023
+        ruby-version: [ 'jruby']
     steps:
       - uses: actions/checkout@v3
       - name: Set up Ruby ${{ matrix.ruby-version }}
