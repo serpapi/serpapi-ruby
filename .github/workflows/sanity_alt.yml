@@ -2,7 +2,7 @@
 name: serpapi-ruby-alternative
 on:
   push:
-    branches: [ master, dev ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 jobs:
@@ -18,9 +18,10 @@ jobs:
         uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
         with:
           ruby-version: ${{ matrix.ruby-version }}
-      - name: Install dependencies
-        run: bundle install
-      - name: oobt
+      - name: demo
         env:
           API_KEY: ${{ secrets.API_KEY }}
-        run: bundle exec rake oobt
+        run: |
+          gem build serpapi.gemspec
+          gem install ./serpapi-*.gem
+          ruby oobt/demo.rb
