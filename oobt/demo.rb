@@ -1,6 +1,7 @@
 # this demo demonstrates a simple implementation of serpapi client.
 #
 require 'serpapi'
+require 'pp'
 
 raise 'API_KEY environment variable must be set' if ENV['API_KEY'].nil?
 
