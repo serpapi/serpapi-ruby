@@ -157,6 +157,35 @@ pp client.account
 
 It prints your account information.
 
+### Bulk Search API
+
+If you have high volume of searches (e.g., >= 1 million) and they don't need to be live, you can use our Bulk Search API. You just have to use the `async` parameter:
+
+```ruby
+client = SerpApi::Client.new api_key: 'secret_api_key', async: true
+
+searches = [
+  engine: "google", q: "coffee",
+  engine: "google", q: "tea",
+  engine: "google", q: "hot chocolate milk",
+  ...
+]
+
+async_searches = searches.map do |search|
+  async_search = client.search search
+  async_search
+end
+
+# Get an ETA using the last search scheduled time
+bulk_search_eta = async_search_results.last[:search_metadata][:scheduled_at]
+
+# After the searches are done processing (i.e., `bulk_search_eta`)
+async_search_results = async_searches.map do |search|
+  results = client.search_archive search[:id]
+  results
+end
+```
+
 ## Basic example per search engine
 
 ### Search bing
