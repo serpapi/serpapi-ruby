@@ -165,12 +165,13 @@ If you have high volume of searches (e.g., >= 1 million) and they don't need to 
 client = SerpApi::Client.new api_key: 'secret_api_key', async: true
 
 searches = [
-  engine: "google", q: "coffee",
-  engine: "google", q: "tea",
-  engine: "google", q: "hot chocolate milk",
-  ...
+  { engine: "google", q: "coffee" },
+  { engine: "google", q: "tea" },
+  { engine: "google", q: "hot chocolate milk" },
+  # ...
 ]
 
+# Submit async searches
 async_searches = searches.map do |search|
   async_search = client.search search
   async_search
