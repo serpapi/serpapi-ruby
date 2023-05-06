@@ -1,10 +1,10 @@
-# SerpApi Ruby Library
+<div align="center">
+<h1 align="center">SerpApi Ruby Library</h1>
 
-[![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
-[![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi)
-[![serpapi-ruby-alternative](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_alt.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_alt.yml)
-[![serpapi-ruby-sanity-1](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_1.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_1.yml)
-[![serpapi-ruby-sanity-2](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_2.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_2.yml)
+![serpapi ruby library logo](https://user-images.githubusercontent.com/78694043/235409962-7afe3a25-9272-4d56-9678-9972b771453b.png)
+
+[![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi) [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)  [![serpapi-ruby-alternative](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_alt.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_alt.yml) [![serpapi-ruby-sanity-1](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_1.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_1.yml) [![serpapi-ruby-sanity-2](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_2.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_2.yml)
+</div>
 
 Integrate search data into your Ruby application. This library is the official wrapper for SerpApi (https://serpapi.com).
 
@@ -156,36 +156,6 @@ pp client.account
 ```
 
 It prints your account information.
-
-### Bulk Search API
-
-If you have high volume of searches (e.g., >= 1 million) and they don't need to be live, you can use our Bulk Search API. You just have to use the `async` parameter:
-
-```ruby
-client = SerpApi::Client.new api_key: 'secret_api_key', async: true
-
-searches = [
-  { engine: "google", q: "coffee" },
-  { engine: "google", q: "tea" },
-  { engine: "google", q: "hot chocolate milk" },
-  # ...
-]
-
-# Submit async searches
-async_searches = searches.map do |search|
-  async_search = client.search search
-  async_search
-end
-
-# Get an ETA using the last search scheduled time
-bulk_search_eta = async_search_results.last[:search_metadata][:scheduled_at]
-
-# After the searches are done processing (i.e., `bulk_search_eta`)
-async_search_results = async_searches.map do |search|
-  results = client.search_archive search[:id]
-  results
-end
-```
 
 ## Basic example per search engine
 
@@ -437,9 +407,10 @@ require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_local_services')
 results = client.search({
   'q': 'Electrician',
-  'place_id': 'ChIJOwg_06VPwokRYv534QaPC8g'
+  'data_cid': 'ChIJOwg_06VPwokRYv534QaPC8g'
 })
-pp results
+pp results[:local_ads]
+# ENV['API_KEY'] captures the secret user API available from http://serpapi.com
 
 ```
 
