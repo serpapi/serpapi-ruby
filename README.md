@@ -1,10 +1,6 @@
-<div align="center">
-<h1 align="center">SerpApi Ruby Library</h1>
-
-![serpapi ruby library logo](https://user-images.githubusercontent.com/78694043/235409962-7afe3a25-9272-4d56-9678-9972b771453b.png)
+# SerpApi Ruby Library
 
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi) [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)  [![serpapi-ruby-alternative](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_alt.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_alt.yml) [![serpapi-ruby-sanity-1](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_1.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_1.yml) [![serpapi-ruby-sanity-2](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_2.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_2.yml)
-</div>
 
 Integrate search data into your Ruby application. This library is the official wrapper for SerpApi (https://serpapi.com).
 
