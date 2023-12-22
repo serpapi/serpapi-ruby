@@ -1,5 +1,5 @@
 describe 'example: google_events search' do
-  xit 'prints events_results' do
+  it 'prints events_results' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_events')
     results = client.search({
       'q': 'coffee'
