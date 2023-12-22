@@ -1,5 +1,5 @@
 <%-
-def snippet(format, path, demo = false) 
+def snippet(format, path, demo = false)
  lines = File.new(path).readlines
  if demo
   buf = lines[1..-1].join
@@ -13,13 +13,9 @@ def snippet(format, path, demo = false)
  %Q(```#{format}\nrequire 'serpapi'\n#{buf}\n```\n\n * source code: [#{path}](https://github.com/serpapi/serpapi-ruby/blob/master/#{path}))
 end
 -%>
-<div align="center">
-<h1 align="center">SerpApi Ruby Library</h1>
-
-![serpapi ruby library logo](https://user-images.githubusercontent.com/78694043/235409962-7afe3a25-9272-4d56-9678-9972b771453b.png)
+# SerpApi Ruby Library
 
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi) [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)  [![serpapi-ruby-alternative](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_alt.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_alt.yml) [![serpapi-ruby-sanity-1](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_1.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_1.yml) [![serpapi-ruby-sanity-2](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_2.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/sanity_2.yml)
-</div>
 
 Integrate search data into your Ruby application. This library is the official wrapper for SerpApi (https://serpapi.com).
 
@@ -27,14 +23,14 @@ SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBa
 
 ## Installation
 
-Ruby 1.9.3 (or more recent), JRuby 9.1.17 (or more recent), or TruffleRuby 19.3.0 (or more recent) is required. 
+Ruby 1.9.3 (or more recent), JRuby 9.1.17 (or more recent), or TruffleRuby 19.3.0 (or more recent) is required.
 
 ### Bundler
 ```ruby
 gem 'serpapi', '~> 1.0.0'
 ```
 
-### Gem 
+### Gem
 ```bash
 $ gem install serpapi
 ```
@@ -63,7 +59,7 @@ client = SerpApi::Client.new(api_key: "secret_key", engine: "google")
 
 # We recommend that you keep your keys safe.
 # At least, don't commit them in plain text.
-# More about configuration via environment variables: 
+# More about configuration via environment variables:
 # https://hackernoon.com/all-the-secrets-of-encrypting-api-keys-in-ruby-revealed-5qf3t5l
 
 # search query overview (more fields available depending on search engine)
@@ -90,7 +86,7 @@ params = {
 }
 
 # formated search results as a Hash
-#  serpapi.com converts HTML -> JSON 
+#  serpapi.com converts HTML -> JSON
 results = client.search(params)
 
 # raw search engine html as a String
@@ -113,7 +109,7 @@ More hands on examples are available below.
 
 ```ruby
 require 'serpapi'
-client = SerpApi::Client.new() 
+client = SerpApi::Client.new()
 location_list = client.location(q: "Austin", limit: 3)
 puts "number of location: #{location_list.size}"
 pp location_list
@@ -164,6 +160,7 @@ pp results
 This code prints the search results from the archive. :)
 
 ### Account API
+
 ```ruby
 require 'serpapi'
 client = SerpApi::Client.new(api_key: 'secret_api_key')
@@ -172,99 +169,146 @@ pp client.account
 
 It prints your account information.
 
+### Bulk Search API
+
+If you have high volume of searches (e.g., >= 1 million) and they don't need to be live, you can use our Bulk Search API. You just have to use the `scheduled` parameter:
+
+```ruby
+client = SerpApi::Client.new api_key: 'secret_api_key', scheduled: true
+searches = [
+  { engine: "google", q: "coffee" },
+  { engine: "google", q: "tea" },
+  { engine: "google", q: "hot chocolate milk" },
+  # ...
+]
+# Submit async searches
+async_searches = searches.map do |search|
+  async_search = client.search search
+  async_search
+end
+# Get an ETA using the last search scheduled time
+bulk_search_eta = async_search_results.last[:search_metadata][:scheduled_at]
+# After the searches are done processing (i.e., `bulk_search_eta`)
+async_search_results = async_searches.map do |search|
+  results = client.search_archive search[:id]
+  results
+end
+```
+
 ## Basic example per search engine
 
-### Search bing
+### Search Bing
+
 <%= snippet('ruby', 'spec/serpapi/example_search_bing_spec.rb') %>
  * doc: [https://serpapi.com/bing-search-api](https://serpapi.com/bing-search-api)
 
-### Search baidu
+### Search Baidu
+
 <%= snippet('ruby', 'spec/serpapi/example_search_baidu_spec.rb') %>
  * doc: [https://serpapi.com/baidu-search-api](https://serpapi.com/baidu-search-api)
 
-### Search yahoo
+### Search Yahoo!
+
 <%= snippet('ruby', 'spec/serpapi/example_search_yahoo_spec.rb') %>
  * doc: [https://serpapi.com/yahoo-search-api](https://serpapi.com/yahoo-search-api)
 
-### Search youtube
+### Search YouTube
+
 <%= snippet('ruby', 'spec/serpapi/example_search_youtube_spec.rb') %>
  * doc: [https://serpapi.com/youtube-search-api](https://serpapi.com/youtube-search-api)
 
-### Search walmart
+### Search Walmart
+
 <%= snippet('ruby', 'spec/serpapi/example_search_walmart_spec.rb') %>
  * doc: [https://serpapi.com/walmart-search-api](https://serpapi.com/walmart-search-api)
 
-### Search ebay
+### Search eBay
+
 <%= snippet('ruby', 'spec/serpapi/example_search_ebay_spec.rb') %>
  * doc: [https://serpapi.com/ebay-search-api](https://serpapi.com/ebay-search-api)
 
-### Search naver
+### Search Naver
+
 <%= snippet('ruby', 'spec/serpapi/example_search_naver_spec.rb') %>
  * doc: [https://serpapi.com/naver-search-api](https://serpapi.com/naver-search-api)
 
-### Search home depot
+### Search The Home Depot
+
 <%= snippet('ruby', 'spec/serpapi/example_search_home_depot_spec.rb') %>
  * doc: [https://serpapi.com/home-depot-search-api](https://serpapi.com/home-depot-search-api)
 
-### Search apple app store
+### Search Apple App Store
+
 <%= snippet('ruby', 'spec/serpapi/example_search_apple_app_store_spec.rb') %>
  * doc: [https://serpapi.com/apple-app-store](https://serpapi.com/apple-app-store)
 
-### Search duckduckgo
+### Search DuckDuckGo
+
 <%= snippet('ruby', 'spec/serpapi/example_search_duckduckgo_spec.rb') %>
  * doc: [https://serpapi.com/duckduckgo-search-api](https://serpapi.com/duckduckgo-search-api)
 
-### Search google search
+### Search Google Search
+
 <%= snippet('ruby', 'spec/serpapi/example_search_google_search_spec.rb') %>
  * doc: [https://serpapi.com/search-api](https://serpapi.com/search-api)
 
-### Search google scholar
+### Search Google Scholar
+
 <%= snippet('ruby', 'spec/serpapi/example_search_google_scholar_spec.rb') %>
  * doc: [https://serpapi.com/google-scholar-api](https://serpapi.com/google-scholar-api)
 
-### Search google autocomplete
+### Search Google Autocomplete
+
 <%= snippet('ruby', 'spec/serpapi/example_search_google_autocomplete_spec.rb') %>
  * doc: [https://serpapi.com/google-autocomplete-api](https://serpapi.com/google-autocomplete-api)
 
-### Search google product
+### Search Google Product
+
 <%= snippet('ruby', 'spec/serpapi/example_search_google_product_spec.rb') %>
  * doc: [https://serpapi.com/google-product-api](https://serpapi.com/google-product-api)
 
-### Search google reverse image
+### Search Google Reverse Image
+
 <%= snippet('ruby', 'spec/serpapi/example_search_google_reverse_image_spec.rb') %>
  * doc: [https://serpapi.com/google-reverse-image](https://serpapi.com/google-reverse-image)
 
-### Search google events
+### Search Google Events
+
 <%= snippet('ruby', 'spec/serpapi/example_search_google_events_spec.rb') %>
  * doc: [https://serpapi.com/google-events-api](https://serpapi.com/google-events-api)
 
-### Search google local services
+### Search Google Local Services
+
 <%= snippet('ruby', 'spec/serpapi/example_search_google_local_services_spec.rb') %>
  * doc: [https://serpapi.com/google-local-services-api](https://serpapi.com/google-local-services-api)
 
-### Search google maps
+### Search Google Maps
+
 <%= snippet('ruby', 'spec/serpapi/example_search_google_maps_spec.rb') %>
  * doc: [https://serpapi.com/google-maps-api](https://serpapi.com/google-maps-api)
 
-### Search google jobs
+### Search Google Jobs
+
 <%= snippet('ruby', 'spec/serpapi/example_search_google_jobs_spec.rb') %>
  * doc: [https://serpapi.com/google-jobs-api](https://serpapi.com/google-jobs-api)
 
-### Search google play
+### Search Google Play
+
 <%= snippet('ruby', 'spec/serpapi/example_search_google_play_spec.rb') %>
  * doc: [https://serpapi.com/google-play-api](https://serpapi.com/google-play-api)
 
-### Search google images
+### Search Google Images
+
 <%= snippet('ruby', 'spec/serpapi/example_search_google_images_spec.rb') %>
  * doc: [https://serpapi.com/images-results](https://serpapi.com/images-results)
 
 ## Migration quick guide
 
-if you were already using (google-search-results-ruby gem)[https://github.com/serpapi/google-search-results-ruby], here are the changes.
+If you were already using [`google-search-results-ruby` gem](https://github.com/serpapi/google-search-results-ruby), here are the changes.
 
-```
+```ruby
 # load library
-# old way 
+# old way
 require 'google_search_results'
 # new way
 require 'serpapi'
@@ -272,7 +316,7 @@ require 'serpapi'
 # define a search
 # old way to describe the search
 search = GoogleSearch.new(search_params)
-# new way 
+# new way
 default_parameter = {api_key: "secret_key", engine: "google"}
 client = SerpApi::Client.new(default_parameter)
 # an instance of the serpapi client is created
@@ -299,7 +343,7 @@ raw_html = client.html(params)
 hash_results = search.get_hash
 # new way
 results = client.search(params)
-# where params is the search parameters (override the default search parameters in the constructor). 
+# where params is the search parameters (override the default search parameters in the constructor).
 
 # search as raw JSON format
 # old way
@@ -310,9 +354,9 @@ results = client.search(params)
 # The prefix get_ is removed from all other methods.
 #  Because it's evident that a method returns something.
 # old -> new way
-search.get_search_archive -> client.search_archive
-search.get_account -> client.account
-search.get_location -> client.location
+# search.get_search_archive -> client.search_archive
+# search.get_account -> client.account
+# search.get_location -> client.location
 ```
 
 Most notable improvements:
@@ -331,11 +375,12 @@ Search API enables `async` search.
  - Non-blocking (`async=true`) : the development is more complex, but this allows handling many simultaneous connections.
  - Blocking (`async=false`) : it's easy to write the code but more compute-intensive when the parent process needs to hold many connections.
 
-Here is an example of asynchronous searches using Ruby 
+Here is an example of asynchronous searches using Ruby
+
 <%= snippet('ruby', 'oobt/demo_async.rb', true) %>
 
-This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). 
-Each search takes a few seconds before completion by SerpApi service and the search engine. By the time the first element pops out of the queue. The search result might be already available in the archive. If not, the `search_archive` method blocks until the search results are available. 
+This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)).
+Each search takes a few seconds before completion by SerpApi service and the search engine. By the time the first element pops out of the queue. The search result might be already available in the archive. If not, the `search_archive` method blocks until the search results are available.
 
 ## Supported Ruby version.
 Ruby versions validated by Github Actions:
@@ -357,16 +402,16 @@ see: [Github Actions.](https://github.com/serpapi/serpapi-ruby/actions/workflows
  - Defensive code style (raise a custom exception)
  - TDD
  - Best API coding practice per platform
- - KiSS principles
+ - KISS principles
 
 ### Inspirations
 This project source code and coding style was inspired by the most awesome Ruby Gems:
  - [bcrypt](https://github.com/bcrypt-ruby/bcrypt-ruby)
  - [Nokogiri](https://nokogiri.org)
- - [Cloudfare](https://rubygems.org/gems/cloudflare/versions/2.1.0)
+ - [Cloudflare](https://rubygems.org/gems/cloudflare/)
  - [rest-client](https://rubygems.org/gems/rest-client)
  - [stripe](https://rubygems.org/gems/stripe)
- 
+
 ### Code quality expectations
  - 0 lint offense: `rake lint`
  - 100% tests passing: `rake test`
@@ -377,7 +422,7 @@ This project source code and coding style was inspired by the most awesome Ruby 
 ### Class diagram
 ```mermaid
 classDiagram
-  Application *-- serpapi 
+  Application *-- serpapi
   serpapi *-- Client
   class Client {
     engine String
@@ -397,7 +442,7 @@ classDiagram
 ### search() : Sequence diagram
 ```mermaid
 sequenceDiagram
-    Client->>SerpApi.com: search() : http request 
+    Client->>SerpApi.com: search() : http request
     SerpApi.com-->>SerpApi.com: query search engine
     SerpApi.com-->>SerpApi.com: parse HTML into JSON
     SerpApi.com-->>Client: JSON string payload
@@ -406,10 +451,10 @@ sequenceDiagram
 where:
   - The end user implements the application.
   - Client refers to SerpApi:Client.
-  - SerpApi.com is the backend HTTP / REST service.
+  - [SerpApi.com](https://serpapi.com) is the backend HTTP / REST service.
   - Engine refers to Google, Baidu, Bing, and more.
 
-The SerpApi.com service (backend)
+The [SerpApi.com](https://serpapi.com) service (backend)
  - executes a scalable search on `engine: "google"` using the search query: `q: "coffee"`.
  - parses the messy HTML responses from Google on the backend.
  - returns a standardized JSON response.
@@ -420,12 +465,12 @@ The class SerpApi::Client (client side / ruby):
 Et voila!
 
 ## Continuous integration
-We love "true open source" and "continuous integration", and Test Drive Development (TDD).
- We are using RSpec to test [our infrastructure around the clock]) using Github Action to achieve the best QoS (Quality Of Service).
+We love "true open source" and "continuous integration", and Test Drive Development (TDD). We are using RSpec to test our infrastructure around the clock using Github Action to achieve the best QoS (Quality Of Service).
 
 The directory spec/ includes specification which serves the dual purposes of examples and functional tests.
 
 Set your secret API key in your shell before running a test.
+
 ```bash
 export API_KEY="your_secret_key"
 ```
@@ -437,28 +482,33 @@ $ rake dependency
 ```
 
 Check code quality using Lint.
+
 ```bash
 $ rake lint
 ```
 
 Run regression.
+
 ```bash
 $ rake test
 ```
 
 To flush the flow.
+
 ```bash
 $ rake
 ```
 
 Open coverage report generated by `rake test`
+
 ```sh
 open coverage/index.html
 ```
 
-Open ./Rakefile for more information.
+Open `Rakefile` for more information.
 
 Contributions are welcome. Feel to submit a pull request!
 
 # TODO
- - [] Release version 1.0.0
+
+- [ ] Release version 1.0.0
