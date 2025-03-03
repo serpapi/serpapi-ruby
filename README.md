@@ -506,7 +506,7 @@ pp results[:images_results]
 
 ## Migration quick guide
 
-if you were already using (google-search-results-ruby gem)[https://github.com/serpapi/google-search-results-ruby], here are the changes.
+if you were already using [google-search-results-ruby gem](https://github.com/serpapi/google-search-results-ruby), here are the changes.
 
 ```
 # load library
