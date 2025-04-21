@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe 'example: google_jobs search' do
   it 'prints jobs_results' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_jobs')

@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe 'example: naver search' do
   it 'prints ads_results' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'naver')

@@ -1,8 +1,8 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
+require 'spec_helper'
 
 describe 'SerpApi Location API' do
-  it 'get normalized location for Austin, TX' do
-    client = SerpApi::Client.new
+  it 'Get normalized location for Austin, TX' do
+    client = SerpApi::Client.new(api_key: ENV['API_KEY'])
     location_list = client.location(q: 'Austin', limit: 3)
     expect(location_list.size).to eq(3)
 

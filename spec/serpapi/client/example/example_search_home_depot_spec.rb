@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe 'example: home_depot search' do
   it 'prints products' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'home_depot')

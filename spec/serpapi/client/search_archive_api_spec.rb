@@ -1,4 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper'))
+require 'spec_helper'
 
 describe 'SerpApi Search Archive API' do
   it 'fetch a search result from the archive' do

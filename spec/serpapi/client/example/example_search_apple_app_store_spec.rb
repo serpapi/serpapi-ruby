@@ -1,8 +1,10 @@
-describe 'example: baidu search' do
+require 'spec_helper'
+
+describe 'example: apple_app_store search' do
   it 'prints organic_results' do
-    client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'baidu')
+    client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'apple_app_store')
     results = client.search({
-      'q': 'coffee'
+      'term': 'coffee'
     })
     expect(results[:organic_results]).not_to be_nil
     # pp results[:organic_results]

@@ -1,6 +1,8 @@
-describe 'example: google_scholar search' do
+require 'spec_helper'
+
+describe 'example: baidu search' do
   it 'prints organic_results' do
-    client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_scholar')
+    client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'baidu')
     results = client.search({
       'q': 'coffee'
     })

@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe 'example: google search' do
   it 'prints organic_results' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google')

@@ -1,17 +1,18 @@
 # Client implementation for SerpApi.com
 #
 module SerpApi
+
   # Client for SerpApi.com
   #
   class Client
-    VERSION = '1.0.0'.freeze
+    include Errors
+
     BACKEND = 'serpapi.com'.freeze
 
-    # HTTP timeout in seconds (default: 120)
-    attr_accessor :timeout
-
-    # Default parameters provided in the constructor (hash)
-    attr_accessor :params
+                # HTTP timeout requests
+    attr_reader :timeout,
+                # Query parameters
+                :params
 
     # Constructor
     #
@@ -24,7 +25,7 @@ module SerpApi
     # The params hash should contains the following optional field:
     #  api_key [String] user secret API key
     #  engine [String] search enginge selected
-    #  timeout [Integer] HTTP read max timeout in seconds (default: 60s)
+    #  timeout [Integer] HTTP read max timeout in seconds (default: 120s)
     #
     # key can be either a symbol or a string.
     #
@@ -113,10 +114,10 @@ module SerpApi
       query = (@params || {}).merge(params || {})
 
       # set ruby client
-      query[:source] = 'serpapi-ruby:' << VERSION
+      query[:source] = 'serpapi-ruby:' << SerpApi::VERSION
 
       # delete empty key/value
-      query.delete_if { |_, value| value.nil? }
+      query.compact!
 
       # HTTP params encoding
       encoded_query = URI.encode_www_form(query)
@@ -133,15 +134,17 @@ module SerpApi
     # @return decoded payload as JSON / Hash or String
     def get(endpoint, decoder = :json, params = {})
       url = build_url(endpoint, params)
-      payload = URI(url).open(read_timeout: @read_timeout).read
+      payload = URI(url).open(read_timeout: timeout).read
       decode(payload, decoder)
-    rescue OpenURI::HTTPError => e
-      data = JSON.parse(e.io.read)
-      raise SerpApiException, "error: #{data['error']} from url: #{url}" if data.key?('error')
-
-      raise SerpApiException, "fail: get url: #{url} response: #{data}"
-    rescue => e
-      raise SerpApiException, "fail: get url: #{url} caused by: #{e}"
+      rescue OpenURI::HTTPError => err
+        data = JSON.parse(err.io.read)
+        if data.key?('error')
+          raise SerpApiException, "error: #{data['error']} from url: #{url}"
+        end
+        raise SerpApiException, "fail: get url: #{url} response: #{data}"
+      rescue => err
+        raise SerpApiException, "fail: get url: #{url} caused by: #{err}"
+      end
     end
 
     # decode HTTP payload either as :json or :html
@@ -160,5 +163,4 @@ module SerpApi
         raise SerpApiException, msg
       end
     end
-  end
 end

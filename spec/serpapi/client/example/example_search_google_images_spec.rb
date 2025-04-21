@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe 'search google images' do
   it 'prints images_results' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_images')

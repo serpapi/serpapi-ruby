@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe 'example: youtube search' do
   it 'prints video_results' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'youtube')

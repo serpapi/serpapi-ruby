@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe 'example: google_local_services search' do
   it 'prints local_ads' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_local_services')

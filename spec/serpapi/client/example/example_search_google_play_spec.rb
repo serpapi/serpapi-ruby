@@ -1,8 +1,11 @@
-describe 'example: bing search' do
+require 'spec_helper'
+
+describe 'example: google_play search' do
   it 'prints organic_results' do
-    client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'bing')
+    client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_play')
     results = client.search({
-      'q': 'coffee'
+      'q': 'kite',
+      'store': 'apps'
     })
     expect(results[:organic_results]).not_to be_nil
     # pp results[:organic_results]

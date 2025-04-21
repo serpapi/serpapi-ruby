@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe 'example: google_autocomplete search' do
   it 'prints suggestions' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_autocomplete')

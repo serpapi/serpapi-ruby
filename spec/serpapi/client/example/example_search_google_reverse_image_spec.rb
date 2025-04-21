@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe 'example: google_reverse_image search' do
   it 'prints image_sizes' do
     client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'google_reverse_image')

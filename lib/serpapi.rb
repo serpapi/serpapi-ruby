@@ -9,5 +9,6 @@ require 'open-uri'
 require 'json'
 
 # implementation
+require_relative 'serpapi/version'
 require_relative 'serpapi/error'
-require_relative 'serpapi/serpapi'
+require_relative 'serpapi/client'
