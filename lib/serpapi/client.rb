@@ -7,6 +7,7 @@ module SerpApi
   class Client
     include Errors
 
+    # Backend service URL
     BACKEND = 'serpapi.com'.freeze
 
                 # HTTP timeout requests

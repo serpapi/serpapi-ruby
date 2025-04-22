@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 if RUBY_VERSION < '2.1.0'
   s.version     = "1.0.0"
 else
-  s.version     = SerpApi::Client::VERSION
+  s.version     = SerpApi::VERSION
 end
   s.summary     = 'Official Ruby wrapper for SerpApi HTTP endpoints'
   s.description = 'Integrate search data into your Ruby application. This library is the official wrapper for SerpApi. SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and more.'

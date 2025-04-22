@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'faraday/httpclient'
 
 describe 'client full coverage' do
   before(:all) do
@@ -62,5 +63,17 @@ describe 'client full coverage' do
     rescue => e
       raise("wrong exception: #{e}")
     end
+  end
+end
+
+describe 'client adapter' do
+
+  it 'test httpclient (requires faraday/httpclient)' do
+    client = SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 10, adapter: :httpclient)
+    data = client.search(q: 'Coffee', location: 'Austin, TX')
+    expect(data.size).to be > 5
+    expect(data.class).to be Hash
+    expect(data.keys.size).to be > 5
+    expect(data[:search_metadata][:id]).not_to be_nil
   end
 end

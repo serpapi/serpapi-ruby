@@ -41,7 +41,7 @@ task :build do
 end
 
 task :install do
-  sh "gem install ./serpapi-#{SerpApi::Client::VERSION}.gem"
+  sh "gem install ./serpapi-#{SerpApi::VERSION}.gem"
 end
 
 task :demo do
@@ -49,11 +49,11 @@ task :demo do
 end
 
 task :version do
-  puts 'current version: ' + SerpApi::Client::VERSION
+  puts 'current version: ' + SerpApi::VERSION
 end
 
 task :tag do
-  version = SerpApi::Client::VERSION
+  version = SerpApi::VERSION
   puts "create git tag #{version}"
   sh "git tag #{version}"
   puts "now publish the tag:\n$ git push origin #{version}"

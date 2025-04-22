@@ -7,6 +7,8 @@ group :development, :production do
 end
 
 group :test, :development do
+  # HTTP client implementation
+  gem 'faraday-httpclient'
   # code coloring for yard
   gem 'redcarpet'
   # documentation generation
