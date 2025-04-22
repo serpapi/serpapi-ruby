@@ -1,8 +1,9 @@
+
 if RUBY_VERSION < '2.1.0'
- load File.join(File.dirname(__FILE__), 'lib/serpapi')
-else
- require_relative 'lib/serpapi'
-end
+  load File.join(File.dirname(__FILE__), 'lib/serpapi/version')
+ else
+  require_relative 'lib/serpapi/version'
+ end
 
 Gem::Specification.new do |s|
   s.name        = 'serpapi'
@@ -20,6 +21,9 @@ end
   s.homepage    = 'https://github.com/serpapi/serpapi-ruby'
   s.license     = 'MIT'
   s.required_ruby_version = '>= 1.9'
+
+  # faraday
+  s.add_dependency 'faraday', '~> 2.13'
 
 #  s.add_development_dependency 'rake'
 #  s.add_development_dependency 'rspec'

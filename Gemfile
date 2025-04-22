@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :production do
-  gem 'faraday', '~> 2.0'
+  gem 'faraday', '~> 2.13'
 end
 
 group :test, :development do

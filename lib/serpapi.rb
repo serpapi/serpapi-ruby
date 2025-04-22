@@ -1,13 +1,13 @@
 # Ruby client for SerpApi.com
 #  Scrape results for all major search engines from our fast, easy, and complete API.
 module SerpApi
-  # see serpapi/serpapi for implementation
+  # see serpapi for implementation
 end
 
 # load faraday HTTP lib
 require 'faraday'
 
-# load 
+# load
 require 'json'
 
 # implementation
