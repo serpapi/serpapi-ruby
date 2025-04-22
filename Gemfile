@@ -2,6 +2,10 @@ source 'https://rubygems.org'
 
 gemspec
 
+group :development, :production do
+  gem 'faraday', '~> 2.0'
+end
+
 group :test, :development do
   # code coloring for yard
   gem 'redcarpet'
@@ -20,4 +24,3 @@ group :test, :development do
     gem "pry-byebug"
   end
 end
-

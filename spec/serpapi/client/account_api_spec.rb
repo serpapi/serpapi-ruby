@@ -25,5 +25,7 @@ describe 'account API' do
     expect(account_info[:account_id]).not_to be_empty
     expect(account_info[:api_key]).not_to be_empty
     expect(account_info[:account_email]).not_to be_empty
+
+    puts "search left: #{account_info[:plan_searches_left]}"
   end
 end

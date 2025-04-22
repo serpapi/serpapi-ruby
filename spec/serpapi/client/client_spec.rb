@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe 'client full coverage' do
   before(:all) do
-    pp Module.constants.select { |c| c.to_s =~ /SerpApi/ }
     @client = SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 30)
   end
 
@@ -59,7 +58,7 @@ describe 'client full coverage' do
     begin
       @client.search({})
     rescue SerpApi::Errors::SerpApiException => e
-      expect(e.message).to include('fail: get url')
+      expect(e.message).to include('get failed with response')
     rescue => e
       raise("wrong exception: #{e}")
     end

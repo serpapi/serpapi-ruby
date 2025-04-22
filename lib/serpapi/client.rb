@@ -30,7 +30,7 @@ module SerpApi
     # key can be either a symbol or a string.
     #
     # @param [Hash] params default for the search
-    def initialize(params = {})
+    def initialize(params = {}, adapter = :net_http)
       # set default read timeout
       @timeout = params[:timeout] || params['timeout'] || 120
       @timeout.freeze
@@ -42,6 +42,9 @@ module SerpApi
       # set default params safely in memory
       @params = params.clone || {}
       @params.freeze
+
+      # setup connection socket
+      @socket = Faraday.new(url: "https://#{BACKEND}")
     end
 
     # perform a search using SerpApi.com
@@ -104,26 +107,16 @@ module SerpApi
 
     private
 
-    # build url from the search params
-    #
-    # @param [String] endpoint HTTP service uri
-    # @param [Hash] params custom search inputs
-    # @return formatted HTTPS URL
-    def build_url(endpoint, params)
-      # force default
-      query = (@params || {}).merge(params || {})
+    # @return [Hash] query parameter
+    def query(params)
+      # merge default params with custom params
+      q = (@params || {}).merge(params || {})
 
       # set ruby client
-      query[:source] = 'serpapi-ruby:' << SerpApi::VERSION
+      q[:source] = 'serpapi-ruby:' << SerpApi::VERSION
 
       # delete empty key/value
-      query.compact!
-
-      # HTTP params encoding
-      encoded_query = URI.encode_www_form(query)
-
-      # return URL
-      URI::HTTPS.build(host: BACKEND, path: endpoint, query: encoded_query)
+      q.compact
     end
 
     # get HTTP query formatted results
@@ -131,36 +124,33 @@ module SerpApi
     # @param [String] endpoint HTTP service uri
     # @param [Symbol] decoder type :json or :html
     # @param [Hash] params custom search inputs
+    # @param [Boolean] symbolize_names if true, convert JSON keys to symbols
     # @return decoded payload as JSON / Hash or String
-    def get(endpoint, decoder = :json, params = {})
-      url = build_url(endpoint, params)
-      payload = URI(url).open(read_timeout: timeout).read
-      decode(payload, decoder)
-      rescue OpenURI::HTTPError => err
-        data = JSON.parse(err.io.read)
-        if data.key?('error')
-          raise SerpApiException, "error: #{data['error']} from url: #{url}"
+    def get(endpoint, decoder = :json, params = {}, symbolize_names = true)
+      begin
+        payload = @socket.get(endpoint) do |req|
+          req.params = query(params)
+          req.options.timeout = timeout
         end
-        raise SerpApiException, "fail: get url: #{url} response: #{data}"
-      rescue => err
-        raise SerpApiException, "fail: get url: #{url} caused by: #{err}"
+        # read http response
+        data = payload.body
+        # decode payload using JSON native parser
+        if decoder == :json
+          data = JSON.parse(data, symbolize_names: symbolize_names)
+          if data.class == Hash && data.key?('error')
+            raise SerpApiException, "get failed with error: #{data['error']} from url: #{endpoint}, params: #{params}, decoder: #{decoder}, http status: #{payload.status} "
+          end
+          if payload.status != 200
+            raise SerpApiException, "get failed with response status: #{payload.status} reponse: #{data} on get url: #{endpoint}, params: #{params}, decoder: #{decoder}"
+          end
+        end
+        # return raw HTML
+        return data
+      rescue Faraday::Error => err
+        raise SerpApiException, "fail: get url: #{endpoint} caused by #{err.class} : #{err.message} (params: #{params}, decoder: #{decoder})"
       end
     end
 
-    # decode HTTP payload either as :json or :html
-    #
-    # @param [String] payload to decode
-    # @param [Symbol] decoder type :json or :html
-    # @return decoded payload as JSON / Hash or HTML / String
-    def decode(payload, decoder)
-      case decoder
-      when :json
-        JSON.parse(payload, symbolize_names: true)
-      when :html
-        payload
-      else
-        msg = "not supported decoder #{decoder}. should be: :html or :json (Symbol)"
-        raise SerpApiException, msg
-      end
-    end
+  end
+
 end

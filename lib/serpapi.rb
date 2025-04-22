@@ -4,8 +4,10 @@ module SerpApi
   # see serpapi/serpapi for implementation
 end
 
-# load native ruby dependency
-require 'open-uri'
+# load faraday HTTP lib
+require 'faraday'
+
+# load 
 require 'json'
 
 # implementation
