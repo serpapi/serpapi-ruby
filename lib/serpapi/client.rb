@@ -1,7 +1,6 @@
 # Client implementation for SerpApi.com
 #
 module SerpApi
-
   # Client for SerpApi.com
   #
   class Client
@@ -10,7 +9,7 @@ module SerpApi
     # Backend service URL
     BACKEND = 'serpapi.com'.freeze
 
-                # HTTP timeout requests
+    # HTTP timeout requests
     attr_reader :timeout,
                 # Query parameters
                 :params
@@ -31,7 +30,7 @@ module SerpApi
     # key can be either a symbol or a string.
     #
     # @param [Hash] params default for the search
-    def initialize(params = {}, adapter = :net_http)
+    def initialize(params = {}, _adapter = :net_http)
       # set default read timeout
       @timeout = params[:timeout] || params['timeout'] || 120
       @timeout.freeze
@@ -128,30 +127,24 @@ module SerpApi
     # @param [Boolean] symbolize_names if true, convert JSON keys to symbols
     # @return decoded payload as JSON / Hash or String
     def get(endpoint, decoder = :json, params = {}, symbolize_names = true)
-      begin
-        payload = @socket.get(endpoint) do |req|
-          req.params = query(params)
-          req.options.timeout = timeout
-        end
-        # read http response
-        data = payload.body
-        # decode payload using JSON native parser
-        if decoder == :json
-          data = JSON.parse(data, symbolize_names: symbolize_names)
-          if data.class == Hash && data.key?('error')
-            raise SerpApiException, "get failed with error: #{data['error']} from url: #{endpoint}, params: #{params}, decoder: #{decoder}, http status: #{payload.status} "
-          end
-          if payload.status != 200
-            raise SerpApiException, "get failed with response status: #{payload.status} reponse: #{data} on get url: #{endpoint}, params: #{params}, decoder: #{decoder}"
-          end
-        end
-        # return raw HTML
-        return data
-      rescue Faraday::Error => err
-        raise SerpApiException, "fail: get url: #{endpoint} caused by #{err.class} : #{err.message} (params: #{params}, decoder: #{decoder})"
+      payload = @socket.get(endpoint) do |req|
+        req.params = query(params)
+        req.options.timeout = timeout
       end
+      # read http response
+      data = payload.body
+      # decode payload using JSON native parser
+      if decoder == :json
+        data = JSON.parse(data, symbolize_names: symbolize_names)
+        if data.instance_of?(Hash) && data.key?('error')
+          raise SerpApiException, "get failed with error: #{data['error']} from url: #{endpoint}, params: #{params}, decoder: #{decoder}, http status: #{payload.status} "
+        end
+        raise SerpApiException, "get failed with response status: #{payload.status} reponse: #{data} on get url: #{endpoint}, params: #{params}, decoder: #{decoder}" if payload.status != 200
+      end
+      # return raw HTML
+      data
+    rescue Faraday::Error => e
+      raise SerpApiException, "fail: get url: #{endpoint} caused by #{e.class} : #{e.message} (params: #{params}, decoder: #{decoder})"
     end
-
   end
-
 end

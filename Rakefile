@@ -69,3 +69,8 @@ task oobt: %i[readme doc check build install demo]
 
 desc "execute all the steps"
 task default: %i[dependency version readme doc build test oobt]
+
+desc "format ruby code using rubocop"
+task :format do
+  sh('rubocop --auto-correct')
+end

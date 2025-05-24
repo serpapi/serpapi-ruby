@@ -12,13 +12,13 @@ group :test, :development do
   # code coloring for yard
   gem 'redcarpet'
   # documentation generation
-  gem 'yard'
+  gem 'yard', '~>0.9.28'
   # linter for ruby
-  gem 'rubocop'
+  gem 'rubocop', '~>1.30.1'
   # test for ruby
-  gem 'rspec'
+  gem 'rspec', '~>3.11'
   # code coverage to monitor rspec tests
-  gem 'simplecov'
+  gem 'simplecov', 
 
   platforms :mri do
     gem "byebug"

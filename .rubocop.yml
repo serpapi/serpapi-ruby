@@ -1,19 +1,20 @@
+# human should be able to read 200 chars per line
 Layout/LineLength:
-  Max: 100
+  Max: 200
 
+# relax branch condition size, code can be too verbose
 Metrics/AbcSize:
-  Max: 21
+  Max: 40
 
+# short clear method name 
 Metrics/MethodLength:
   Max: 25
 
-Style/FrozenStringLiteralComment:
+# no performance implication
+Style/OptionalBooleanParameter:
   Enabled: false
 
-Style/RescueStandardError:
-  Enabled: false
-
-# %i is not supported by older languages
+# %i(array) is not common in Ruby
 Style/SymbolArray:
   Enabled: false
 
