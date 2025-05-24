@@ -86,7 +86,7 @@ module SerpApi
     def search_archive(search_id, format = :json)
       raise SerpApiException, 'format must be json or html' unless [:json, :html].include?(format)
 
-      get("/searches/#{search_id}.#{format}", format, nil)
+      get("/searches/#{search_id}.#{format}", format)
     end
 
     # Get account information using Account API
@@ -98,12 +98,12 @@ module SerpApi
 
     # @return [String] default search engine
     def engine
-      @params['engine'] || @params[:engine]
+      @params[:engine]
     end
 
     # @return [String] api_key user secret api_key as supplied in the constructor params[:api_key]
     def api_key
-      @params['api_key'] || @params[:api_key]
+      @params[:api_key]
     end
 
     private
@@ -111,7 +111,7 @@ module SerpApi
     # @return [Hash] query parameter
     def query(params)
       # merge default params with custom params
-      q = (@params || {}).merge(params || {})
+      q = @params.merge(params)
 
       # set ruby client
       q[:source] = 'serpapi-ruby:' << SerpApi::VERSION
