@@ -18,7 +18,7 @@ group :test, :development do
   # test for ruby
   gem 'rspec', '~>3.11'
   # code coverage to monitor rspec tests
-  gem 'simplecov', 
+  gem 'simplecov'
 
   # platforms :mri do
   #   gem "byebug"
