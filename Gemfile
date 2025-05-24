@@ -20,9 +20,9 @@ group :test, :development do
   # code coverage to monitor rspec tests
   gem 'simplecov', 
 
-  platforms :mri do
-    gem "byebug"
-    gem "pry"
-    gem "pry-byebug"
-  end
+  # platforms :mri do
+  #   gem "byebug"
+  #   gem "pry"
+  #   gem "pry-byebug"
+  # end
 end
