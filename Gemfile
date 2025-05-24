@@ -14,7 +14,7 @@ group :test, :development do
   # documentation generation
   gem 'yard', '~>0.9.28'
   # linter for ruby
-  gem 'rubocop', '~>1.30.1'
+  gem 'rubocop', '~>1.75.7'
   # test for ruby
   gem 'rspec', '~>3.11'
   # code coverage to monitor rspec tests

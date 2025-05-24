@@ -25,23 +25,10 @@ end
   # faraday
   s.add_dependency 'faraday', '~> 2.13'
 
-#  s.add_development_dependency 'rake'
-#  s.add_development_dependency 'rspec'
-#  s.add_development_dependency 'yard'
-#  s.add_development_dependency 'rubocop'
+  # development dependency
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'yard'
+  s.add_development_dependency 'rubocop'
 
-  # break
-  # # add Ruby version specific dependencies
-  if  RUBY_VERSION > '2.2.0'
-     # Ruby 2.3+
-     s.add_development_dependency 'rake', '~> 13.0.6'
-     s.add_development_dependency 'rspec', '~> 3.11'
-     s.add_development_dependency 'yard', '~> 0.9.28'
-     s.add_development_dependency 'rubocop', '~> 1.30.1'
-  else
-   #  if RUBY_VERSION < '2.0.0'
-     # Ruby 1.9
-     s.add_development_dependency 'rake', '~> 12.2'
-     s.add_development_dependency 'rspec', '~> 2.01'
-  end
 end
