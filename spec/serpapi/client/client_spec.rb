@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'faraday/httpclient'
 
-describe 'client full coverage' do
+describe 'client full code coverage' do
   before(:all) do
     @client = SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 30)
   end
@@ -66,7 +66,7 @@ describe 'client full coverage' do
   end
 end
 
-describe 'client adapter' do
+describe 'client adapter with httpclient' do
 
   it 'test httpclient (requires faraday/httpclient)' do
     client = SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 10, adapter: :httpclient)
@@ -76,4 +76,5 @@ describe 'client adapter' do
     expect(data.keys.size).to be > 5
     expect(data[:search_metadata][:id]).not_to be_nil
   end
+
 end

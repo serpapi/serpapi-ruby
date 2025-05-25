@@ -1,8 +1,8 @@
 # code coverage
-# require 'simplecov'
-# SimpleCov.start 'rails'
+require 'simplecov'
+SimpleCov.start
 
-# # load libary
+# load libary
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'serpapi'
 

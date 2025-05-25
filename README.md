@@ -12,8 +12,9 @@ SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBa
 
 ## Installation
 
-Ruby 3+ must be installed for best performance the latest version 3.4 is recommended.
- For older version of Ruby 1.9 and 2.x or JRuby, our older library is still functional.
+To achieve optimal performance, it is essential to have Ruby 3.x (preferably version 3.4) installed. 
+
+| Older versions such as Ruby 1.9, 2.x, and JRuby are compatible with [serpapi older library](https://github.com/serpapi/google-search-results-ruby), which continues to function effectively.
 
 ### Bundler
 ```ruby
@@ -174,6 +175,30 @@ gem install faraday-httpclient
 client = SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 10, adapter: :httpclient)
 data = client.search(q: 'Coffee', location: 'Austin, TX')
 pp data
+```
+
+or a more [advanced parallel requests example](https://lostisland.github.io/faraday/#/advanced/parallel-requests)
+
+```ruby
+# install and load
+require 'async/http/faraday'
+
+# initialize the client
+client = SerpApi::Client.new(adapter: :async_http, api_key: ENV['API_KEY'], timeout: 10)
+
+# run same query in parallel
+Async do
+  Async do
+    data = client.search(engine: 'google', q: 'Coffee', location: 'Austin, TX')
+    expect(data.keys.size).to be > 5
+    expect(data.dig(:search_metadata,:id)).not_to be_nil
+  end
+  Async do
+    data = client.search(engine: 'youtube', search_query: 'Coffee', location: 'Austin, TX')
+    expect(data.keys.size).to be > 5
+    expect(data.dig(:search_metadata,:id)).not_to be_nil
+  end
+end
 ```
 
 ## Basic example per search engine

@@ -20,6 +20,9 @@ group :test, :development do
   # code coverage to monitor rspec tests
   gem 'simplecov'
 
+  # for client_async_spec.rb
+  gem 'async-http-faraday'
+  
   # platforms :mri do
   #   gem "byebug"
   #   gem "pry"
