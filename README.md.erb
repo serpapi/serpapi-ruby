@@ -50,8 +50,8 @@ $ gem install serpapi
 
 ```ruby
 require 'serpapi'
-client = SerpApi::Client.new api_key: "serpapi_api_key"
-results = client.search q: "coffee", engine: "google"
+client = SerpApi::Client.new(api_key: "serpapi_api_key")
+results = client.search(q: "coffee", engine: "google")
 pp results
  ```
 
@@ -64,7 +64,7 @@ This example runs a search for "coffee" on Google. It then returns the results a
 require 'serpapi'
 
 # serpapi client created with default parameters
-client = SerpApi::Client.new(api_key: "secret_key", engine: "google")
+client = SerpApi::Client.new(engine: 'google', api_key: 'secret_key')
 
 # We recommend that you keep your keys safe.
 # At least, don't commit them in plain text.
@@ -103,7 +103,7 @@ results = client.search(params)
 raw_html = client.html(parameter)
 ```
 
-[Google search documentation](https://serpapi.com/search-api).
+[SerpApi documentation](https://serpapi.com/search-api).
 More hands on examples are available below.
 
 #### Documentations
@@ -150,14 +150,15 @@ This API allows retrieving previous search results.
 To fetch earlier results from the search_id.
 
 First, you need to run a search and save the search id.
+
 ```ruby
 require 'serpapi'
-client = SerpApi::Client.new(api_key: 'secret_api_key', engine: 'google')
+client = SerpApi::Client.new(engine: 'google', api_key: 'secret_api_key')
 results = client.search(q: "Coffee", location: "Portland")
 search_id = results[:search_metadata][:id]
 ```
 
-Now let's retrieve the previous search results from the archive.
+Now we can retrieve the previous search results from the archive (free)
 
 ```ruby
 require 'serpapi'
