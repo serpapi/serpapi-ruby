@@ -18,6 +18,10 @@ Style/OptionalBooleanParameter:
 Style/SymbolArray:
   Enabled: false
 
+# too restrictive
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
 AllCops:
   NewCops: enable
   Exclude:
