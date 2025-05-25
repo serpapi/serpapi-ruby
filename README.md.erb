@@ -4,13 +4,17 @@ def snippet(format, path, demo = false)
  if demo
   buf = lines[1..-1].join
  else
+  # select test from line start to stop
+  start = 9
   stop = lines.find_index { |line| line =~ /pp results/}
-  slice = File.new(path).readlines[2..stop+1]
-  slice.reject! { |l| l =~ /expect\(/ }
-  buf = slice.map { |l| l.gsub(/(^\s\s\s\s)/, '')}.join
+  slice = File.new(path).readlines[start..stop+1]
+  slice.reject! { |l| l =~ /expect\(|^\s*describe|^\s+it|^\s*end\s*$/ }
+  slice.map! { |l| l.gsub(/(^\s\s\s\s)/, '')}
+  buf = slice.join
   buf.gsub!('# pp ', 'pp ')
+  buf.gsub!('api_key)', "ENV['API_KEY'])")
  end
- %Q(```#{format}\nrequire 'serpapi'\n#{buf}\n```\n\n * source code: [#{path}](https://github.com/serpapi/serpapi-ruby/blob/master/#{path}))
+ %Q(```#{format}\nrequire 'serpapi'\n#{buf}```\n\n * source code: [#{path}](https://github.com/serpapi/serpapi-ruby/blob/master/#{path}))
 end
 -%>
 <div align="center">
@@ -27,7 +31,8 @@ SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBa
 
 ## Installation
 
-Ruby 1.9.3 (or more recent), JRuby 9.1.17 (or more recent), or TruffleRuby 19.3.0 (or more recent) is required. 
+Ruby 3+ must be installed for best performance the latest version 3.4 is recommended.
+ For older version of Ruby 1.9 and 2.x or JRuby, our older library is still functional.
 
 ### Bundler
 ```ruby
@@ -75,7 +80,7 @@ params = {
   # then adds search engine specific options.
   # for example: google specific parameters: https://serpapi.com/search-api
   google_domain: "Google Domain",
-  location: "Location Requested", # example: Portland,Oregon,United States [see: Location API](#Location-API)
+  location: "Location Requested", # example: Portland,Oregon,United States [ * doc: Location API](#Location-API)
   device: "desktop|mobile|tablet",
   hl: "Google UI Language",
   gl: "Google Country",
@@ -191,48 +196,10 @@ pp data
 
 ## Basic example per search engine
 
-### Search bing
-<%= snippet('ruby', 'spec/serpapi/client/example/example_search_bing_spec.rb') %>
- * doc: [https://serpapi.com/bing-search-api](https://serpapi.com/bing-search-api)
+Here is how to calls the APIs.
 
-### Search baidu
-<%= snippet('ruby', 'spec/serpapi/client/example/example_search_baidu_spec.rb') %>
- * doc: [https://serpapi.com/baidu-search-api](https://serpapi.com/baidu-search-api)
-
-### Search yahoo
-<%= snippet('ruby', 'spec/serpapi/client/example/example_search_yahoo_spec.rb') %>
- * doc: [https://serpapi.com/yahoo-search-api](https://serpapi.com/yahoo-search-api)
-
-### Search youtube
-<%= snippet('ruby', 'spec/serpapi/client/example/example_search_youtube_spec.rb') %>
- * doc: [https://serpapi.com/youtube-search-api](https://serpapi.com/youtube-search-api)
-
-### Search walmart
-<%= snippet('ruby', 'spec/serpapi/client/example/example_search_walmart_spec.rb') %>
- * doc: [https://serpapi.com/walmart-search-api](https://serpapi.com/walmart-search-api)
-
-### Search ebay
-<%= snippet('ruby', 'spec/serpapi/client/example/example_search_ebay_spec.rb') %>
- * doc: [https://serpapi.com/ebay-search-api](https://serpapi.com/ebay-search-api)
-
-### Search naver
-<%= snippet('ruby', 'spec/serpapi/client/example/example_search_naver_spec.rb') %>
- * doc: [https://serpapi.com/naver-search-api](https://serpapi.com/naver-search-api)
-
-### Search home depot
-<%= snippet('ruby', 'spec/serpapi/client/example/example_search_home_depot_spec.rb') %>
- * doc: [https://serpapi.com/home-depot-search-api](https://serpapi.com/home-depot-search-api)
-
-### Search apple app store
-<%= snippet('ruby', 'spec/serpapi/client/example/example_search_apple_app_store_spec.rb') %>
- * doc: [https://serpapi.com/apple-app-store](https://serpapi.com/apple-app-store)
-
-### Search duckduckgo
-<%= snippet('ruby', 'spec/serpapi/client/example/example_search_duckduckgo_spec.rb') %>
- * doc: [https://serpapi.com/duckduckgo-search-api](https://serpapi.com/duckduckgo-search-api)
-
-### Search google search
-<%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_search_spec.rb') %>
+### Search google
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_spec.rb') %>
  * doc: [https://serpapi.com/search-api](https://serpapi.com/search-api)
 
 ### Search google scholar
@@ -274,6 +241,82 @@ pp data
 ### Search google images
 <%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_images_spec.rb') %>
  * doc: [https://serpapi.com/images-results](https://serpapi.com/images-results)
+
+### Search google lens
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_lens_spec.rb') %>
+ * doc: [https://serpapi.com/google-lens-api](https://serpapi.com/google-lens-api)
+
+### Search google images light
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_images_light_spec.rb') %>
+ * doc: [https://serpapi.com/google-images-light-api](https://serpapi.com/google-images-light-api)
+
+### Search google hotels
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_hotels_spec.rb') %>
+ * doc: [https://serpapi.com/google-hotels-api](https://serpapi.com/google-hotels-api)
+
+### Search google flights
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_flights_spec.rb') %>
+ * doc: [https://serpapi.com/google-flights-api](https://serpapi.com/google-flights-api)
+
+### Search google finance
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_finance_spec.rb') %>
+ * doc: [https://serpapi.com/google-finance-api](https://serpapi.com/google-finance-api)
+
+### Search google ai overview
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_ai_overview_spec.rb') %>
+ * doc: [https://serpapi.com/google-ai-overview-api](https://serpapi.com/google-ai-overview-api)
+
+### Search google news
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_news_spec.rb') %>
+ * doc: [https://serpapi.com/google-news-api](https://serpapi.com/google-news-api)
+
+### Search google patents
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_patents_spec.rb') %>
+ * doc: [https://serpapi.com/google-patents-api](https://serpapi.com/google-patents-api)
+
+### Search google trends
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_trends_spec.rb') %>
+ * doc: [https://serpapi.com/google-trends-api](https://serpapi.com/google-trends-api)
+
+### Search google shopping
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_google_shopping_spec.rb') %>
+ * doc: [https://serpapi.com/google-shopping-api](https://serpapi.com/google-shopping-api)
+
+### Search baidu
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_baidu_spec.rb') %>
+ * doc: [https://serpapi.com/baidu-search-api](https://serpapi.com/baidu-search-api)
+
+### Search yahoo
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_yahoo_spec.rb') %>
+ * doc: [https://serpapi.com/yahoo-search-api](https://serpapi.com/yahoo-search-api)
+
+### Search youtube
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_youtube_spec.rb') %>
+ * doc: [https://serpapi.com/youtube-search-api](https://serpapi.com/youtube-search-api)
+
+### Search walmart
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_walmart_spec.rb') %>
+ * doc: [https://serpapi.com/walmart-search-api](https://serpapi.com/walmart-search-api)
+
+### Search ebay
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_ebay_spec.rb') %>
+ * doc: [https://serpapi.com/ebay-search-api](https://serpapi.com/ebay-search-api)
+
+### Search naver
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_naver_spec.rb') %>
+ * doc: [https://serpapi.com/naver-search-api](https://serpapi.com/naver-search-api)
+
+### Search home depot
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_home_depot_spec.rb') %>
+ * doc: [https://serpapi.com/home-depot-search-api](https://serpapi.com/home-depot-search-api)
+
+### Search apple app store
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_apple_app_store_spec.rb') %>
+ * doc: [https://serpapi.com/apple-app-store](https://serpapi.com/apple-app-store)
+
+### Search duckduckgo
+<%= snippet('ruby', 'spec/serpapi/client/example/example_search_duckduckgo_spec.rb') %>
+ * doc: [https://serpapi.com/duckduckgo-search-api](https://serpapi.com/duckduckgo-search-api)
 
 ## Migration quick guide
 
@@ -358,7 +401,7 @@ Each search takes a few seconds before completion by SerpApi service and the sea
 Ruby versions validated by Github Actions:
  - 3.1
  - 2.6
-see: [Github Actions.](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
+ * doc: [Github Actions.](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 
 ## Change logs
  * [2023-02-20] 1.0.0 Full API support

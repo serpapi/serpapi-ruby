@@ -2,12 +2,21 @@ require 'spec_helper'
 
 describe 'example: home_depot search' do
   it 'prints products' do
-    client = SerpApi::Client.new(api_key: ENV['API_KEY'], engine: 'home_depot')
+    # Confirm that the environment variable for API_KEY has been set properly.
+    #  Your SerpApi key can be obtained at this URL http://serpapi.com
+    api_key = ENV['API_KEY']
+    skip('API_KEY not set. Please set your SerpApi API key.') if api_key.nil?
+
+    # initialize the serp api client
+    client = SerpApi::Client.new(engine: 'home_depot', api_key: api_key)
+    # run a search using serpapi service
     results = client.search({
-      'q': 'table'
+      q: 'table'
     })
-    expect(results[:products]).not_to be_nil
+    expect(results[:products]).not_to be_nil, "No products found! keys available: #{results.keys}"
+
+    # print the output of the response in formatted JSON
     # pp results[:products]
-    # ENV['API_KEY'] captures the secret user API available from http://serpapi.com
+    # doc: https://serpapi.com/home_depot
   end
 end
