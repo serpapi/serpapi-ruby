@@ -3,12 +3,10 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :production do
-  gem 'faraday', '~> 2.13'
+  gem 'http', '~> 0.13.3'
 end
 
 group :test, :development do
-  # HTTP client implementation
-  gem 'faraday-httpclient'
   # code coloring for yard
   gem 'redcarpet'
   # documentation generation
@@ -20,12 +18,11 @@ group :test, :development do
   # code coverage to monitor rspec tests
   gem 'simplecov'
 
-  # for client_async_spec.rb
-  gem 'async-http-faraday'
+  # Thread pool example file: thread_pool_spec.rb
+  # https://github.com/mperham/connection_pool/tree/main
+  gem 'connection_pool'
+
+  # Benchmark is no longer included in Ruby 3.5
+  gem 'benchmark'
   
-  # platforms :mri do
-  #   gem "byebug"
-  #   gem "pry"
-  #   gem "pry-byebug"
-  # end
 end

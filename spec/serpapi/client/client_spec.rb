@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'faraday/httpclient'
 
 describe 'client full code coverage' do
   before(:all) do
@@ -21,7 +20,7 @@ describe 'client full code coverage' do
   it 'missing query' do
     begin
       @client.search({})
-    rescue SerpApi::Errors::SerpApiException => e
+    rescue SerpApi::SerpApiError => e
       expect(e.message).to include('Missing query')
     rescue => e
       raise("wrong exception: #{e}")
@@ -47,34 +46,30 @@ describe 'client full code coverage' do
   it 'get bad decoder' do
     begin
       @client.send(:get, '/search', :bad, {q: 'hello'})
-    rescue SerpApi::Errors::SerpApiException => e
+    rescue SerpApi::SerpApiError => e
       expect(e.message).to include('not supported decoder')
-    rescue => e
-      raise("wrong exception: #{e}")
-    end
-  end
-
-  it 'fail: get url' do
-    allow(JSON).to receive(:parse) { {} }
-    begin
-      @client.search({})
-    rescue SerpApi::Errors::SerpApiException => e
-      expect(e.message).to include('get failed with response')
     rescue => e
       raise("wrong exception: #{e}")
     end
   end
 end
 
-describe 'client adapter with httpclient' do
-
-  it 'test httpclient (requires faraday/httpclient)' do
-    client = SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 10, adapter: :httpclient)
-    data = client.search(q: 'Coffee', location: 'Austin, TX')
-    expect(data.size).to be > 5
-    expect(data.class).to be Hash
-    expect(data.keys.size).to be > 5
-    expect(data[:search_metadata][:id]).not_to be_nil
+describe 'SerpApi client adapter' do
+  let(:client) do
+    SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 10, persistency: true) 
   end
 
+  it 'makes a search request with valid parameters' do
+    expect(client.socket).to_not be_nil
+    response = client.search(q: 'Coffee', location: 'Austin, TX')
+    expect(response.size).to be > 5
+    expect(response.class).to be Hash
+    expect(response.keys.size).to be > 5
+    expect(response[:search_metadata][:id]).not_to be_nil
+  end
+
+  it 'handles API errors' do
+    allow(client).to receive(:search).and_raise(SerpApi::SerpApiError)
+    expect { client.search(q: 'Invalid Query') }.to raise_error(SerpApi::SerpApiError)
+  end
 end

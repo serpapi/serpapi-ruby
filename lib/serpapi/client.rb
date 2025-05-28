@@ -4,7 +4,6 @@ module SerpApi
   # Client for SerpApi.com
   #
   class Client
-    include Errors
 
     # Backend service URL
     BACKEND = 'serpapi.com'.freeze
@@ -12,7 +11,11 @@ module SerpApi
     # HTTP timeout requests
     attr_reader :timeout,
                 # Query parameters
-                :params
+                :params,
+                # HTTP persistent
+                :persistent,
+                # HTTP.rb client
+                :socket
 
     # Constructor
     #
@@ -30,21 +33,32 @@ module SerpApi
     # key can be either a symbol or a string.
     #
     # @param [Hash] params default for the search
-    def initialize(params = {}, _adapter = :net_http)
-      # set default read timeout
-      @timeout = params[:timeout] || params['timeout'] || 120
+    def initialize(params = {})
+      # store client HTTP request timeout
+      @timeout = params[:timeout] || 120
       @timeout.freeze
 
-      # delete this client only configuration keys
-      params.delete('timeout') if params.key? 'timeout'
-      params.delete(:timeout) if params.key? :timeout
+      # enable HTTP persistent mode
+      @persistent = params[:persistent] || true
+      @persistent.freeze
 
-      # set default params safely in memory
+      # delete this client only configuration keys
+      %i(timeout persistent).each do |option|
+        params.delete(option) if params.key?(option)
+      end
+
+      # set default serpapi related parameters
       @params = params.clone || {}
+
+      # track ruby library as a client for statistic purpose
+      @params[:source] = 'serpapi-ruby:' << SerpApi::VERSION
+
       @params.freeze
 
-      # setup connection socket
-      @socket = Faraday.new(url: "https://#{BACKEND}")
+      # create connection socket
+      if persistent?
+        @socket = HTTP.persistent("https://#{BACKEND}")
+      end
     end
 
     # perform a search using SerpApi.com
@@ -83,7 +97,7 @@ module SerpApi
     # @param [Symbol] format :json or :html (default: json, optional)
     # @return [String|Hash] raw html or JSON / Hash
     def search_archive(search_id, format = :json)
-      raise SerpApiException, 'format must be json or html' unless [:json, :html].include?(format)
+      raise SerpApiError, 'format must be json or html' unless [:json, :html].include?(format)
 
       get("/searches/#{search_id}.#{format}", format)
     end
@@ -105,6 +119,11 @@ module SerpApi
       @params[:api_key]
     end
 
+    # close open connection 
+    def close
+      @socket.close if @socket
+    end
+
     private
 
     # @return [Hash] query parameter
@@ -112,11 +131,13 @@ module SerpApi
       # merge default params with custom params
       q = @params.merge(params)
 
-      # set ruby client
-      q[:source] = 'serpapi-ruby:' << SerpApi::VERSION
-
       # delete empty key/value
       q.compact
+    end
+
+    # @return [Boolean] HTTP session persistent enabled
+    def persistent?
+      persistent
     end
 
     # get HTTP query formatted results
@@ -125,26 +146,33 @@ module SerpApi
     # @param [Symbol] decoder type :json or :html
     # @param [Hash] params custom search inputs
     # @param [Boolean] symbolize_names if true, convert JSON keys to symbols
-    # @return decoded payload as JSON / Hash or String
+    # @return decoded response as JSON / Hash or String
     def get(endpoint, decoder = :json, params = {}, symbolize_names = true)
-      payload = @socket.get(endpoint) do |req|
-        req.params = query(params)
-        req.options.timeout = timeout
+      # execute get via open socket 
+      if persistent?
+        response = @socket.get(endpoint, params: query(params))
+      else
+        response = HTTP.timeout(timeout).get("https://#{BACKEND}#{endpoint}", params: query(params))
       end
-      # read http response
-      data = payload.body
-      # decode payload using JSON native parser
-      if decoder == :json
-        data = JSON.parse(data, symbolize_names: symbolize_names)
-        if data.instance_of?(Hash) && data.key?('error')
-          raise SerpApiException, "get failed with error: #{data['error']} from url: #{endpoint}, params: #{params}, decoder: #{decoder}, http status: #{payload.status} "
+      
+      # decode response using JSON native parser
+      case decoder
+      when :json
+        # read http response
+        data = JSON.parse(response.body, symbolize_names: symbolize_names)
+        if data.instance_of?(Hash) && data.key?(:error)
+          raise SerpApiError, "HTTP request failed with error: #{data[:error]} from url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}, response status: #{response.status} "
+        elsif response.status != 200
+          raise SerpApiError, "HTTP request failed with response status: #{response.status} reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}" 
         end
-        raise SerpApiException, "get failed with response status: #{payload.status} reponse: #{data} on get url: #{endpoint}, params: #{params}, decoder: #{decoder}" if payload.status != 200
+
+        # discard response body
+        response.flush if persistent?
+
+        return data
+      else
+        return response.body
       end
-      # return raw HTML
-      data
-    rescue Faraday::Error => e
-      raise SerpApiException, "fail: get url: #{endpoint} caused by #{e.class} : #{e.message} (params: #{params}, decoder: #{decoder})"
     end
   end
 end

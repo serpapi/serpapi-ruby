@@ -12,9 +12,12 @@ if RUBY_VERSION < '2.1.0'
 else
   s.version     = SerpApi::VERSION
 end
-  s.summary     = 'Official Ruby wrapper for SerpApi HTTP endpoints'
-  s.description = 'Integrate search data into your Ruby application. This library is the official wrapper for SerpApi. SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and more.'
-  s.authors     = ['victor benarbia']
+  s.summary     = 'Official Ruby library for SerpApi HTTP endpoints'
+  s.description = 'Integrate powerful search functionality into your Ruby application with SerpApi. SerpApi offers official 
+support for Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and more. 
+Access a vast range of data, including web search results, local business listings, and product 
+information.'
+  s.authors     = ['victor benarbia', 'Julien Khaleghy']
   s.email       = 'victor@serpapi.com'
   s.files       = Dir['{lib}/serpapi.rb'] + Dir['{lib}/serpapi/*.rb']
   s.require_paths = ['lib']
@@ -23,7 +26,7 @@ end
   s.required_ruby_version = '>= 3.1'
 
   # faraday
-  s.add_dependency 'faraday', '~> 2.13'
+  s.add_dependency 'http', '~> 0.13.3'
 
   # development dependency
   s.add_development_dependency 'rake', '~> 13.2.1'

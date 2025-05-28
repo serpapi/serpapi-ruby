@@ -2,6 +2,9 @@
 require 'simplecov'
 SimpleCov.start
 
+require 'benchmark'
+require 'http'
+
 # load libary
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'serpapi'

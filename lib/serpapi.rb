@@ -4,8 +4,8 @@ module SerpApi
   # see serpapi for implementation
 end
 
-# load faraday HTTP lib
-require 'faraday'
+# load HTTP
+require 'http'
 
 # load
 require 'json'

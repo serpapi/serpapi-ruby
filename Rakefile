@@ -63,6 +63,8 @@ end
 desc 'run demo example'
 task :demo do
   sh 'ruby oobt/demo.rb'
+  sh 'ruby oobt/demo_async.rb'
+  sh 'ruby oobt/demo_thread_pool.rb'
 end
 
 desc 'release the gem to the public rubygems.org'

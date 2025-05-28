@@ -160,47 +160,6 @@ pp client.account
 
 It prints your account information.
 
-### Change HTTP client implementation
-
-The internal HTTP client is based on the [Faraday](https://lostisland.github.io/faraday/) library.
- You can change the HTTP client by passing the adapter as an argument to the `SerpApi::Client.new` method.
-
-It requires to install the adapter gem.
-```sh
-gem install faraday-httpclient
-```
-
-```ruby
-# see faraday documentation for adapter description.
-client = SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 10, adapter: :httpclient)
-data = client.search(q: 'Coffee', location: 'Austin, TX')
-pp data
-```
-
-or a more [advanced parallel requests example](https://lostisland.github.io/faraday/#/advanced/parallel-requests)
-
-```ruby
-# install and load
-require 'async/http/faraday'
-
-# initialize the client
-client = SerpApi::Client.new(adapter: :async_http, api_key: ENV['API_KEY'], timeout: 10)
-
-# run same query in parallel
-Async do
-  Async do
-    data = client.search(engine: 'google', q: 'Coffee', location: 'Austin, TX')
-    expect(data.keys.size).to be > 5
-    expect(data.dig(:search_metadata,:id)).not_to be_nil
-  end
-  Async do
-    data = client.search(engine: 'youtube', search_query: 'Coffee', location: 'Austin, TX')
-    expect(data.keys.size).to be > 5
-    expect(data.dig(:search_metadata,:id)).not_to be_nil
-  end
-end
-```
-
 ## Basic example per search engine
 
 Here is how to calls the APIs.
@@ -841,15 +800,47 @@ Search API enables `async` search.
 Here is an example of asynchronous searches using Ruby 
 ```ruby
 require 'serpapi'
+# The code snippet aims to improve the efficiency of searching using the SerpApi client async function. It 
+# targets companies in the MAANG (Meta, Amazon, Apple, Netflix, Google) group.
+#
+# **Process:**
+# 1. **Request Queue:** The company list is iterated over, and each company is queried using the SerpApi client. Requests 
+# are stored in a queue to avoid blocking the main thread.
+#
+# 2. **Client Retrieval:** After each request, the code checks the status of the search result. If it's cached or 
+# successful, the company name is printed, and the request is skipped. Otherwise, the result is added to the queue for 
+# further processing.
+#
+# 3. **Queue Processing:** The queue is processed until it's empty. In each iteration, the last result is retrieved and 
+# its client ID is extracted.
+#
+# 4. **Archived Client Retrieval:** Using the client ID, the code retrieves the archived client and checks its status. If 
+# it's cached or successful, the company name is printed, and the client is skipped. Otherwise, the result is added back 
+# to the queue for further processing.
+#
+# 5. **Completion:** The queue is closed, and a message is printed indicating that the process is complete.
+#
+# * **Asynchronous Requests:** The `async: true` option ensures that search requests are processed in parallel, improving 
+# efficiency.
+# * **Queue Management:** The queue allows requests to be processed asynchronously without blocking the main thread.
+# * **Status Checking:** The code checks the status of each search result before processing it, avoiding unnecessary work.
+# * **Queue Processing:** The queue ensures that all requests are processed in the order they were submitted.
+
+# **Overall, the code snippet demonstrates a well-structured approach to improve the efficiency of searching for company 
+# information using SerpApi.**
+
+# load serpapi library
+require 'serpapi'
+
 # target MAANG companies
 company_list = %w(meta amazon apple netflix google)
-client = SerpApi::Client.new({engine: 'google', async: true, api_key: ENV['API_KEY']})
+client = SerpApi::Client.new(engine: 'google', async: true, persistent: true, api_key: ENV['API_KEY'])
 search_queue = Queue.new
 company_list.each do |company|
   # store request into a search_queue - no-blocker
   result = client.search({q: company})
   if result[:search_metadata][:status] =~ /Cached|Success/
-    puts "#{company}: client done"
+    puts "#{company}: search results found in cache for: #{company}"
     next
   end
 
@@ -864,9 +855,9 @@ while !search_queue.empty?
   search_id = result[:search_metadata][:id]
 
   # retrieve client from the archive - blocker
-  search_archived = client.2(search_id)
+  search_archived = client.search_archive(search_id)
   if search_archived[:search_metadata][:status] =~ /Cached|Success/
-    puts "#{search_archived[:search_parameters][:q]}: client done"
+    puts "#{search_archived[:search_parameters][:q]}: search results found in archive for: #{company}"
     next
   end
 
@@ -874,6 +865,7 @@ while !search_queue.empty?
   search_queue.push(result)
 end
 
+# destroy the queue
 search_queue.close
 puts 'done'```
 
