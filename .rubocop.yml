@@ -22,6 +22,15 @@ Style/SymbolArray:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
+# default complexity is low at 8
+Metrics/PerceivedComplexity:
+  Max: 10
+
+# if works as well as safe navigation (&.)
+Style/SafeNavigation:
+  Enabled: false
+
+
 AllCops:
   NewCops: enable
   Exclude:

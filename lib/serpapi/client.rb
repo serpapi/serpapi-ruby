@@ -4,7 +4,6 @@ module SerpApi
   # Client for SerpApi.com
   #
   class Client
-
     # Backend service URL
     BACKEND = 'serpapi.com'.freeze
 
@@ -43,7 +42,7 @@ module SerpApi
       @persistent.freeze
 
       # delete this client only configuration keys
-      %i(timeout persistent).each do |option|
+      %i[timeout persistent].each do |option|
         params.delete(option) if params.key?(option)
       end
 
@@ -56,9 +55,9 @@ module SerpApi
       @params.freeze
 
       # create connection socket
-      if persistent?
-        @socket = HTTP.persistent("https://#{BACKEND}")
-      end
+      return unless persistent?
+
+      @socket = HTTP.persistent("https://#{BACKEND}")
     end
 
     # perform a search using SerpApi.com
@@ -119,7 +118,7 @@ module SerpApi
       @params[:api_key]
     end
 
-    # close open connection 
+    # close open connection
     def close
       @socket.close if @socket
     end
@@ -148,13 +147,13 @@ module SerpApi
     # @param [Boolean] symbolize_names if true, convert JSON keys to symbols
     # @return decoded response as JSON / Hash or String
     def get(endpoint, decoder = :json, params = {}, symbolize_names = true)
-      # execute get via open socket 
-      if persistent?
-        response = @socket.get(endpoint, params: query(params))
-      else
-        response = HTTP.timeout(timeout).get("https://#{BACKEND}#{endpoint}", params: query(params))
-      end
-      
+      # execute get via open socket
+      response = if persistent?
+                   @socket.get(endpoint, params: query(params))
+                 else
+                   HTTP.timeout(timeout).get("https://#{BACKEND}#{endpoint}", params: query(params))
+                 end
+
       # decode response using JSON native parser
       case decoder
       when :json
@@ -163,15 +162,15 @@ module SerpApi
         if data.instance_of?(Hash) && data.key?(:error)
           raise SerpApiError, "HTTP request failed with error: #{data[:error]} from url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}, response status: #{response.status} "
         elsif response.status != 200
-          raise SerpApiError, "HTTP request failed with response status: #{response.status} reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}" 
+          raise SerpApiError, "HTTP request failed with response status: #{response.status} reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}"
         end
 
         # discard response body
         response.flush if persistent?
 
-        return data
+        data
       else
-        return response.body
+        response.body
       end
     end
   end
