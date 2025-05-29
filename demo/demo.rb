@@ -1,5 +1,5 @@
-# The code snippet you provided demonstrates a simple implementation of the SerpApi client using the Ruby Serpapi gem. It 
-# performs a Google Autocomplete search for the query "coffee" and prints the suggestions returned.
+# The code snippet you provided demonstrates a simple implementation of the SerpApi client using the Ruby Serpapi gem.
+# It  performs a Google Autocomplete search for the query "coffee" and prints the suggestions returned.
 #
 # **Key Points:**
 #

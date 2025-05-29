@@ -1,15 +1,10 @@
-require 'serpapi'
-require 'benchmark'
-require "connection_pool"
-
-# **Code Explanation:**
 
 # The provided code snippet is a Ruby spec test case that 
 # demonstrates the use of thread pools to execute multiple HTTP 
 # requests concurrently.
-
+#
 # **Key Points:**
-
+#
 # * The `connection_pool` gem is used to create a thread pool of 
 # `HTTP` connections.
 # * The `Thread` class is used to spawn multiple threads, each of 
@@ -26,25 +21,25 @@ require "connection_pool"
 # improve performance by executing multiple tasks concurrently. In 
 # this case, it makes multiple HTTP requests to an API endpoint using 
 # a thread pool of connections.
-
+#
 # **Benefits:**
-
+#
 # * Improved performance by avoiding the overhead of creating and 
 # destroying connections for each request.
 # * Efficient use of resources by sharing connections among multiple 
 # threads.
 # * Concurrency and parallelism, allowing multiple requests to be 
 # processed simultaneously.
-
+#
 # **Usage:**
-
+#
 # The code snippet can be used as a reference to implement thread 
 # pools in Ruby applications. It provides an example of how to use 
 # the `connection_pool` gem to create a thread pool of connections 
 # and make concurrent HTTP requests.
-
+#
 # **Additional Notes:**
-
+#
 # * The number of threads created should be set to an appropriate 
 # value based on the available resources and the expected request 
 # load.
@@ -57,6 +52,10 @@ require "connection_pool"
 # * The `benchmark` gem is used to measure the execution time of the 
 # code block.
 # reference: https://github.com/httprb/http/wiki/Thread-Safety
+
+require 'serpapi'
+require 'benchmark'
+require 'connection_pool'
 
 # number of thread == number of HTTP persistent connection
 n = 4

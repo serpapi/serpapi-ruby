@@ -1,6 +1,5 @@
-
-# The code snippet aims to improve the efficiency of searching using the SerpApi client async function. It 
-# targets companies in the MAANG (Meta, Amazon, Apple, Netflix, Google) group.
+# The code snippet aims to improve the efficiency of searching using the SerpApi client in async mode.
+# The request are non-blocking which allows batching a large amount of query, and wait before fetching the result back.
 #
 # **Process:**
 # 1. **Request Queue:** The company list is iterated over, and each company is queried using the SerpApi client. Requests 

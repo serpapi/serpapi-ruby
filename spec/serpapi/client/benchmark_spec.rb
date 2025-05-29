@@ -14,7 +14,7 @@ require 'spec_helper'
 # ````
 # For an example of thread pool where the socket connection can be shared see: thread_pool_spec.rb 
 
-describe 'benchmark SerpApi client with/without persistent conenction' do
+describe 'benchmark SerpApi client with/without persistent connection' do
 
   # number of sequential requests
   n = 10

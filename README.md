@@ -6,9 +6,16 @@
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi) [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)  
 </div>
 
-Integrate search data into your Ruby application. This library is the official wrapper for SerpApi (https://serpapi.com).
-
+Integrate search data into your Ruby application. This library is the official wrapper for SerpApi (https://serpapi.com). 
 SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and more.
+Fast query at scale a vast range of data, including web search results, flight schedule, stock market data, news headlines, and more.
+
+## Features
+  * `persistent`:Keep socket connection open to save on SSL handshake / reconnection (2x
+  faster). [default: true] [Search at scale](#Search-At-Scale)
+  * `async`: [Boolean] Support non-blocking job submission. [default: false] [Search Asynchronous](#Search-Asynchronous)
+  * extensive documentations
+  * real world examples
 
 ## Installation
 
@@ -32,29 +39,36 @@ $ gem install serpapi
 
 ```ruby
 require 'serpapi'
-client = SerpApi::Client.new(api_key: "serpapi_api_key")
-results = client.search(q: "coffee", engine: "google")
+client = SerpApi::Client.new(engine: "google", api_key: "<SERPAPI_KEY>")
+results = client.search(q: "coffee")
 pp results
  ```
 
-This example runs a search for "coffee" on Google. It then returns the results as a regular Ruby Hash. See the [playground](https://serpapi.com/playground) to generate your own code.
+This example runs a search for "coffee" on Google. It then returns the results as a regular Ruby Hash.
+ See the [playground](https://serpapi.com/playground) to generate your own code.
 
-## Advanced Usage
-### Search API
+The `SERPAPI_KEY` should be replaced with your actual API key obtained from 
+https://serpapi.com/users/sign_up?plan=free.
+
+## Search API advanced Usage
+
 ```ruby
 # load gem
 require 'serpapi'
 
 # serpapi client created with default parameters
-client = SerpApi::Client.new(engine: 'google', api_key: 'secret_key')
-
-# We recommend that you keep your keys safe.
-# At least, don't commit them in plain text.
-# More about configuration via environment variables: 
-# https://hackernoon.com/all-the-secrets-of-encrypting-api-keys-in-ruby-revealed-5qf3t5l
+client = SerpApi::Client.new(
+  engine: 'google',
+  api_key: ENV['SERPAPI_KEY'],
+  # HTTP client behavior
+  async: false, # non blocking HTTP request see [Search Asynchronous](#Search-Asynchronous)
+  persistent: true, # leave socket connection open for faster response time [Search at scale](#Search-At-Scale)
+  timeout: 5, # HTTP timeout in seconds on the client side only.
+)
 
 # search query overview (more fields available depending on search engine)
 params = {
+  # overview of parameter for Google search engine which one of many search engine supported.
   # select the search engine (full list: https://serpapi.com/)
   engine: "google",
   # actual search query
@@ -62,7 +76,8 @@ params = {
   # then adds search engine specific options.
   # for example: google specific parameters: https://serpapi.com/search-api
   google_domain: "Google Domain",
-  location: "Location Requested", # example: Portland,Oregon,United States [ * doc: Location API](#Location-API)
+  # example: Portland,Oregon,United States [ * doc: Location API](#Location-API)
+  location: "Location Requested",
   device: "desktop|mobile|tablet",
   hl: "Google UI Language",
   gl: "Google Country",
@@ -71,22 +86,18 @@ params = {
   start: "Pagination Offset",
   tbm: "nws|isch|shop",
   tbs: "custom to be client criteria",
-  # tweak HTTP client behavior
-  async: false, # true when async call enabled.
-  timeout: 60, # HTTP timeout in seconds on the client side only.
 }
 
-# formated search results as a Hash
-#  serpapi.com converts HTML -> JSON 
+# formatted search results as a Hash
+#  serpapi.com converts HTML -> JSON
 results = client.search(params)
 
 # raw search engine html as a String
-#  serpapi.com acts a proxy to provive high throughputs, no search limit and more.
-raw_html = client.html(parameter)
+#  serpapi.com acts a proxy to provide high throughputs, no search limit and more.
+raw_html = client.html(params) # Corrected parameter reference
 ```
 
 [SerpApi documentation](https://serpapi.com/search-api).
-More hands on examples are available below.
 
 #### Documentations
 
@@ -96,6 +107,128 @@ More hands on examples are available below.
  * [Library GEM page](https://rubygems.org/gems/serpapi/)
  * [API health status](https://serpapi.com/status)
 
+## Advanced search API usage
+### Search Asynchronous
+
+Search API features non-blocking search using the option: `async=true`.
+ - Non-blocking - async=true - a single parent process can handle unlimited concurrent searches.
+ - Blocking - async=false - many processes must be forked and synchronized to handle concurrent searches. This strategy is I/O usage because each client would hold a network connection.
+
+Search API enables `async` search.
+ - Non-blocking (`async=true`) : the development is more complex, but this allows handling many simultaneous connections.
+ - Blocking (`async=false`) : it's easy to write the code but more compute-intensive when the parent process needs to hold many connections.
+
+Here is an example of asynchronous searches using Ruby 
+```ruby
+require 'serpapi'
+
+company_list = %w(meta amazon apple netflix google)
+client = SerpApi::Client.new(engine: 'google', async: true, persistent: true, api_key: ENV['API_KEY'])
+search_queue = Queue.new
+company_list.each do |company|
+  result = client.search({q: company})
+  if result[:search_metadata][:status] =~ /Cached|Success/
+    puts "#{company}: search results found in cache for: #{company}"
+    next
+  end
+
+  search_queue.push(result)
+end
+
+puts "wait until all searches are cached or success"
+while !search_queue.empty?
+  result = search_queue.pop
+  search_id = result[:search_metadata][:id]
+
+  search_archived = client.search_archive(search_id)
+  if search_archived[:search_metadata][:status] =~ /Cached|Success/
+    puts "#{search_archived[:search_parameters][:q]}: search results found in archive for: #{company}"
+    next
+  end
+
+  search_queue.push(result)
+end
+
+search_queue.close
+puts 'done'
+```
+
+ * source code: [demo/demo_async.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_async.rb)
+
+This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). 
+Each search takes a few seconds before completion by SerpApi service and the search engine. By the time the first element pops out of the queue. The search result might be already available in the archive. If not, the `search_archive` method blocks until the search results are available. 
+
+### Search at scale
+The provided code snippet is a Ruby spec test case that demonstrates the use of thread pools to execute multiple HTTP requests concurrently.
+
+```ruby
+require 'serpapi'
+require 'connection_pool'
+
+# create a thread pool of 4 threads with a persistent connection to serpapi.com
+pool = ConnectionPool.new(size: n, timeout: 5) do
+    SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 30, persistent: true)
+end
+
+# run user thread to search for your favorites coffee type
+threads = %w(latte espresso cappuccino americano mocha macchiato frappuccino cold_brew).map do |query|
+  Thread.new do
+    pool.with { |socket| socket.search({q: query }).to_s }
+  end
+end
+responses = threads.map(&:value)
+```
+
+The code aims to demonstrate how thread pools can be used to 
+improve performance by executing multiple tasks concurrently. In 
+this case, it makes multiple HTTP requests to an API endpoint using 
+a thread pool of persistent connections.
+
+**Benefits:**
+
+* Improved performance by avoiding the overhead of creating and 
+destroying connections for each request.
+* Efficient use of resources by sharing connections among multiple 
+threads.
+* Concurrency and parallelism, allowing multiple requests to be 
+processed simultaneously.
+
+benchmark: (demo/demo_thread_pool.rb)
+
+### Real world search without persistency
+
+```ruby
+require 'serpapi'
+
+raise 'API_KEY environment variable must be set' if ENV['API_KEY'].nil?
+
+default_params = {
+  engine: 'google_autocomplete',
+  client: 'safari',
+  hl: 'en',
+  gl: 'us',
+  api_key: ENV['API_KEY'],
+  persistent: false,
+  timeout: 2
+}
+client = SerpApi::Client.new(default_params)
+params = {
+  q: 'coffee'
+}
+results = client.search(params)
+puts 'print suggestions'
+if !results[:suggestions] || results[:suggestions].empty?
+  puts 'no suggestions found'
+  exit 1
+end
+pp results[:suggestions]
+puts 'done'
+exit 0
+```
+
+ * source code: [demo/demo.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo.rb)
+
+## APIs supported
 ### Location API
 
 ```ruby
@@ -161,8 +294,6 @@ pp client.account
 It prints your account information.
 
 ## Basic example per search engine
-
-Here is how to calls the APIs.
 
 ### Search google
 ```ruby
@@ -786,102 +917,14 @@ Most notable improvements:
  - Reduce logic complexity in our implementation. (faster performance)
  - Better documentation.
 
-## Advanced search API usage
-### Highly scalable batching
-
-Search API features non-blocking search using the option: `async=true`.
- - Non-blocking - async=true - a single parent process can handle unlimited concurrent searches.
- - Blocking - async=false - many processes must be forked and synchronized to handle concurrent searches. This strategy is I/O usage because each client would hold a network connection.
-
-Search API enables `async` search.
- - Non-blocking (`async=true`) : the development is more complex, but this allows handling many simultaneous connections.
- - Blocking (`async=false`) : it's easy to write the code but more compute-intensive when the parent process needs to hold many connections.
-
-Here is an example of asynchronous searches using Ruby 
-```ruby
-require 'serpapi'
-# The code snippet aims to improve the efficiency of searching using the SerpApi client async function. It 
-# targets companies in the MAANG (Meta, Amazon, Apple, Netflix, Google) group.
-#
-# **Process:**
-# 1. **Request Queue:** The company list is iterated over, and each company is queried using the SerpApi client. Requests 
-# are stored in a queue to avoid blocking the main thread.
-#
-# 2. **Client Retrieval:** After each request, the code checks the status of the search result. If it's cached or 
-# successful, the company name is printed, and the request is skipped. Otherwise, the result is added to the queue for 
-# further processing.
-#
-# 3. **Queue Processing:** The queue is processed until it's empty. In each iteration, the last result is retrieved and 
-# its client ID is extracted.
-#
-# 4. **Archived Client Retrieval:** Using the client ID, the code retrieves the archived client and checks its status. If 
-# it's cached or successful, the company name is printed, and the client is skipped. Otherwise, the result is added back 
-# to the queue for further processing.
-#
-# 5. **Completion:** The queue is closed, and a message is printed indicating that the process is complete.
-#
-# * **Asynchronous Requests:** The `async: true` option ensures that search requests are processed in parallel, improving 
-# efficiency.
-# * **Queue Management:** The queue allows requests to be processed asynchronously without blocking the main thread.
-# * **Status Checking:** The code checks the status of each search result before processing it, avoiding unnecessary work.
-# * **Queue Processing:** The queue ensures that all requests are processed in the order they were submitted.
-
-# **Overall, the code snippet demonstrates a well-structured approach to improve the efficiency of searching for company 
-# information using SerpApi.**
-
-# load serpapi library
-require 'serpapi'
-
-# target MAANG companies
-company_list = %w(meta amazon apple netflix google)
-client = SerpApi::Client.new(engine: 'google', async: true, persistent: true, api_key: ENV['API_KEY'])
-search_queue = Queue.new
-company_list.each do |company|
-  # store request into a search_queue - no-blocker
-  result = client.search({q: company})
-  if result[:search_metadata][:status] =~ /Cached|Success/
-    puts "#{company}: search results found in cache for: #{company}"
-    next
-  end
-
-  # add results to the client queue
-  search_queue.push(result)
-end
-
-puts "wait until all searches are cached or success"
-while !search_queue.empty?
-  result = search_queue.pop
-  # extract client id
-  search_id = result[:search_metadata][:id]
-
-  # retrieve client from the archive - blocker
-  search_archived = client.search_archive(search_id)
-  if search_archived[:search_metadata][:status] =~ /Cached|Success/
-    puts "#{search_archived[:search_parameters][:q]}: search results found in archive for: #{company}"
-    next
-  end
-
-  # add results to the client queue
-  search_queue.push(result)
-end
-
-# destroy the queue
-search_queue.close
-puts 'done'```
-
- * source code: [oobt/demo_async.rb](https://github.com/serpapi/serpapi-ruby/blob/master/oobt/demo_async.rb)
-
-This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). 
-Each search takes a few seconds before completion by SerpApi service and the search engine. By the time the first element pops out of the queue. The search result might be already available in the archive. If not, the `search_archive` method blocks until the search results are available. 
-
 ## Supported Ruby version.
 Ruby versions validated by Github Actions:
  - 3.1
- - 2.6
+ - 3.4
  * doc: [Github Actions.](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 
 ## Change logs
- * [2023-02-20] 1.0.0 Full API support
+ * [2025-07-01] 1.0.0 Full API support
 
 ## Developer Guide
 ### Key goals
@@ -892,7 +935,7 @@ Ruby versions validated by Github Actions:
    - Thread safe
  - Easy extension
  - Defensive code style (raise a custom exception)
- - TDD
+ - TDD - Test driven development
  - Best API coding practice per platform
  - KiSS principles
 
@@ -996,6 +1039,3 @@ open coverage/index.html
 Open ./Rakefile for more information.
 
 Contributions are welcome. Feel to submit a pull request!
-
-# TODO
- - [] Release version 1.0.0

@@ -2,6 +2,12 @@
 #
 module SerpApi
   # Client for SerpApi.com
+  # powered by HTTP.rb
+  #
+  #  it supports:
+  #  * async non-block search
+  #  * persistent HTTP connection
+  #  * many endpoints
   #
   class Client
     # Backend service URL
@@ -17,22 +23,49 @@ module SerpApi
                 :socket
 
     # Constructor
+    # The `Serpapi::Client` constructor takes a hash of options as input.
     #
-    # Example:
+    # **Example:**
+    #
     # ```ruby
     # require 'serpapi'
-    # client = SerpApi::Client.new(api_key: "secure API key", engine: "google", timeout: 30)
-    # result = client.search(q: "coffee")
-    # ```
-    # The params hash should contains the following optional field:
-    #  api_key [String] user secret API key
-    #  engine [String] search enginge selected
-    #  timeout [Integer] HTTP read max timeout in seconds (default: 120s)
     #
-    # key can be either a symbol or a string.
+    # client = SerpApi::Client.new(
+    #   api_key: "secure API key",
+    #   engine: "google",
+    #   timeout: 30,
+    #   persistent: true
+    # )
+    #
+    # result = client.search(q: "coffee")
+    #
+    # client.close
+    # ```
+    #
+    # **Parameters:**
+    #
+    # * `api_key`: [String] User secret API key.
+    # * `engine`: [String] Search engine selected.
+    # * `persistent`: [Boolean] Keep socket connection open to save on SSL handshake / connection reconnectino (2x
+    # faster). [default: true]
+    # * `async`: [Boolean] Support non-blocking job submission. [default: false]
+    # * `timeout`: [Integer] HTTP get max timeout in seconds [default: 120s == 2m]
+    #
+    # **Key:**kr
+    #
+    # The `key` parameter can be either a symbol or a string.
+    #
+    # **Note:**
+    #
+    # * All parameters are optional.
+    # * The `close` method should be called when the client is no longer needed.
     #
     # @param [Hash] params default for the search
+    #
     def initialize(params = {})
+      raise SerpApiError, 'params cannot be nil' if params.nil?
+      raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
+
       # store client HTTP request timeout
       @timeout = params[:timeout] || 120
       @timeout.freeze
@@ -46,12 +79,13 @@ module SerpApi
         params.delete(option) if params.key?(option)
       end
 
-      # set default serpapi related parameters
+      # set default query parameters
       @params = params.clone || {}
 
       # track ruby library as a client for statistic purpose
       @params[:source] = 'serpapi-ruby:' << SerpApi::VERSION
 
+      # ensure default parameter would not be modified later
       @params.freeze
 
       # create connection socket
@@ -62,13 +96,15 @@ module SerpApi
 
     # perform a search using SerpApi.com
     #
-    # @param [Hash] params search includes engine, api_key, search fields and more..
-    #                this override the default params set in the constructor.
-    # @return [Hash] search results formatted as a Hash.
-    #                 note that the raw response
-    #                 from the search engine is converted to JSON by SerpApi.com backend.
-    #                 thus, most of the compute power is on the backkend and not on the client side.
+    # see: https://serpapi.com/search-api
     #
+    #
+    # note that the raw response
+    #                 from the search engine is converted to JSON by SerpApi.com backend.
+    #                 thus, most of the compute power is on the backsdend and not on the client side.
+    # @param [Hash] params includes engine, api_key, search fields and more..
+    #                this override the default params provided to the constructor.
+    # @return [Hash] search results formatted as a Hash.
     def search(params = {})
       get('/search', :json, params)
     end
@@ -82,18 +118,22 @@ module SerpApi
 
     # Get location using Location API
     #
-    # @param [Hash] params must includes fields: q, limit
-    # @return [Array<Hash>] list of matching location
-    #
     # example: spec/serpapi/location_api_spec.rb
+    # doc: https://serpapi.com/search-api
+    #
+    # @param [Hash] params must includes fields: q, limit
+    # @return [Array<Hash>] list of matching locations
     def location(params = {})
       get('/locations.json', :json, params)
     end
 
     # Retrieve search result from the Search Archive API
     #
+    # example: spec/serpapi/client/search_archive_api_spec.rb
+    # doc: https://serpapi.com/search-archive-api
+    #
     # @param [String|Integer] search_id is returned
-    # @param [Symbol] format :json or :html (default: json, optional)
+    # @param [Symbol] format :json or :html [default: json, optional]
     # @return [String|Hash] raw html or JSON / Hash
     def search_archive(search_id, format = :json)
       raise SerpApiError, 'format must be json or html' unless [:json, :html].include?(format)
@@ -102,7 +142,12 @@ module SerpApi
     end
 
     # Get account information using Account API
+    #
+    # example: spec/serpapi/client/account_api_spec.rb
+    # doc: https://serpapi.com/google-jobs-api
+    #
     # @param [String] api_key secret key
+    # @return [Hash] account information
     def account(api_key = nil)
       params = (api_key.nil? ? {} : { api_key: api_key })
       get('/account', :json, params)
@@ -113,20 +158,23 @@ module SerpApi
       @params[:engine]
     end
 
-    # @return [String] api_key user secret api_key as supplied in the constructor params[:api_key]
+    # @return [String] api_key user secret API key as provided to the constructor
     def api_key
       @params[:api_key]
     end
 
-    # close open connection
+    # close open connection if active
     def close
       @socket.close if @socket
     end
 
     private
 
-    # @return [Hash] query parameter
+    # @param [Hash] params to merge with default parameters provided to the constructor.
+    # @return [Hash] merged query parameters after cleanup
     def query(params)
+      raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
+
       # merge default params with custom params
       q = @params.merge(params)
 
