@@ -153,21 +153,24 @@ search_queue.close
 puts 'done'
 ```
 
- * source code: [demo/demo_async.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_async.rb)
-
 This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). 
 Each search takes a few seconds before completion by SerpApi service and the search engine. By the time the first element pops out of the queue. The search result might be already available in the archive. If not, the `search_archive` method blocks until the search results are available. 
 
+ * source code: [demo/demo_async.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_async.rb)
+
 ### Search at scale
-The provided code snippet is a Ruby spec test case that demonstrates the use of thread pools to execute multiple HTTP requests concurrently.
+
+The code aims to demonstrate how thread pools can be used to improve performance by executing multiple search concurrently. 
+The connection_pool gem abstract away the management of a pool of connections (must be installed using `gem install connection_pool`)
 
 ```ruby
 require 'serpapi'
 require 'connection_pool'
 
-# create a thread pool of 4 threads with a persistent connection to serpapi.com
+# create 4 persistent connection to serpapi.com
+n = 4
 pool = ConnectionPool.new(size: n, timeout: 5) do
-    SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 30, persistent: true)
+  SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'], timeout: 30, persistent: true)
 end
 
 # run user thread to search for your favorites coffee type
@@ -179,23 +182,17 @@ end
 responses = threads.map(&:value)
 ```
 
-The code aims to demonstrate how thread pools can be used to 
-improve performance by executing multiple tasks concurrently. In 
-this case, it makes multiple HTTP requests to an API endpoint using 
-a thread pool of persistent connections.
-
 **Benefits:**
 
-* Improved performance by avoiding the overhead of creating and 
-destroying connections for each request.
-* Efficient use of resources by sharing connections among multiple 
-threads.
-* Concurrency and parallelism, allowing multiple requests to be 
-processed simultaneously.
+* Improved performance by avoiding the overhead of creating and destroying connections for each request.
+* Efficient use of resources by sharing connections among multiple threads.
+* Concurrency and parallelism, allowing multiple requests to be processed simultaneously.
 
-benchmark: (demo/demo_thread_pool.rb)
+source code: [demo/demo_thread_pool.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_thread_pool.rb)
 
 ### Real world search without persistency
+
+when a client performs a single search 
 
 ```ruby
 require 'serpapi'
