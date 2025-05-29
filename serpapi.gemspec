@@ -7,12 +7,8 @@ if RUBY_VERSION < '2.1.0'
 
 Gem::Specification.new do |s|
   s.name        = 'serpapi'
-if RUBY_VERSION < '2.1.0'
-  s.version     = "1.0.0"
-else
   s.version     = SerpApi::VERSION
-end
-  s.summary     = 'Official Ruby library for SerpApi HTTP endpoints'
+  s.summary     = 'Official Ruby library for SerpApi.com'
   s.description = 'Integrate powerful search functionality into your Ruby application with SerpApi. SerpApi offers official 
 support for Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and more. 
 Access a vast range of data, including web search results, local business listings, and product 
@@ -26,7 +22,7 @@ information.'
   s.required_ruby_version = '>= 3.1'
 
   # faraday
-  s.add_dependency 'http', '~> 0.13.3'
+  s.add_dependency 'http', '~> 5.2'
 
   # development dependency
   s.add_development_dependency 'rake', '~> 13.2.1'

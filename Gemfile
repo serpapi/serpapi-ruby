@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :production do
-  gem 'http', '~> 0.13.3'
+  gem 'http', '~> 5.2'
 end
 
 group :test, :development do
@@ -24,5 +24,5 @@ group :test, :development do
 
   # Benchmark is no longer included in Ruby 3.5
   gem 'benchmark'
-  
+
 end
