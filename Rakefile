@@ -15,7 +15,7 @@ require 'yard'
 require_relative 'lib/serpapi'
 
 desc "run out of box testing using the local gem file pre-release"
-task oobt: %i[check readme doc check build install demo]
+task oobt: %i[check readme doc build install demo]
 
 desc "execute all the steps except release"
 task default: %i[check dependency version readme doc build test oobt]
@@ -31,8 +31,21 @@ YARD::Rake::YardocTask.new(:doc) do |t|
   t.stats_options = ['--list-undoc']
 end
 
+desc 'validate core client spec files'
 RSpec::Core::RakeTask.new(:test) do |t|
-  t.pattern = Dir.glob('test/*_spec.rb')
+  t.pattern = Dir.glob('spec/serpapi/client/*_spec.rb') + Dir.glob('spec/serpapi/*_spec.rb')
+  t.rspec_opts = '--format documentation'
+end
+
+desc 'valiate all the examples (comprehensive of tests)' 
+RSpec::Core::RakeTask.new(:regression) do |t|
+  t.pattern = Dir.glob('spec/serpapi/client/example/*_spec.rb')
+  t.rspec_opts = '--format documentation'
+end
+
+desc 'run benchmark tests'
+RSpec::Core::RakeTask.new(:benchmark) do |t|
+  t.pattern = Dir.glob('spec/serpapi/client/benchmark/*_spec.rb')
   t.rspec_opts = '--format documentation'
 end
 
