@@ -18,17 +18,15 @@ def snippet(format, path, demo = false)
  %Q(```#{format}\nrequire 'serpapi'\n#{buf}```\n\n * source code: [#{path}](https://github.com/serpapi/serpapi-ruby/blob/master/#{path}))
 end
 -%>
-<div align="center">
-<h1 align="center">SerpApi Ruby Library</h1>
+# SerpApi Ruby Library
 
-![serpapi ruby library logo](https://user-images.githubusercontent.com/78694043/235409962-7afe3a25-9272-4d56-9678-9972b771453b.png)
+[![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml) [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi) 
 
-[![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi) [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)  
-</div>
+Integrate search data into your AI workflow, RAG / fine tuning or ruby application using this official wrapper for [SerpApi](https://serpapi.com). 
 
-Integrate search data into your AI workflow or ruby application. This library is the official wrapper for [SerpApi](https://serpapi.com). 
-SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and more.
-Fast query at scale a vast range of data, including web search results, flight schedule, stock market data, news headlines, and more.
+SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and [more.](https://serpapi.com). 
+
+Fast query at scale a vast range of data, including web search results, flight schedule, stock market data, news headlines, and [more.](https://serpapi.com). 
 
 ## Features
   * `persistent` → Keep socket connection open to save on SSL handshake / reconnection (2x faster).  [Search at scale](#Search-At-Scale)
@@ -40,7 +38,7 @@ Fast query at scale a vast range of data, including web search results, flight s
 
 To achieve optimal performance, it is essential to have Ruby 3.1+ (preferably version 3.4) installed. 
 
-| Older versions such as Ruby 1.9, 2.x, and JRuby are compatible with [serpapi older library](https://github.com/serpapi/google-search-results-ruby), which continues to function effectively.
+| Older versions such as Ruby 1.9, 2.x, and JRuby are compatible with [serpapi older library](https://github.com/serpapi/google-search-results-ruby), which continues to function effectively. see [migration guide](#Migration-quick-guide) if you are using the older library.
 
 ### Bundler
 ```ruby
@@ -73,7 +71,10 @@ Environment variables are a secure, safe, and easy way to manage secrets.
  Ruby accesses these variables from `ENV['SERPAPI_KEY']`.
 
 
-## Search API advanced Usage
+## Search API advanced usage with Google search engine
+
+This example dives into all the available parameters for the Google search engine.
+ The set of parameters is extensive and depends on the search engine you choose.
 
 ```ruby
 # load gem
@@ -87,6 +88,7 @@ client = SerpApi::Client.new(
   async: false, # non blocking HTTP request see: Search Asynchronous (default: false)
   persistent: true, # leave socket connection open for faster response time see: Search at scale (default: true)
   timeout: 5, # HTTP timeout in seconds on the client side only. (default: 120s)
+  symbolize_names: true # turn on/off JSON keys to symbols (default: on more efficient)
 )
 
 # search query overview (more fields available depending on search engine)
@@ -111,23 +113,20 @@ params = {
   tbs: "custom to be client criteria",
 }
 
-# formatted search results as a Hash
-#  serpapi.com converts HTML -> JSON
+# search results as a symbolized Hash (per performance)
 results = client.search(params)
 
-# raw search engine html as a String
-#  serpapi.com acts a proxy to provide high throughputs, no search limit and more.
+# search results as a raw HTML string
 raw_html = client.html(params) # Corrected parameter reference
 ```
-
-[SerpApi documentation](https://serpapi.com/search-api).
+ → [SerpApi documentation](https://serpapi.com/search-api).
 
 #### Documentations
-
- * [API documentation](https://rubydoc.info/github/serpapi/serpapi-ruby/master)
+This library is well documented, and you can find the following resources:
  * [Full documentation on SerpApi.com](https://serpapi.com)
  * [Library Github page](https://github.com/serpapi/serpapi-ruby)
  * [Library GEM page](https://rubygems.org/gems/serpapi/)
+ * [Library API documentation](https://rubydoc.info/github/serpapi/serpapi-ruby/master)
  * [API health status](https://serpapi.com/status)
 
 ## Advanced search API usage

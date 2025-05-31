@@ -5,16 +5,29 @@ describe 'set of client test to archieve full code coverage' do
     client = SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'], timeout: 30)
   end
 
-  it 'search for coffee in Austin, TX and receive json results' do
-    data = client.search(q: 'Coffee', location: 'Austin, TX')
-    expect(data.size).to be > 5
-    expect(data.class).to be Hash
-    expect(data.keys.size).to be > 5
+  it 'search for coffee in Austin, TX, returns symbolized Hash' do
+    results = client.search(q: 'Coffee', location: 'Austin, TX')
+
+    expect(results.size).to be > 5
+    expect(results.class).to be Hash
+    expect(results.keys.size).to be > 5
+
+    expect(results.keys).to include(:search_metadata), ':search_metadata should be present in the results'
   end
 
-  it 'search fir coffee in Austin, TX and receive raw HTML' do
-    data = client.html(q: 'Coffee', location: 'Austin, TX')
-    expect(data).to match(/coffee/i)
+  it 'search for coffee in Austin, TX, returns non-symbolized Hash' do
+    results = client.search(q: 'Coffee', location: 'Austin, TX', symbolize_names: false)
+
+    expect(results.size).to be > 5
+    expect(results.class).to be Hash
+    expect(results.keys.size).to be > 5
+
+    expect(results.keys).to include('search_metadata'), 'search_metadata should be present in the results'
+  end
+
+  it 'search for coffee in Austin, TX and receive raw HTML' do
+    results = client.html(q: 'Coffee', location: 'Austin, TX')
+    expect(results).to match(/coffee/i)
   end
 
   it 'missing query' do
@@ -77,7 +90,7 @@ describe 'set of client test to archieve full code coverage' do
     begin
       client.send(:get, '/invalid', :html, {})
     rescue SerpApi::SerpApiError => e
-      expect(e.message).to include('HTTP request failed with response status: 404')
+      expect(e.message).to include(/HTTP request failed with response status: 404 Not Found reponse/), "got #{e.message}"
     rescue => e
       raise("wrong exception: #{e}")
     end
@@ -96,11 +109,11 @@ describe 'SerpApi client with persitency enable' do
   end
 
   it 'makes a search request with valid parameters' do
-    response = client.search(q: 'Coffee', location: 'Austin, TX')
-    expect(response.size).to be > 5
-    expect(response.class).to be Hash
-    expect(response.keys.size).to be > 5
-    expect(response[:search_metadata][:id]).not_to be_nil
+    results = client.search(q: 'Coffee', location: 'Austin, TX')
+    expect(results.size).to be > 5
+    expect(results.class).to be Hash
+    expect(results.keys.size).to be > 5
+    expect(results[:search_metadata][:id]).not_to be_nil
 
     expect(client.close).to eq(:clean)
   end

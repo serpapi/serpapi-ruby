@@ -4,10 +4,13 @@ module SerpApi
   # Client for SerpApi.com
   # powered by HTTP.rb
   #
-  #  it supports:
+  #  features:
   #  * async non-block search
   #  * persistent HTTP connection
-  #  * many endpoints
+  #  * search API
+  #  * location API
+  #  * account API
+  #  * search archive API
   #
   class Client
     # Backend service URL
@@ -99,7 +102,6 @@ module SerpApi
     #
     # see: https://serpapi.com/search-api
     #
-    #
     # note that the raw response
     #                 from the search engine is converted to JSON by SerpApi.com backend.
     #                 thus, most of the compute power is on the backsdend and not on the client side.
@@ -110,7 +112,10 @@ module SerpApi
       get('/search', :json, params)
     end
 
-    # html search
+    # html search perform a search using SerpApi.com
+    #  the output is raw HTML from the search engine.
+    #  it is useful for training AI models, RAG, debugging
+    #   or when you need to parse the HTML yourself.
     #
     # @return [String] raw html search results directly from the search engine.
     def html(params = {})
@@ -120,7 +125,7 @@ module SerpApi
     # Get location using Location API
     #
     # example: spec/serpapi/location_api_spec.rb
-    # doc: https://serpapi.com/search-api
+    # doc: https://serpapi.com/locations-api
     #
     # @param [Hash] params must includes fields: q, limit
     # @return [Array<Hash>] list of matching locations
@@ -129,11 +134,17 @@ module SerpApi
     end
 
     # Retrieve search result from the Search Archive API
-    #
+    # 
+    # ```ruby
+    # client = SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'])
+    # results = client.search(q: 'Coffee', location: 'Portland')
+    # search_id = results[:search_metadata][:id]
+    # archive_search = client.search_archive(search_id)
+    # ```
     # example: spec/serpapi/client/search_archive_api_spec.rb
     # doc: https://serpapi.com/search-archive-api
     #
-    # @param [String|Integer] search_id is returned
+    # @param [String|Integer] search_id from original search `results[:search_metadata][:id]`
     # @param [Symbol] format :json or :html [default: json, optional]
     # @return [String|Hash] raw html or JSON / Hash
     def search_archive(search_id, format = :json)
@@ -145,9 +156,9 @@ module SerpApi
     # Get account information using Account API
     #
     # example: spec/serpapi/client/account_api_spec.rb
-    # doc: https://serpapi.com/google-jobs-api
+    # doc: https://serpapi.com/account-api
     #
-    # @param [String] api_key secret key
+    # @param [String] api_key secret key [optional if already provided to the constructor]
     # @return [Hash] account information
     def account(api_key = nil)
       params = (api_key.nil? ? {} : { api_key: api_key })
@@ -177,7 +188,12 @@ module SerpApi
       raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
 
       # merge default params with custom params
-      q = @params.merge(params)
+      q = @params.clone.merge(params)
+
+      # do not pollute default params with custom params
+      if q.key?(:symbolize_names)
+        q.delete(:symbolize_names)
+      end
 
       # delete empty key/value
       q.compact
@@ -188,14 +204,14 @@ module SerpApi
       persistent
     end
 
-    # get HTTP query formatted results
+    # Perform HTTP GET request to the SerpApi.com backend endpoint.
     #
-    # @param [String] endpoint HTTP service uri
+    # @param [String] endpoint HTTP service URI
     # @param [Symbol] decoder type :json or :html
     # @param [Hash] params custom search inputs
-    # @param [Boolean] symbolize_names if true, convert JSON keys to symbols
-    # @return decoded response as JSON / Hash or String
-    def get(endpoint, decoder = :json, params = {}, symbolize_names = true)
+    # @param [Boolean] symbolize_names if true, convert JSON keys to symbols more memory efficient.
+    # @return [String|Hash] raw HTML or decoded response as JSON / Hash
+    def get(endpoint, decoder = :json, params = {})
       # execute get via open socket
       response = if persistent?
                    @socket.get(endpoint, params: query(params))
@@ -208,6 +224,11 @@ module SerpApi
       when :json
         # read http response
         begin
+          # user can turn on/off JSON keys to symbols
+          # this is more memory efficient, but not always needed
+          symbolize_names = params.key?(:symbolize_names) ? params[:symbolize_names] : true
+
+          # parse JSON response with Ruby standard library
           data = JSON.parse(response.body, symbolize_names: symbolize_names)
           if data.instance_of?(Hash) && data.key?(:error)
             raise SerpApiError, "HTTP request failed with error: #{data[:error]} from url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}, response status: #{response.status} "
