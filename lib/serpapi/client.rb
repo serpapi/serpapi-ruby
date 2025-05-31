@@ -53,6 +53,7 @@ module SerpApi
     # faster). [default: true]
     # * `async`: [Boolean] Support non-blocking job submission. [default: false]
     # * `timeout`: [Integer] HTTP get max timeout in seconds [default: 120s == 2m]
+    # * `symbolize_names`: [Boolean] Convert JSON keys to symbols. [default: true]
     #
     # **Key:**kr
     #
@@ -134,7 +135,7 @@ module SerpApi
     end
 
     # Retrieve search result from the Search Archive API
-    # 
+    #
     # ```ruby
     # client = SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'])
     # results = client.search(q: 'Coffee', location: 'Portland')
@@ -191,9 +192,7 @@ module SerpApi
       q = @params.clone.merge(params)
 
       # do not pollute default params with custom params
-      if q.key?(:symbolize_names)
-        q.delete(:symbolize_names)
-      end
+      q.delete(:symbolize_names) if q.key?(:symbolize_names)
 
       # delete empty key/value
       q.compact
@@ -209,7 +208,6 @@ module SerpApi
     # @param [String] endpoint HTTP service URI
     # @param [Symbol] decoder type :json or :html
     # @param [Hash] params custom search inputs
-    # @param [Boolean] symbolize_names if true, convert JSON keys to symbols more memory efficient.
     # @return [String|Hash] raw HTML or decoded response as JSON / Hash
     def get(endpoint, decoder = :json, params = {})
       # execute get via open socket

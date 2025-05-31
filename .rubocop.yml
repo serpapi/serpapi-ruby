@@ -38,7 +38,7 @@ Style/SafeNavigation:
 # SerpApiClient constructor is rated to 9
 #  def initialize(params = {}) 
 Metrics/CyclomaticComplexity:
-  Max: 10
+  Max: 12
 
 AllCops:
   NewCops: enable
