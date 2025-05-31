@@ -1,5 +1,6 @@
 # code coverage
 require 'simplecov'
+SimpleCov.add_filter '/spec/'
 SimpleCov.start
 
 require 'benchmark'
@@ -13,6 +14,7 @@ RSpec.configure do |config|
   config.include SerpApi
 
   config.before(:each) do
-    ENV.key?('API_KEY') || fail('Missing ENV API_KEY')
+    ENV.key?('SERPAPI_KEY') || fail('Missing ENV SERPAPI_KEY')
   end
 end
+

@@ -3,8 +3,8 @@
 #
 # **Key Points:**
 #
-# * **API Key:** The code requires an API key to be set in the `API_KEY` environment variable.
-# * **Serpapi Client:** A SerpApi client is created with default parameters, including the engine, client, language, 
+# * **API Key:** The code requires an API key to be set in the `SERPAPI_KEY` environment variable.
+# * **Serpapi Client:** A SerpApi client is created with default parameters, including the engine, client, language,
 # country, API key, persistence settings, and timeout.
 # * **Search Parameters:** A search request is made with the query "coffee".
 # * **Suggestions Retrieval:** The `suggestions` key in the response is checked for availability and non-emptiness.
@@ -12,12 +12,12 @@
 #
 # **Purpose:**
 #
-# The code is designed to demonstrate how to use the SerpApi client to retrieve autocomplete suggestions from Google. It 
+# The code is designed to demonstrate how to use the SerpApi client to retrieve autocomplete suggestions from Google. It
 # verifies that suggestions are returned and outputs them for demonstration purposes.
 #
 # **Usage:**
 #
-# To run the code, you need to set the `API_KEY` environment variable to your actual SerpApi API key. 
+# To run the code, you need to set the `SERPAPI_KEY` environment variable to your actual SerpApi API key.
 # Obtain your free key from: serpapi.com
 #
 # **Output:**
@@ -34,14 +34,14 @@
 require 'serpapi'
 require 'pp'
 
-raise 'API_KEY environment variable must be set' if ENV['API_KEY'].nil?
+raise 'SERPAPI_KEY environment variable must be set' if ENV['SERPAPI_KEY'].nil?
 
 default_params = {
   engine: 'google_autocomplete',
   client: 'safari',
   hl: 'en',
   gl: 'us',
-  api_key: ENV['API_KEY'],
+  api_key: ENV.fetch('SERPAPI_KEY', nil),
   persistent: false,
   timeout: 2
 }

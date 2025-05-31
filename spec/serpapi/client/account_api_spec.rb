@@ -2,14 +2,14 @@ require 'spec_helper'
 
 describe 'account API' do
   it 'fetch user account information' do
-    client = SerpApi::Client.new(api_key: ENV['API_KEY'])
+    client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
 
-    # mock response if no API_KEY specified
-    if ENV['API_KEY'].nil?
+    # mock response if no SERPAPI_KEY specified
+    if ENV['SERPAPI_KEY'].nil?
       allow(search).to receive(:get_results) {
         '{
           "account_id": "5ac54d6adefb2f1dba1663f5",
-          "api_key": "SECRET_API_KEY",
+          "api_key": "SECRET_SERPAPI_KEY",
           "account_email": "demo@serpapi.com",
           "plan_id": "bigdata",
           "plan_name": "Big Data Plan",

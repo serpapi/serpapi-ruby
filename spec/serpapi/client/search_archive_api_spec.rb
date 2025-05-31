@@ -10,7 +10,7 @@ describe 'SerpApi Search Archive API' do
     }
 
     # search
-    client = SerpApi::Client.new(api_key: ENV['API_KEY'] || '', engine: 'google')
+    client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'] || '', engine: 'google')
     if client.api_key.empty?
       allow(client).to receive(:search) { search_response_mock }
     end

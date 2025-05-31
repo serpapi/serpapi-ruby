@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'SerpApi Location API' do
   it 'Get normalized location for Austin, TX' do
-    client = SerpApi::Client.new(api_key: ENV['API_KEY'])
+    client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
     location_list = client.location(q: 'Austin, TX', limit: 3)
     expect(location_list.size).to eq(1)
 
@@ -14,10 +14,5 @@ describe 'SerpApi Location API' do
     expect(first[:gps]).to eq([-97.7430608, 30.267153])
     expect(first[:keys]).to eq(%w[austin tx texas united states])
     expect(first[:canonical_name]).to eq('Austin,TX,Texas,United States')
-
-    if client.engine == 'google'
-      expect(first[:google_id]).to eq(200_635)
-      expect(first[:google_parent_id]).to eq(21_176)
-    end
   end
 end

@@ -88,10 +88,10 @@ end
 
 # private
 task :check do
-  if ENV['API_KEY']
-    puts 'check: found $API_KEY'
+  if ENV['SERPAPI_KEY']
+    puts 'check: found $SERPAPI_KEY'
   else
-    puts 'check: API_KEY must be defined'
+    puts 'check: SERPAPI_KEY must be defined'
     exit 1
   end
 end

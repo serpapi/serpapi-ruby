@@ -13,7 +13,7 @@ def snippet(format, path, demo = false)
   slice.map! { |l| l.gsub(/(^\s\s\s\s)/, '')}
   buf = slice.join
   buf.gsub!('# pp ', 'pp ')
-  buf.gsub!('api_key)', "ENV['API_KEY'])")
+  buf.gsub!('api_key)', "ENV['SERPAPI_KEY'])")
  end
  %Q(```#{format}\nrequire 'serpapi'\n#{buf}```\n\n * source code: [#{path}](https://github.com/serpapi/serpapi-ruby/blob/master/#{path}))
 end
@@ -26,20 +26,19 @@ end
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi) [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)  
 </div>
 
-Integrate search data into your Ruby application. This library is the official wrapper for SerpApi (https://serpapi.com). 
+Integrate search data into your AI workflow or ruby application. This library is the official wrapper for [SerpApi](https://serpapi.com). 
 SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and more.
 Fast query at scale a vast range of data, including web search results, flight schedule, stock market data, news headlines, and more.
 
 ## Features
-  * `persistent`:Keep socket connection open to save on SSL handshake / reconnection (2x
-  faster). [default: true] [Search at scale](#Search-At-Scale)
-  * `async`: [Boolean] Support non-blocking job submission. [default: false] [Search Asynchronous](#Search-Asynchronous)
-  * extensive documentations
-  * real world examples
+  * `persistent` → Keep socket connection open to save on SSL handshake / reconnection (2x faster).  [Search at scale](#Search-At-Scale)
+  * `async` → Support non-blocking job submission. [Search Asynchronous](#Search-Asynchronous)
+  * extensive documentation → easy to follow
+  * real world examples → included throughout
 
 ## Installation
 
-To achieve optimal performance, it is essential to have Ruby 3.x (preferably version 3.4) installed. 
+To achieve optimal performance, it is essential to have Ruby 3.1+ (preferably version 3.4) installed. 
 
 | Older versions such as Ruby 1.9, 2.x, and JRuby are compatible with [serpapi older library](https://github.com/serpapi/google-search-results-ruby), which continues to function effectively.
 
@@ -67,8 +66,12 @@ pp results
 This example runs a search for "coffee" on Google. It then returns the results as a regular Ruby Hash.
  See the [playground](https://serpapi.com/playground) to generate your own code.
 
-The `SERPAPI_KEY` should be replaced with your actual API key obtained from 
-https://serpapi.com/users/sign_up?plan=free.
+The SerpApi key can be obtained from [serpapi.com/signup](https://serpapi.com/users/sign_up?plan=free).
+
+Environment variables are a secure, safe, and easy way to manage secrets.
+ Set `export SERPAPI_KEY=<secret_serpapi_key>` in your shell.
+ Ruby accesses these variables from `ENV['SERPAPI_KEY']`.
+
 
 ## Search API advanced Usage
 
@@ -80,10 +83,10 @@ require 'serpapi'
 client = SerpApi::Client.new(
   engine: 'google',
   api_key: ENV['SERPAPI_KEY'],
-  # HTTP client behavior
-  async: false, # non blocking HTTP request see [Search Asynchronous](#Search-Asynchronous)
-  persistent: true, # leave socket connection open for faster response time [Search at scale](#Search-At-Scale)
-  timeout: 5, # HTTP timeout in seconds on the client side only.
+  # HTTP client configuration
+  async: false, # non blocking HTTP request see: Search Asynchronous (default: false)
+  persistent: true, # leave socket connection open for faster response time see: Search at scale (default: true)
+  timeout: 5, # HTTP timeout in seconds on the client side only. (default: 120s)
 )
 
 # search query overview (more fields available depending on search engine)
@@ -136,7 +139,7 @@ Search API features non-blocking search using the option: `async=true`.
 
 Search API enables `async` search.
  - Non-blocking (`async=true`) : the development is more complex, but this allows handling many simultaneous connections.
- - Blocking (`async=false`) : it's easy to write the code but more compute-intensive when the parent process needs to hold many connections.
+ - Blocking (`async=false`) : it is easy to write the code but more compute-intensive when the parent process needs to hold many connections.
 
 Here is an example of asynchronous searches using Ruby 
 <%= snippet('ruby', 'demo/demo_async.rb', true) %>
@@ -153,7 +156,7 @@ require 'connection_pool'
 
 # create a thread pool of 4 threads with a persistent connection to serpapi.com
 pool = ConnectionPool.new(size: n, timeout: 5) do
-    SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 30, persistent: true)
+    SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'], timeout: 30, persistent: true)
 end
 
 # run user thread to search for your favorites coffee type
@@ -524,7 +527,7 @@ The directory spec/ includes specification which serves the dual purposes of exa
 
 Set your secret API key in your shell before running a test.
 ```bash
-export API_KEY="your_secret_key"
+export SERPAPI_KEY="your_secret_key"
 ```
 Install testing dependency
 ```bash

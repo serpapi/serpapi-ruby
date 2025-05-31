@@ -6,20 +6,19 @@
 [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi) [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)  
 </div>
 
-Integrate search data into your Ruby application. This library is the official wrapper for SerpApi (https://serpapi.com). 
+Integrate search data into your AI workflow or ruby application. This library is the official wrapper for [SerpApi](https://serpapi.com). 
 SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and more.
 Fast query at scale a vast range of data, including web search results, flight schedule, stock market data, news headlines, and more.
 
 ## Features
-  * `persistent`:Keep socket connection open to save on SSL handshake / reconnection (2x
-  faster). [default: true] [Search at scale](#Search-At-Scale)
-  * `async`: [Boolean] Support non-blocking job submission. [default: false] [Search Asynchronous](#Search-Asynchronous)
-  * extensive documentations
-  * real world examples
+  * `persistent` → Keep socket connection open to save on SSL handshake / reconnection (2x faster).  [Search at scale](#Search-At-Scale)
+  * `async` → Support non-blocking job submission. [Search Asynchronous](#Search-Asynchronous)
+  * extensive documentation → easy to follow
+  * real world examples → included throughout
 
 ## Installation
 
-To achieve optimal performance, it is essential to have Ruby 3.x (preferably version 3.4) installed. 
+To achieve optimal performance, it is essential to have Ruby 3.1+ (preferably version 3.4) installed. 
 
 | Older versions such as Ruby 1.9, 2.x, and JRuby are compatible with [serpapi older library](https://github.com/serpapi/google-search-results-ruby), which continues to function effectively.
 
@@ -47,8 +46,12 @@ pp results
 This example runs a search for "coffee" on Google. It then returns the results as a regular Ruby Hash.
  See the [playground](https://serpapi.com/playground) to generate your own code.
 
-The `SERPAPI_KEY` should be replaced with your actual API key obtained from 
-https://serpapi.com/users/sign_up?plan=free.
+The SerpApi key can be obtained from [serpapi.com/signup](https://serpapi.com/users/sign_up?plan=free).
+
+Environment variables are a secure, safe, and easy way to manage secrets.
+ Set `export SERPAPI_KEY=<secret_serpapi_key>` in your shell.
+ Ruby accesses these variables from `ENV['SERPAPI_KEY']`.
+
 
 ## Search API advanced Usage
 
@@ -60,10 +63,10 @@ require 'serpapi'
 client = SerpApi::Client.new(
   engine: 'google',
   api_key: ENV['SERPAPI_KEY'],
-  # HTTP client behavior
-  async: false, # non blocking HTTP request see [Search Asynchronous](#Search-Asynchronous)
-  persistent: true, # leave socket connection open for faster response time [Search at scale](#Search-At-Scale)
-  timeout: 5, # HTTP timeout in seconds on the client side only.
+  # HTTP client configuration
+  async: false, # non blocking HTTP request see: Search Asynchronous (default: false)
+  persistent: true, # leave socket connection open for faster response time see: Search at scale (default: true)
+  timeout: 5, # HTTP timeout in seconds on the client side only. (default: 120s)
 )
 
 # search query overview (more fields available depending on search engine)
@@ -116,31 +119,35 @@ Search API features non-blocking search using the option: `async=true`.
 
 Search API enables `async` search.
  - Non-blocking (`async=true`) : the development is more complex, but this allows handling many simultaneous connections.
- - Blocking (`async=false`) : it's easy to write the code but more compute-intensive when the parent process needs to hold many connections.
+ - Blocking (`async=false`) : it is easy to write the code but more compute-intensive when the parent process needs to hold many connections.
 
 Here is an example of asynchronous searches using Ruby 
 ```ruby
 require 'serpapi'
 
-company_list = %w(meta amazon apple netflix google)
-client = SerpApi::Client.new(engine: 'google', async: true, persistent: true, api_key: ENV['API_KEY'])
+company_list = %w[meta amazon apple netflix google]
+client = SerpApi::Client.new(engine: 'google', async: true, persistent: true, api_key: ENV.fetch('SERPAPI_KEY', nil))
 search_queue = Queue.new
 company_list.each do |company|
-  result = client.search({q: company})
-  if result[:search_metadata][:status] =~ /Cached|Success/
+  result = client.search({ q: company })
+  if result[:search_metadata][:status] =~ /Cached/
     puts "#{company}: search results found in cache for: #{company}"
-    next
   end
 
-  search_queue.push(result)
+  search_queue.push(result[:search_metadata][:id])
 end
 
-puts "wait until all searches are cached or success"
-while !search_queue.empty?
-  result = search_queue.pop
-  search_id = result[:search_metadata][:id]
+puts 'wait for all requests to be completed'
+sleep(10)
+
+puts 'wait until all searches are cached or success'
+until search_queue.empty?
+  search_id = search_queue.pop
 
   search_archived = client.search_archive(search_id)
+
+  company = search_archived[:search_parameters][:q]
+
   if search_archived[:search_metadata][:status] =~ /Cached|Success/
     puts "#{search_archived[:search_parameters][:q]}: search results found in archive for: #{company}"
     next
@@ -153,24 +160,21 @@ search_queue.close
 puts 'done'
 ```
 
+ * source code: [demo/demo_async.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_async.rb)
+
 This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). 
 Each search takes a few seconds before completion by SerpApi service and the search engine. By the time the first element pops out of the queue. The search result might be already available in the archive. If not, the `search_archive` method blocks until the search results are available. 
 
- * source code: [demo/demo_async.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_async.rb)
-
 ### Search at scale
-
-The code aims to demonstrate how thread pools can be used to improve performance by executing multiple search concurrently. 
-The connection_pool gem abstract away the management of a pool of connections (must be installed using `gem install connection_pool`)
+The provided code snippet is a Ruby spec test case that demonstrates the use of thread pools to execute multiple HTTP requests concurrently.
 
 ```ruby
 require 'serpapi'
 require 'connection_pool'
 
-# create 4 persistent connection to serpapi.com
-n = 4
+# create a thread pool of 4 threads with a persistent connection to serpapi.com
 pool = ConnectionPool.new(size: n, timeout: 5) do
-  SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'], timeout: 30, persistent: true)
+    SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'], timeout: 30, persistent: true)
 end
 
 # run user thread to search for your favorites coffee type
@@ -182,29 +186,35 @@ end
 responses = threads.map(&:value)
 ```
 
+The code aims to demonstrate how thread pools can be used to 
+improve performance by executing multiple tasks concurrently. In 
+this case, it makes multiple HTTP requests to an API endpoint using 
+a thread pool of persistent connections.
+
 **Benefits:**
 
-* Improved performance by avoiding the overhead of creating and destroying connections for each request.
-* Efficient use of resources by sharing connections among multiple threads.
-* Concurrency and parallelism, allowing multiple requests to be processed simultaneously.
+* Improved performance by avoiding the overhead of creating and 
+destroying connections for each request.
+* Efficient use of resources by sharing connections among multiple 
+threads.
+* Concurrency and parallelism, allowing multiple requests to be 
+processed simultaneously.
 
-source code: [demo/demo_thread_pool.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_thread_pool.rb)
+benchmark: (demo/demo_thread_pool.rb)
 
 ### Real world search without persistency
-
-when a client performs a single search 
 
 ```ruby
 require 'serpapi'
 
-raise 'API_KEY environment variable must be set' if ENV['API_KEY'].nil?
+raise 'SERPAPI_KEY environment variable must be set' if ENV['SERPAPI_KEY'].nil?
 
 default_params = {
   engine: 'google_autocomplete',
   client: 'safari',
   hl: 'en',
   gl: 'us',
-  api_key: ENV['API_KEY'],
+  api_key: ENV.fetch('SERPAPI_KEY', nil),
   persistent: false,
   timeout: 2
 }
@@ -296,7 +306,7 @@ It prints your account information.
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'coffee'
@@ -314,7 +324,7 @@ pp results[:organic_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_scholar', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_scholar', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'biology'
@@ -332,7 +342,7 @@ pp results[:organic_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_autocomplete', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_autocomplete', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'coffee'
@@ -350,7 +360,7 @@ pp results[:suggestions]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_product', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_product', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'coffee',
@@ -369,7 +379,7 @@ pp results[:product_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_reverse_image', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_reverse_image', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   image_url: 'https://i.imgur.com/5bGzZi7.jpg'
@@ -387,7 +397,7 @@ pp results[:image_sizes]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_events', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_events', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'coffee'
@@ -405,7 +415,7 @@ pp results[:events_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_local_services', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_local_services', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'electrician',
@@ -424,7 +434,7 @@ pp results[:local_ads]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_maps', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_maps', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'Coffee',
@@ -444,7 +454,7 @@ pp results[:local_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_jobs', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_jobs', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'coffee'
@@ -462,7 +472,7 @@ pp results[:jobs_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_play', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_play', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'kite',
@@ -481,7 +491,7 @@ pp results[:organic_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_images', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_images', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   tbm: 'isch',
@@ -500,7 +510,7 @@ pp results[:images_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_lens', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_lens', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   url: 'https://i.imgur.com/HBrB8p0.png'
@@ -518,7 +528,7 @@ pp results[:visual_matches]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_images_light', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_images_light', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'Coffee'
@@ -536,7 +546,7 @@ pp results[:images_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_hotels', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_hotels', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'Bali Resorts',
@@ -560,7 +570,7 @@ pp results[:properties]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_flights', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_flights', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   departure_id: 'PEK',
@@ -583,7 +593,7 @@ pp results[:best_flights]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_finance', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_finance', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'GOOG:NASDAQ'
@@ -601,7 +611,7 @@ pp results[:markets]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_ai_overview', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_ai_overview', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   page_token: 'KIVu-nictZPdjrI4GMeTPdkrWU8cFXV0dBKyKbUgiigy6OgJQawFQapUBpmzvZe9qr2aLYzO6I5vsm-yW0Ip7dPn4__L88efoR8Ff_36i3c87tlzrZamaZVQSkJcdemu5rAscmsbGrLY9X5PkhCLaRkC1VCh6hivs_e1EiaaPA2xIr9r8ixxXqfhEkova0UWlq-jEgnFhJW8UMRRKXsTmyWXiUIJ-2JTJ2jZxnTINvK-8zgJBtEiM4JSEVG0Vw7DW57Qactqdo1PwW_NHv-psiqObMusqpNU7ZM-OFlWFbNWdVxzdtwE_NsBv5YSJMblF5K71vwcgkAqlvk0569vIPXsx0D5pALt0Tbd6yAqUD4jJfxVZYAu0dN8gc6H9MfREVKlyu2WWszcgQx4zCKlD0dGnmJ_wEu6mI5BBfQJHkknc_69LGK8gP5e65BzXTeDDEziu0wH0KitCRdXqK1i_qnXYpZLDV-6ApW7TlzvmoJE585mMs2icNfe4-28-dYBDwVGl31yZNcc9acEefre8kxQ1apS_YLQGFMuZZ7OAPSl_T0cXAD0hZDXTPjDUMp3ehlfAj3fAL2Uu3G55eJyL_isTbLgl7NcPpRLJ5-lLdwWMCDKD-E4FyvHE3CEfTrN0JkAzC8qCliQQ35jiMk5pQ9FFx-6WoU5gmBiqJIKJBW6eRflSYaFMTpXQhDwB8EtQgDMuyJcj-EP9iVwh5nSSA9O3PXh-MWakaC52oRuJREk3dxcmNHd6qeaz_1_uHq8NZMzV3if621rEmkOL62Za4KMnKuhX7XmmesIKAieuSZXXOFPcEXWKG_N71zTgitvTatgm3M1tv_k-l-1ZoEXf3xu-zTZkm_92obr02LIdCKkM_9oyVJMuo2t5Wmx8WBvdsfnfUzJg-2vn6XG4JitSwfRo2l5TTErO_GxnNI4KPtR2YnWMfXXpV0YU1FwWvG7NyOVXlyJvK129AUN6TFI3JPk4MZ4OfLdKNzoShtnpl3RfNxij748svedxMtmmI3e-gc6kgJFVye-qg48j7Rwo71OcbA7dA9-NBe2o2napHMzmuMFQWqr9zSVtJXmKbbej73jI7XHPaymnfBdEIqsmPg6RI_L1URaVmiJuY6N2ZtYb3U3zSen3mjV611h0y3tyDHbi_W_AU9HHA0'
@@ -619,7 +629,7 @@ pp results[:ai_overview]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_news', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_news', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'pizza',
@@ -639,7 +649,7 @@ pp results[:news_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_patents', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_patents', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: '(Coffee)'
@@ -657,7 +667,7 @@ pp results[:organic_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_trends', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_trends', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'coffee,milk,bread,pasta,steak',
@@ -676,7 +686,7 @@ pp results[:interest_over_time]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'google_shopping', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'google_shopping', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'Macbook M4'
@@ -694,7 +704,7 @@ pp results[:shopping_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'baidu', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'baidu', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'coffee'
@@ -712,7 +722,7 @@ pp results[:organic_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'yahoo', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'yahoo', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   p: 'coffee'
@@ -730,7 +740,7 @@ pp results[:organic_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'youtube', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'youtube', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   search_query: 'coffee'
@@ -748,7 +758,7 @@ pp results[:video_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'walmart', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'walmart', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   query: 'coffee'
@@ -766,7 +776,7 @@ pp results[:organic_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'ebay', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'ebay', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   _nkw: 'coffee'
@@ -784,7 +794,7 @@ pp results[:organic_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'naver', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'naver', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   query: 'coffee'
@@ -802,7 +812,7 @@ pp results[:ads_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'home_depot', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'home_depot', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'table'
@@ -820,7 +830,7 @@ pp results[:products]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'apple_app_store', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'apple_app_store', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   term: 'coffee'
@@ -838,7 +848,7 @@ pp results[:organic_results]
 ```ruby
 require 'serpapi'
 # initialize the serp api client
-client = SerpApi::Client.new(engine: 'duckduckgo', api_key: ENV['API_KEY'])
+client = SerpApi::Client.new(engine: 'duckduckgo', api_key: ENV['SERPAPI_KEY'])
 # run a search using serpapi service
 results = client.search({
   q: 'coffee'
@@ -1004,7 +1014,7 @@ The directory spec/ includes specification which serves the dual purposes of exa
 
 Set your secret API key in your shell before running a test.
 ```bash
-export API_KEY="your_secret_key"
+export SERPAPI_KEY="your_secret_key"
 ```
 Install testing dependency
 ```bash

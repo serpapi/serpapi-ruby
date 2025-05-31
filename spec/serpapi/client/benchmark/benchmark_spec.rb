@@ -21,7 +21,7 @@ describe 'benchmark SerpApi client with/without persistent connection' do
 
   it 'regular get' do
     runtime = Benchmark.measure do
-      client = SerpApi::Client.new(persistent: false, engine: 'google', api_key: ENV['API_KEY'])
+      client = SerpApi::Client.new(persistent: false, engine: 'google', api_key: ENV['SERPAPI_KEY'])
       results = n.times.map { |x| client.search(q: "coffee #{x}") }
       client.close
     end.total
@@ -30,7 +30,7 @@ describe 'benchmark SerpApi client with/without persistent connection' do
 
   it 'keep alive' do
     runtime = Benchmark.measure do
-      client = SerpApi::Client.new(persistent: true, engine: 'google', api_key: ENV['API_KEY'],)
+      client = SerpApi::Client.new(persistent: true, engine: 'google', api_key: ENV['SERPAPI_KEY'],)
       results = n.times.map { |x| client.search(q: "coffee #{n+x}") }
       client.close 
     end.total
