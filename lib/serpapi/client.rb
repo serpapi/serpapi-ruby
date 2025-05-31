@@ -71,7 +71,8 @@ module SerpApi
       @timeout.freeze
 
       # enable HTTP persistent mode
-      @persistent = params[:persistent] || true
+      @persistent = true
+      @persistent = params[:persistent] if params.key?(:persistent)
       @persistent.freeze
 
       # delete this client only configuration keys
@@ -206,19 +207,30 @@ module SerpApi
       case decoder
       when :json
         # read http response
-        data = JSON.parse(response.body, symbolize_names: symbolize_names)
-        if data.instance_of?(Hash) && data.key?(:error)
-          raise SerpApiError, "HTTP request failed with error: #{data[:error]} from url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}, response status: #{response.status} "
-        elsif response.status != 200
-          raise SerpApiError, "HTTP request failed with response status: #{response.status} reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}"
+        begin
+          data = JSON.parse(response.body, symbolize_names: symbolize_names)
+          if data.instance_of?(Hash) && data.key?(:error)
+            raise SerpApiError, "HTTP request failed with error: #{data[:error]} from url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}, response status: #{response.status} "
+          elsif response.status != 200
+            raise SerpApiError, "HTTP request failed with response status: #{response.status} reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}"
+          end
+        rescue JSON::ParserError
+          raise SerpApiError, "JSON parse error: #{response.body} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}, response status: #{response.status}"
         end
 
         # discard response body
         response.flush if persistent?
 
         data
-      else
+      when :html
+        # html decoder
+        if response.status != 200
+          raise SerpApiError, "HTTP request failed with response status: #{response.status} reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}"
+        end
+
         response.body
+      else
+        raise SerpApiError, "not supported decoder: #{decoder}, available: :json, :html"
       end
     end
   end

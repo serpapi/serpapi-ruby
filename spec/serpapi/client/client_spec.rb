@@ -1,25 +1,25 @@
 require 'spec_helper'
 
-describe 'client full code coverage' do
-  before(:all) do
-    @client = SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 30)
+describe 'set of client test to archieve full code coverage' do
+  let(:client) do
+    client = SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'], timeout: 30)
   end
 
   it 'search for coffee in Austin, TX and receive json results' do
-    data = @client.search(q: 'Coffee', location: 'Austin, TX')
+    data = client.search(q: 'Coffee', location: 'Austin, TX')
     expect(data.size).to be > 5
     expect(data.class).to be Hash
     expect(data.keys.size).to be > 5
   end
 
   it 'search fir coffee in Austin, TX and receive raw HTML' do
-    data = @client.html(q: 'Coffee', location: 'Austin, TX')
+    data = client.html(q: 'Coffee', location: 'Austin, TX')
     expect(data).to match(/coffee/i)
   end
 
   it 'missing query' do
     begin
-      @client.search({})
+      client.search({})
     rescue SerpApi::SerpApiError => e
       expect(e.message).to include('Missing query')
     rescue => e
@@ -28,48 +28,99 @@ describe 'client full code coverage' do
   end
 
   it 'get params' do
-    expect(@client.params[:api_key]).to eq(ENV['API_KEY'])
+    expect(client.params[:api_key]).to eq(ENV['SERPAPI_KEY'])
   end
 
   it 'api_key' do
-    expect(@client.api_key).to eq(ENV['API_KEY'])
+    expect(client.api_key).to eq(ENV['SERPAPI_KEY'])
   end
 
   it 'engine' do
-    expect(@client.engine).to eq('google')
+    expect(client.engine).to eq('google')
   end
 
   it 'timeout' do
-    expect(@client.timeout).to eq(30)
+    expect(client.timeout).to eq(30)
+  end
+
+  it 'persistent' do
+    expect(client.persistent).to be true
   end
 
   it 'get bad decoder' do
     begin
-      @client.send(:get, '/search', :bad, {q: 'hello'})
+      client.send(:get, '/search', :bad, {q: 'hello'})
     rescue SerpApi::SerpApiError => e
       expect(e.message).to include('not supported decoder')
     rescue => e
       raise("wrong exception: #{e}")
     end
   end
+
+  it 'get endpoint error' do
+    expect { 
+      client.send(:get, '/search', :json, {}) 
+    }.to raise_error(SerpApi::SerpApiError).with_message(/HTTP request failed with error: Missing query `q` parameter./)
+  end
+
+  it 'get bad endpoint' do
+    begin
+      client.send(:get, '/invalid', :json, {})
+    rescue SerpApi::SerpApiError => e
+      expect(e.message).to include('JSON parse error')
+    rescue => e
+      raise("wrong exception: #{e}")
+    end
+  end
+
+  it 'get bad html endpoint' do
+    begin
+      client.send(:get, '/invalid', :html, {})
+    rescue SerpApi::SerpApiError => e
+      expect(e.message).to include('HTTP request failed with response status: 404')
+    rescue => e
+      raise("wrong exception: #{e}")
+    end
+  end
 end
 
-describe 'SerpApi client adapter' do
+describe 'SerpApi client with persitency enable' do
+
   let(:client) do
-    SerpApi::Client.new(engine: 'google', api_key: ENV['API_KEY'], timeout: 10, persistency: true) 
+    SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'], timeout: 10, persistent: true) 
+  end
+
+  it 'check socket is open when persistent mode is enabled' do    
+    expect(client.socket).to_not be_nil
+    expect(client.persistent).to be true
   end
 
   it 'makes a search request with valid parameters' do
-    expect(client.socket).to_not be_nil
     response = client.search(q: 'Coffee', location: 'Austin, TX')
     expect(response.size).to be > 5
     expect(response.class).to be Hash
     expect(response.keys.size).to be > 5
     expect(response[:search_metadata][:id]).not_to be_nil
+
+    expect(client.close).to eq(:clean)
   end
 
   it 'handles API errors' do
     allow(client).to receive(:search).and_raise(SerpApi::SerpApiError)
     expect { client.search(q: 'Invalid Query') }.to raise_error(SerpApi::SerpApiError)
+  end
+
+end
+
+describe 'SerpApi client with persitency disabled' do
+  it 'check socket is closed when persistent mode is disabled' do
+    client = SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'], timeout: 10, persistent: false)
+    expect(client.persistent).to be false
+    expect(client.socket).to be_nil
+    expect(client.close).to be_nil
+
+    client.search(q: 'Coffee', location: 'Austin, TX')
+    expect(client.socket).to be_nil
+    expect(client.close).to be_nil
   end
 end
