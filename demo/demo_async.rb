@@ -37,9 +37,7 @@ search_queue = Queue.new
 company_list.each do |company|
   # store request into a search_queue - no-blocker
   result = client.search({ q: company })
-  if result[:search_metadata][:status] =~ /Cached/
-    puts "#{company}: search results found in cache for: #{company}"
-  end
+  puts "#{company}: search results found in cache for: #{company}" if result[:search_metadata][:status] =~ /Cached/
 
   # add results to the client queue
   search_queue.push(result[:search_metadata][:id])
@@ -67,7 +65,7 @@ until search_queue.empty?
     next
   end
 
-  # add results back to the client queue 
+  # add results back to the client queue
   #  if the search is still in progress
   search_queue.push(result)
 end

@@ -24,7 +24,11 @@ Style/FrozenStringLiteralComment:
 
 # default complexity is low at 8
 Metrics/PerceivedComplexity:
-  Max: 10
+  Max: 12
+
+# method length is not a problem
+MethodLength:
+  Max: 30
 
 # if works as well as safe navigation (&.)
 Style/SafeNavigation:
