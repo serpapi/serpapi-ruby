@@ -33,25 +33,28 @@ require 'serpapi'
 # target MAANG companies
 company_list = %w[meta amazon apple netflix google]
 client = SerpApi::Client.new(engine: 'google', async: true, persistent: true, api_key: ENV.fetch('SERPAPI_KEY', nil))
-search_queue = Queue.new
+schedule_search = Queue.new
+result = nil
 company_list.each do |company|
-  # store request into a search_queue - no-blocker
+  # store request into a schedule_search - no-blocker
   result = client.search({ q: company })
   puts "#{company}: search results found in cache for: #{company}" if result[:search_metadata][:status] =~ /Cached/
 
   # add results to the client queue
-  search_queue.push(result[:search_metadata][:id])
+  schedule_search.push(result[:search_metadata][:id])
 end
 
+puts "Last search submited at: #{result[:search_metadata][:created_at]}"
+
 # wait for all requests to be completed
-puts 'wait for all requests to be completed'
+puts 'wait 10s for all requests to be completed '
 # wait for 10 seconds to allow all requests to be processed
 sleep(10)
 
 puts 'wait until all searches are cached or success'
-until search_queue.empty?
+until schedule_search.empty?
   # extract client id
-  search_id = search_queue.pop
+  search_id = schedule_search.pop
 
   # retrieve client from the archive - blocker
   search_archived = client.search_archive(search_id)
@@ -67,9 +70,9 @@ until search_queue.empty?
 
   # add results back to the client queue
   #  if the search is still in progress
-  search_queue.push(result)
+  schedule_search.push(result)
 end
 
 # destroy the queue
-search_queue.close
+schedule_search.close
 puts 'done'
