@@ -17,6 +17,6 @@ describe 'example: apple_app_store search' do
 
     # print the output of the response in formatted JSON
     # pp results[:organic_results]
-    # doc: https://serpapi.com/apple_app_store
+    # doc: https://serpapi.com/apple-app-store
   end
 end

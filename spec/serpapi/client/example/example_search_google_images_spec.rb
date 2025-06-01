@@ -18,6 +18,6 @@ describe 'example: google_images search' do
 
     # print the output of the response in formatted JSON
     # pp results[:images_results]
-    # doc: https://serpapi.com/google_images
+    # doc: https://serpapi.com/images-results
   end
 end

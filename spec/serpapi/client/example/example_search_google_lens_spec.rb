@@ -17,6 +17,6 @@ describe 'example: google_lens search' do
 
     # print the output of the response in formatted JSON
     # pp results[:visual_matches]
-    # doc: https://serpapi.com/google_lens
+    # doc: https://serpapi.com/google-lens-api
   end
 end

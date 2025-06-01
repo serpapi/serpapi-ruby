@@ -23,6 +23,6 @@ describe 'example: google_hotels search' do
 
     # print the output of the response in formatted JSON
     # pp results[:properties]
-    # doc: https://serpapi.com/google_hotels
+    # doc: https://serpapi.com/google-hotels-api
   end
 end

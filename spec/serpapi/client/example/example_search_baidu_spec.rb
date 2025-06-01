@@ -17,6 +17,6 @@ describe 'example: baidu search' do
 
     # print the output of the response in formatted JSON
     # pp results[:organic_results]
-    # doc: https://serpapi.com/baidu
+    # doc: https://serpapi.com/baidu-search-api
   end
 end

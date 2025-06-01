@@ -17,6 +17,6 @@ describe 'example: walmart search' do
 
     # print the output of the response in formatted JSON
     # pp results[:organic_results]
-    # doc: https://serpapi.com/walmart
+    # doc: https://serpapi.com/walmart-search-api
   end
 end

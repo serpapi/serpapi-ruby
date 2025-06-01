@@ -22,6 +22,6 @@ describe 'example: google_flights search' do
 
     # print the output of the response in formatted JSON
     # pp results[:best_flights]
-    # doc: https://serpapi.com/google_flights
+    # doc: https://serpapi.com/google-flights-api
   end
 end

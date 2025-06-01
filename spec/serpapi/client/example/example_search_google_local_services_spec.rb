@@ -18,6 +18,6 @@ describe 'example: google_local_services search' do
 
     # print the output of the response in formatted JSON
     # pp results[:local_ads]
-    # doc: https://serpapi.com/google_local_services
+    # doc: https://serpapi.com/google-local-services-api
   end
 end

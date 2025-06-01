@@ -19,6 +19,6 @@ describe 'example: google_maps search' do
 
     # print the output of the response in formatted JSON
     # pp results[:local_results]
-    # doc: https://serpapi.com/google_maps
+    # doc: https://serpapi.com/google-maps-api
   end
 end

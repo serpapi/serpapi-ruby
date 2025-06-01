@@ -17,6 +17,6 @@ describe 'example: google_finance search' do
 
     # print the output of the response in formatted JSON
     # pp results[:markets]
-    # doc: https://serpapi.com/google_finance
+    # doc: https://serpapi.com/google-finance-api
   end
 end

@@ -18,6 +18,6 @@ describe 'example: google_play search' do
 
     # print the output of the response in formatted JSON
     # pp results[:organic_results]
-    # doc: https://serpapi.com/google_play
+    # doc: https://serpapi.com/google-play-api
   end
 end

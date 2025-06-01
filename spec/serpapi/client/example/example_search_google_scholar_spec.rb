@@ -17,6 +17,6 @@ describe 'example: google_scholar search' do
 
     # print the output of the response in formatted JSON
     # pp results[:organic_results]
-    # doc: https://serpapi.com/google_scholar
+    # doc: https://serpapi.com/google-scholar-api
   end
 end

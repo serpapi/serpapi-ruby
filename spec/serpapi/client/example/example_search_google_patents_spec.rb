@@ -17,6 +17,6 @@ describe 'example: google_patents search' do
 
     # print the output of the response in formatted JSON
     # pp results[:organic_results]
-    # doc: https://serpapi.com/google_patents
+    # doc: https://serpapi.com/google-patents-api
   end
 end

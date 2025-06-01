@@ -17,6 +17,6 @@ describe 'example: google_reverse_image search' do
 
     # print the output of the response in formatted JSON
     # pp results[:image_sizes]
-    # doc: https://serpapi.com/google_reverse_image
+    # doc: https://serpapi.com/google-reverse-image
   end
 end

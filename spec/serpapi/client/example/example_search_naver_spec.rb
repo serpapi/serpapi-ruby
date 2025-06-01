@@ -17,6 +17,6 @@ describe 'example: naver search' do
 
     # print the output of the response in formatted JSON
     # pp results[:ads_results]
-    # doc: https://serpapi.com/naver
+    # doc: https://serpapi.com/naver-search-api
   end
 end

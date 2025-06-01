@@ -17,6 +17,6 @@ describe 'example: home_depot search' do
 
     # print the output of the response in formatted JSON
     # pp results[:products]
-    # doc: https://serpapi.com/home_depot
+    # doc: https://serpapi.com/home-depot-search-api
   end
 end

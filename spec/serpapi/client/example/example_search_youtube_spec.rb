@@ -17,6 +17,6 @@ describe 'example: youtube search' do
 
     # print the output of the response in formatted JSON
     # pp results[:video_results]
-    # doc: https://serpapi.com/youtube
+    # doc: https://serpapi.com/youtube-search-api
   end
 end

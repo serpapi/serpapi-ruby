@@ -17,6 +17,6 @@ describe 'example: google_autocomplete search' do
 
     # print the output of the response in formatted JSON
     # pp results[:suggestions]
-    # doc: https://serpapi.com/google_autocomplete
+    # doc: https://serpapi.com/google-autocomplete-api
   end
 end

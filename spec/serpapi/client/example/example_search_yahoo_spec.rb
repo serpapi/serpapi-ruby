@@ -17,6 +17,6 @@ describe 'example: yahoo search' do
 
     # print the output of the response in formatted JSON
     # pp results[:organic_results]
-    # doc: https://serpapi.com/yahoo
+    # doc: https://serpapi.com/yahoo-search-api
   end
 end

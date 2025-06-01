@@ -17,6 +17,6 @@ describe 'example: google_events search' do
 
     # print the output of the response in formatted JSON
     # pp results[:events_results]
-    # doc: https://serpapi.com/google_events
+    # doc: https://serpapi.com/google-events-api
   end
 end

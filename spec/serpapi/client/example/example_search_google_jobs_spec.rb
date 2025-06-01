@@ -17,6 +17,6 @@ describe 'example: google_jobs search' do
 
     # print the output of the response in formatted JSON
     # pp results[:jobs_results]
-    # doc: https://serpapi.com/google_jobs
+    # doc: https://serpapi.com/google-jobs-api
   end
 end

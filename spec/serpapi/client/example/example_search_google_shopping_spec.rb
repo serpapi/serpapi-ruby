@@ -17,6 +17,6 @@ describe 'example: google_shopping search' do
 
     # print the output of the response in formatted JSON
     # pp results[:shopping_results]
-    # doc: https://serpapi.com/google_shopping
+    # doc: https://serpapi.com/google-shopping-api
   end
 end
