@@ -227,16 +227,16 @@ First, you need to run a search and save the search id.
 
 ```ruby
 require 'serpapi'
-client = SerpApi::Client.new(engine: 'google', api_key: 'secret_api_key')
+client = SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'])
 results = client.search(q: "Coffee", location: "Portland")
 search_id = results[:search_metadata][:id]
 ```
 
-Now we can retrieve the previous search results from the archive (free)
+Now we can retrieve the previous search results from the archive using the search id (free of charge).
 
 ```ruby
 require 'serpapi'
-client = SerpApi::Client.new(api_key: 'secret_api_key')
+client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
 results = client.search_archive(search_id)
 pp results
 ```
@@ -246,11 +246,30 @@ This code prints the search results from the archive. :)
 ### Account API
 ```ruby
 require 'serpapi'
-client = SerpApi::Client.new(api_key: 'secret_api_key')
+client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
 pp client.account
 ```
 
-It prints your account information.
+It prints your account information as:
+``json
+{
+ account_id: "1234567890",
+ api_key: "your_secret_key",
+ account_email: "email@company.com",
+ account_status: "Active",
+ plan_id: "free",
+ plan_name: "Free Plan",
+ plan_monthly_price: 0.0,
+ searches_per_month: 100,
+ plan_searches_left: 0,
+ extra_credits: 100,
+ total_searches_left: 10,
+ this_month_usage: 100,
+ this_hour_searches: 0,
+ last_hour_searches: 0,
+ account_rate_limit_per_hour: 100
+ } 
+ ```
 
 ## Basic example per search engine
 

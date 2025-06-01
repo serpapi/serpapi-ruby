@@ -1,4 +1,4 @@
-# The code snippet aims to improve the efficiency of searching using the SerpApi client in async mode.
+# The code snippet aims to improve the efficiency of searching using the SerpApi client using `async` mode.
 # The request are non-blocking which allows batching a large amount of query, and wait before fetching the result back.
 #
 # **Process:**
