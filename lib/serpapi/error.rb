@@ -1,5 +1,6 @@
 # Module includes SerpApi error handling.
 # frozen_string_literal: true
+
 module SerpApi
   # SerpApiError wraps any errors related to the SerpApi client.
   class SerpApiError < StandardError
