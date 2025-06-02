@@ -1,49 +1,16 @@
-# The code snippet you provided demonstrates a simple implementation of the SerpApi client using the Ruby Serpapi gem.
-# It  performs a Google Autocomplete search for the query "coffee" and prints the suggestions returned.
-#
-# **Key Points:**
-#
-# * **API Key:** The code requires an API key to be set in the `SERPAPI_KEY` environment variable.
-# * **Serpapi Client:** A SerpApi client is created with default parameters, including the engine, client, language,
-# country, API key, persistence settings, and timeout.
-# * **Search Parameters:** A search request is made with the query "coffee".
-# * **Suggestions Retrieval:** The `suggestions` key in the response is checked for availability and non-emptiness.
-# * **Output:** The suggestions are printed using the `pp` gem.
-#
-# **Purpose:**
-#
-# The code is designed to demonstrate how to use the SerpApi client to retrieve autocomplete suggestions from Google. It
-# verifies that suggestions are returned and outputs them for demonstration purposes.
-#
-# **Usage:**
-#
-# To run the code, you need to set the `SERPAPI_KEY` environment variable to your actual SerpApi API key.
-# Obtain your free key from: serpapi.com
-#
-# **Output:**
-#
-# The script will output the autocomplete suggestions for the query "coffee" in a formatted manner.
-#
-# **Additional Notes:**
-#
-# * The `persistent: false` parameter ensures that each search request is treated as a new session. this is no the best pratice.
-# * The `timeout: 2` parameter sets a timeout of 2 seconds for each request.
-# * The code uses the `pp` gem for pretty-printing the suggestions.
-# * The `exit 1` and `exit 0` statements are used to indicate success or failure, respectively.
-
-require 'serpapi'
-require 'pp'
+# This script initializes default parameters for interacting with the SerpApi service.
+# The `default_params` hash contains the following keys:
+# - `engine`: Specifies the search engine to be used, in this case, 'google'.
+# - `api_key`: Retrieves the API key from the environment variable `SERPAPI_KEY`.
+# Ensure that the `SERPAPI_KEY` environment variable is set before running this script.
 
 raise 'SERPAPI_KEY environment variable must be set' if ENV['SERPAPI_KEY'].nil?
+require 'pp'
+require 'serpapi'
 
 default_params = {
-  engine: 'google_autocomplete',
-  client: 'safari',
-  hl: 'en',
-  gl: 'us',
-  api_key: ENV.fetch('SERPAPI_KEY', nil),
-  persistent: false,
-  timeout: 2
+  engine: 'google',
+  api_key: ENV['SERPAPI_KEY']
 }
 client = SerpApi::Client.new(default_params)
 params = {
