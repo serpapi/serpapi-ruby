@@ -5,12 +5,13 @@
 # Ensure that the `SERPAPI_KEY` environment variable is set before running this script.
 
 raise 'SERPAPI_KEY environment variable must be set' if ENV['SERPAPI_KEY'].nil?
+
 require 'pp'
 require 'serpapi'
 
 default_params = {
   engine: 'google',
-  api_key: ENV['SERPAPI_KEY']
+  api_key: ENV.fetch('SERPAPI_KEY', nil)
 }
 client = SerpApi::Client.new(default_params)
 params = {

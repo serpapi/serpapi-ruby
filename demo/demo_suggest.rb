@@ -1,4 +1,3 @@
-
 # This script demonstrates how to use the SerpApi Ruby client to fetch Google Autocomplete suggestions.
 # It requires the `serpapi` gem and an environment variable `SERPAPI_KEY` containing your SerpApi API key.
 #
@@ -23,7 +22,7 @@ default_params = {
   client: 'safari',
   hl: 'en',
   gl: 'us',
-  api_key: ENV['SERPAPI_KEY'],
+  api_key: ENV.fetch('SERPAPI_KEY', nil),
   persistent: false,
   timeout: 2
 }
