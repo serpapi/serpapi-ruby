@@ -207,28 +207,22 @@ benchmark: (demo/demo_thread_pool.rb)
 ```ruby
 require 'serpapi'
 
-raise 'SERPAPI_KEY environment variable must be set' if ENV['SERPAPI_KEY'].nil?
+require 'pp'
 
 default_params = {
-  engine: 'google_autocomplete',
-  client: 'safari',
-  hl: 'en',
-  gl: 'us',
-  api_key: ENV.fetch('SERPAPI_KEY', nil),
-  persistent: false,
-  timeout: 2
+  engine: 'google',
+  api_key: ENV.fetch('SERPAPI_KEY', nil)
 }
 client = SerpApi::Client.new(default_params)
 params = {
   q: 'coffee'
 }
 results = client.search(params)
-puts 'print suggestions'
-if !results[:suggestions] || results[:suggestions].empty?
-  puts 'no suggestions found'
+if !results[:organic_results]
+  puts 'organic results found'
   exit 1
 end
-pp results[:suggestions]
+pp results[:organic_results]
 puts 'done'
 exit 0
 ```

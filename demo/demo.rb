@@ -11,18 +11,17 @@ require 'serpapi'
 
 default_params = {
   engine: 'google',
-  api_key: ENV.fetch('SERPAPI_KEY', nil)
+  api_key: ENV['SERPAPI_KEY']
 }
 client = SerpApi::Client.new(default_params)
 params = {
   q: 'coffee'
 }
 results = client.search(params)
-puts 'print suggestions'
-if !results[:suggestions] || results[:suggestions].empty?
-  puts 'no suggestions found'
+if !results[:organic_results]
+  puts 'organic results found'
   exit 1
 end
-pp results[:suggestions]
+pp results[:organic_results]
 puts 'done'
 exit 0

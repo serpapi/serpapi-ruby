@@ -75,9 +75,10 @@ end
 
 desc 'run demo example'
 task :demo do
-  sh 'ruby demo/demo.rb'
-  sh 'ruby demo/demo_async.rb'
-  sh 'ruby demo/demo_thread_pool.rb'
+  Dir.glob('demo/*.rb').each do |file|
+    puts "running demo: #{file}"
+    sh "ruby #{file}"
+  end
 end
 
 desc 'release the gem to the public rubygems.org'
