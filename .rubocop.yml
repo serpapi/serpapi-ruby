@@ -34,6 +34,10 @@ MethodLength:
 Style/SafeNavigation:
   Enabled: false
 
+# disable this cop, dont agree with it
+Style/FetchEnvVar:
+  Enabled: false
+
 # buggus check in Rubocop.
 # SerpApiClient constructor is rated to 9
 #  def initialize(params = {}) 
@@ -41,12 +45,14 @@ Metrics/CyclomaticComplexity:
   Max: 12
 
 AllCops:
+  # hide message
+  SuggestExtensions: false
+  # show new cops
   NewCops: enable
+  # exclude rspec files from linting
   Exclude:
     - 'serpapi.gemspec'
     - 'spec/**/*_spec.rb'
     - 'spec/spec_helper.rb'
-    - 'script/*'
-    - 'oobt/*'
     - 'Gemfile'
     - 'Rakefile'

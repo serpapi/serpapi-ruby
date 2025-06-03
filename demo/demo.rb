@@ -18,7 +18,7 @@ params = {
   q: 'coffee'
 }
 results = client.search(params)
-if !results[:organic_results]
+unless results[:organic_results]
   puts 'organic results found'
   exit 1
 end
