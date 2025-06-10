@@ -1,6 +1,6 @@
-# The provided code snippet is a Ruby spec test case that
-# demonstrates the use of thread pools to execute multiple HTTP
-# requests concurrently.
+# The provided code snippet is a Ruby benchmarking script that
+#  demonstrates the use of thread pools to execute multiple HTTP
+#  requests concurrently using persistent connections to SerpApi.
 #
 # **Key Points:**
 #
@@ -13,9 +13,9 @@
 # * The `to_s` method converts the HTTP response to a string.
 # * The `total` method from the `Benchmark` class is used to measure
 # the total execution time of the code block.
-
+#
 # **Purpose:**
-
+#
 # The code aims to demonstrate how thread pools can be used to
 # improve performance by executing multiple tasks concurrently. In
 # this case, it makes multiple HTTP requests to an API endpoint using
