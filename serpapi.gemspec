@@ -19,7 +19,7 @@ information.'
   s.require_paths = ['lib']
   s.homepage    = 'https://github.com/serpapi/serpapi-ruby'
   s.license     = 'MIT'
-  s.required_ruby_version = '>= 3.1'
+  s.required_ruby_version = '>= 2.7'
 
   # faraday
   s.add_dependency 'http', '~> 5.2'

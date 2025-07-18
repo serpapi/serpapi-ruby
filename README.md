@@ -209,16 +209,20 @@ require 'serpapi'
 
 require 'pp'
 
-default_params = {
-  engine: 'google',
-  api_key: ENV.fetch('SERPAPI_KEY', nil)
-}
-client = SerpApi::Client.new(default_params)
+client = SerpApi::Client.new({api_key: ENV['SERPAPI_KEY']})
 params = {
   q: 'coffee'
 }
 results = client.search(params)
-if !results[:organic_results]
+print results[:search_parameters][:engine]
+if params[:engine] != results[:search_parameters][:engine]
+  puts "Engine mismatch: expected #{params[:engine]}, got #{results[:search_parameters][:engine]}"
+  exit 1
+end
+puts 'search engine match'
+exit 0
+
+unless results[:organic_results]
   puts 'organic results found'
   exit 1
 end
@@ -1072,6 +1076,7 @@ Ruby versions validated by Github Actions:
  * doc: [Github Actions.](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 
 ## Change logs
+ * [2025-07-18] 1.0.1 Add support for old Ruby versions (2.7, 3.0)
  * [2025-07-01] 1.0.0 Full API support
 
 ## Developer Guide
