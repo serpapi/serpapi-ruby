@@ -36,9 +36,10 @@ Fast query at scale a vast range of data, including web search results, flight s
 
 ## Installation
 
-To achieve optimal performance, it is essential to have Ruby 3.1+ (preferably version 3.4) installed. 
+To achieve optimal performance, it is essential to latest Ruby version installed on your system (Ruby 2.7+ is supported by 3.4 is recommended for [performance reason](#Performance-Comparison)).
 
 | Older versions such as Ruby 1.9, 2.x, and JRuby are compatible with [serpapi older library](https://github.com/serpapi/google-search-results-ruby), which continues to function effectively. see [migration guide](#Migration-quick-guide) if you are using the older library.
+
 
 ### Bundler
 ```ruby
@@ -421,6 +422,25 @@ see: [https://serpapi.com/yandex-search-api](https://serpapi.com/yandex-search-a
 ### Search yelp
 <%= snippet('ruby', 'spec/serpapi/client/example/example_search_yelp_spec.rb') %>
 see: [https://serpapi.com/yelp-search-api](https://serpapi.com/yelp-search-api)
+
+## Performance Comparison
+
+### Ruby 3.4.4 vs Ruby 2.7.8 Performance
+
+| Metric | Ruby 2.7.8 | Ruby 3.4.4 | Improvement |
+|--------|------------|------------|-------------|
+| **SerpApi Non-Persistent** | 100.93 req/s | 114.97 req/s | **+13.9%** |
+| **SerpApi Persistent** | 226.82 req/s | 255.07 req/s | **+12.4%** |
+| **HTTP.rb Non-Persistent** | 270.62 req/s | 294.01 req/s | **+8.6%** |
+| **HTTP.rb Persistent** | 347.04 req/s | 570.95 req/s | **+64.5%** |
+
+### Key Takeaways
+1. **Upgrade to Ruby 3.4.4**: Clear performance benefits across all scenarios
+2. **Use Persistent Connections**: 2x+ performance improvement in most cases
+3. **HTTP.rb Performance**: Particularly benefits from Ruby 3.4.4 with persistent connections
+4. **SerpApi Optimization**: Shows consistent ~2.2x improvement with persistent connections regardless of Ruby version
+
+The older library (google-search-results-ruby) was performing at 55 req/s on Ruby 2.7.8, which is 2x slower than the current version (serpapi-ruby) on Ruby 3.4.4.
 
 ## Migration quick guide
 
