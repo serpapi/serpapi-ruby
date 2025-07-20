@@ -29,5 +29,6 @@ information.'
   s.add_development_dependency 'rspec', '~>3.11'
   s.add_development_dependency 'yard', '~>0.9.28'
   s.add_development_dependency 'rubocop', '~>1.75.7'
+  s.add_development_dependency 'csv'
 
 end

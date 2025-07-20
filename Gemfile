@@ -17,6 +17,8 @@ group :test, :development do
   gem 'rspec', '~>3.11'
   # code coverage to monitor rspec tests
   gem 'simplecov'
+  # save CSV files
+  gem 'csv'
 
   # Thread pool example file: thread_pool_spec.rb
   # https://github.com/mperham/connection_pool/tree/main
