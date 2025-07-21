@@ -1,6 +1,5 @@
-# The provided code snippet is a Ruby benchmarking script that
-#  demonstrates the use of thread pools to execute multiple HTTP
-#  requests concurrently using persistent connections to SerpApi.
+# The provided code snippet demonstrates the use of thread pools
+# to execute multiple HTTP requests concurrently using persistent connections to SerpApi.
 #
 # **Key Points:**
 #

@@ -9,17 +9,15 @@ raise 'SERPAPI_KEY environment variable must be set' if ENV['SERPAPI_KEY'].nil?
 require 'pp'
 require 'serpapi'
 
-default_params = {
+# client initialization with default parameters
+client = SerpApi::Client.new({
   engine: 'google',
   api_key: ENV['SERPAPI_KEY']
-}
-client = SerpApi::Client.new(default_params)
-params = {
-  q: 'coffee'
-}
-results = client.search(params)
+})
+# search for coffee
+results = client.search(q: 'coffee')
 unless results[:organic_results]
-  puts 'organic results found'
+  puts 'no organic results found'
   exit 1
 end
 pp results[:organic_results]
