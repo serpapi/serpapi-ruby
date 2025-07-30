@@ -23,7 +23,7 @@ To achieve optimal performance, you should have the latest Ruby version installe
 
 ### Bundler
 ```ruby
-gem 'serpapi', '~> 1.0.0'
+gem 'serpapi', '~> 1.0', '>= 1.0.1'
 ```
 
 ### Gem 
