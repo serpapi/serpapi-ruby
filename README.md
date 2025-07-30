@@ -2,11 +2,11 @@
 
 [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml) [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi) 
 
-Integrate search data into your AI workflow, RAG / fine tuning or ruby application using this official wrapper for [SerpApi](https://serpapi.com). 
+Integrate search data into your AI workflow, RAG / fine-tuning, or Ruby application using this official wrapper for [SerpApi](https://serpapi.com). 
 
-SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and [more.](https://serpapi.com). 
+SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and [more](https://serpapi.com). 
 
-Fast query at scale a vast range of data, including web search results, flight schedule, stock market data, news headlines, and [more.](https://serpapi.com). 
+Fast query at scale a vast range of data, including web search results, flight schedules, stock market data, news headlines, and [more](https://serpapi.com). 
 
 ## Features
   * `persistent` → Keep socket connection open to save on SSL handshake / reconnection (2x faster).  [Search at scale](#Search-At-Scale)
@@ -16,7 +16,7 @@ Fast query at scale a vast range of data, including web search results, flight s
 
 ## Installation
 
-To achieve optimal performance, it is essential to latest Ruby version installed on your system (Ruby 2.7+ is supported by 3.4 is recommended for [performance reason](#Performance-Comparison)).
+To achieve optimal performance, you should have the latest Ruby version installed on your system (Ruby 2.7+ is supported, but 3.4 is recommended for [performance reason](#Performance-Comparison)).
 
 | Older versions such as Ruby 1.9, 2.x, and JRuby are compatible with [serpapi older library](https://github.com/serpapi/google-search-results-ruby), which continues to function effectively. see [migration guide](#Migration-quick-guide) if you are using the older library.
 
@@ -55,7 +55,7 @@ Environment variables are a secure, safe, and easy way to manage secrets.
 ## Search API advanced usage with Google search engine
 
 This example dives into all the available parameters for the Google search engine.
- The set of parameters is extensive and depends on the search engine you choose.
+The set of parameters is extensive and depends on your chosen search engine.
 
 ```ruby
 # load gem
@@ -66,15 +66,15 @@ client = SerpApi::Client.new(
   engine: 'google',
   api_key: ENV['SERPAPI_KEY'],
   # HTTP client configuration
-  async: false, # non blocking HTTP request see: Search Asynchronous (default: false)
+  async: false, # non-blocking HTTP request see: Search Asynchronous (default: false)
   persistent: true, # leave socket connection open for faster response time see: Search at scale (default: true)
   timeout: 5, # HTTP timeout in seconds on the client side only. (default: 120s)
-  symbolize_names: true # turn on/off JSON keys to symbols (default: on more efficient)
+  symbolize_names: true # turn on/off JSON keys to symbols (default: on, more efficient)
 )
 
 # search query overview (more fields available depending on search engine)
 params = {
-  # overview of parameter for Google search engine which one of many search engine supported.
+  # overview of parameter for Google search engine which is one of many search engine supported.
   # select the search engine (full list: https://serpapi.com/)
   engine: "google",
   # actual search query
@@ -164,7 +164,7 @@ puts 'done'
  * source code: [demo/demo_async.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_async.rb)
 
 This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). 
-Each search takes a few seconds before completion by SerpApi service and the search engine. By the time the first element pops out of the queue. The search result might be already available in the archive. If not, the `search_archive` method blocks until the search results are available. 
+Each search takes a few seconds before completion by SerpApi service and the search engine. By the time the first element pops out of the queue. The search result might already be available in the archive. If not, the `search_archive` method blocks until the search results are available. 
 
 ### Search at scale
 The provided code snippet is a Ruby spec test case that demonstrates the use of thread pools to execute multiple HTTP requests concurrently.
@@ -270,7 +270,7 @@ NOTE: api_key is not required for this endpoint.
 This API allows retrieving previous search results.
 To fetch earlier results from the search_id.
 
-First, you need to run a search and save the search id.
+First, you need to run a search and save the search ID.
 
 ```ruby
 require 'serpapi'
@@ -279,7 +279,7 @@ results = client.search(q: "Coffee", location: "Portland")
 search_id = results[:search_metadata][:id]
 ```
 
-Now we can retrieve the previous search results from the archive using the search id (free of charge).
+Now we can retrieve the previous search results from the archive using the search ID (free of charge).
 
 ```ruby
 require 'serpapi'
