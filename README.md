@@ -6,7 +6,7 @@ Integrate search data into your AI workflow, RAG / fine-tuning, or Ruby applicat
 
 SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and [more](https://serpapi.com). 
 
-Fast query at scale a vast range of data, including web search results, flight schedules, stock market data, news headlines, and [more](https://serpapi.com). 
+Query a vast range of data at scale, including web search results, flight schedules, stock market data, news headlines, and [more](https://serpapi.com). 
 
 ## Features
   * `persistent` → Keep socket connection open to save on SSL handshake / reconnection (2x faster).  [Search at scale](#Search-At-Scale)
@@ -16,10 +16,9 @@ Fast query at scale a vast range of data, including web search results, flight s
 
 ## Installation
 
-To achieve optimal performance, you should have the latest Ruby version installed on your system (Ruby 2.7+ is supported, but 3.4 is recommended for [performance reason](#Performance-Comparison)).
+Ruby 2.7 and later are supported. To achieve an optimal performance, the latest version is recommended. Check 2.7.8 vs 3.4.4 [performance comparison](#Performance-Comparison).
 
-| Older versions such as Ruby 1.9, 2.x, and JRuby are compatible with [serpapi older library](https://github.com/serpapi/google-search-results-ruby), which continues to function effectively. see [migration guide](#Migration-quick-guide) if you are using the older library.
-
+Other versions, such as Ruby 1.9, Ruby 2.x, and JRuby, are compatible with [legacy SerpApi library](https://github.com/serpapi/google-search-results-ruby), which is still supported. To upgrade to the latest library, check our [migration guide](#Migration-quick-guide).
 
 ### Bundler
 ```ruby
@@ -55,7 +54,7 @@ Environment variables are a secure, safe, and easy way to manage secrets.
 ## Search API advanced usage with Google search engine
 
 This example dives into all the available parameters for the Google search engine.
-The set of parameters is extensive and depends on your chosen search engine.
+The list of parameters depends on the chosen search engine.
 
 ```ruby
 # load gem
@@ -163,8 +162,7 @@ puts 'done'
 
  * source code: [demo/demo_async.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_async.rb)
 
-This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). 
-Each search takes a few seconds before completion by SerpApi service and the search engine. By the time the first element pops out of the queue. The search result might already be available in the archive. If not, the `search_archive` method blocks until the search results are available. 
+This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). Each search may take up to few seconds to complete. By the time the first element pops out of the queue, the search results might already be available in the archive. If not, the `search_archive` method blocks until the search results are available.
 
 ### Search at scale
 The provided code snippet is a Ruby spec test case that demonstrates the use of thread pools to execute multiple HTTP requests concurrently.
@@ -300,22 +298,22 @@ pp client.account
 It prints your account information as:
 ```ruby
 {
- account_id: "1234567890",
- api_key: "your_secret_key",
- account_email: "email@company.com",
- account_status: "Active",
- plan_id: "free",
- plan_name: "Free Plan",
- plan_monthly_price: 0.0,
- searches_per_month: 100,
- plan_searches_left: 0,
- extra_credits: 100,
- total_searches_left: 10,
- this_month_usage: 100,
- this_hour_searches: 0,
- last_hour_searches: 0,
- account_rate_limit_per_hour: 100
- } 
+  account_id: "1234567890",
+  api_key: "your_secret_key",
+  account_email: "email@company.com",
+  account_status: "Active",
+  plan_id: "free",
+  plan_name: "Free Plan",
+  plan_monthly_price: 0.0,
+  searches_per_month: 250,
+  plan_searches_left: 250,
+  extra_credits: 0,
+  total_searches_left: 250,
+  this_month_usage: 0,
+  this_hour_searches: 0,
+  last_hour_searches: 0,
+  account_rate_limit_per_hour: 250
+}
  ```
 
 ## Basic example per search engine
