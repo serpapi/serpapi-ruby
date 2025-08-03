@@ -44,6 +44,10 @@ Style/FetchEnvVar:
 Metrics/CyclomaticComplexity:
   Max: 12
 
+# this rule doesn't always work well with Ruby
+Layout/FirstHashElementIndentation:
+  Enabled: false
+
 AllCops:
   # hide message
   SuggestExtensions: false
