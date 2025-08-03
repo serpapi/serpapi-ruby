@@ -213,14 +213,6 @@ params = {
   q: 'coffee'
 }
 results = client.search(params)
-print results[:search_parameters][:engine]
-if params[:engine] != results[:search_parameters][:engine]
-  puts "Engine mismatch: expected #{params[:engine]}, got #{results[:search_parameters][:engine]}"
-  exit 1
-end
-puts 'search engine match'
-exit 0
-
 unless results[:organic_results]
   puts 'organic results found'
   exit 1
