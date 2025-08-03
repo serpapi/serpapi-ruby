@@ -11,9 +11,9 @@ require 'serpapi'
 
 # client initialization with default parameters
 client = SerpApi::Client.new({
-  engine: 'google',
-  api_key: ENV['SERPAPI_KEY']
-})
+                               engine: 'google',
+                               api_key: ENV['SERPAPI_KEY']
+                             })
 # search for coffee
 results = client.search(q: 'coffee')
 unless results[:organic_results]
