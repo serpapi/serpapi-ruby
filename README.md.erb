@@ -22,11 +22,11 @@ end
 
 [![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml) [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi) 
 
-Integrate search data into your AI workflow, RAG / fine tuning or ruby application using this official wrapper for [SerpApi](https://serpapi.com). 
+Integrate search data into your AI workflow, RAG / fine-tuning, or Ruby application using this official wrapper for [SerpApi](https://serpapi.com). 
 
-SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and [more.](https://serpapi.com). 
+SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and [more](https://serpapi.com). 
 
-Fast query at scale a vast range of data, including web search results, flight schedule, stock market data, news headlines, and [more.](https://serpapi.com). 
+Query a vast range of data at scale, including web search results, flight schedules, stock market data, news headlines, and [more](https://serpapi.com). 
 
 ## Features
   * `persistent` → Keep socket connection open to save on SSL handshake / reconnection (2x faster).  [Search at scale](#Search-At-Scale)
@@ -36,14 +36,13 @@ Fast query at scale a vast range of data, including web search results, flight s
 
 ## Installation
 
-To achieve optimal performance, it is essential to latest Ruby version installed on your system (Ruby 2.7+ is supported by 3.4 is recommended for [performance reason](#Performance-Comparison)).
+Ruby 2.7 and later are supported. To achieve an optimal performance, the latest version is recommended. Check 2.7.8 vs 3.4.4 [performance comparison](#Performance-Comparison).
 
-| Older versions such as Ruby 1.9, 2.x, and JRuby are compatible with [serpapi older library](https://github.com/serpapi/google-search-results-ruby), which continues to function effectively. see [migration guide](#Migration-quick-guide) if you are using the older library.
-
+Other versions, such as Ruby 1.9, Ruby 2.x, and JRuby, are compatible with [legacy SerpApi library](https://github.com/serpapi/google-search-results-ruby), which is still supported. To upgrade to the latest library, check our [migration guide](#Migration-quick-guide).
 
 ### Bundler
 ```ruby
-gem 'serpapi', '~> 1.0.0'
+gem 'serpapi', '~> 1.0', '>= 1.0.1'
 ```
 
 ### Gem 
@@ -75,7 +74,7 @@ Environment variables are a secure, safe, and easy way to manage secrets.
 ## Search API advanced usage with Google search engine
 
 This example dives into all the available parameters for the Google search engine.
- The set of parameters is extensive and depends on the search engine you choose.
+The list of parameters depends on the chosen search engine.
 
 ```ruby
 # load gem
@@ -86,15 +85,15 @@ client = SerpApi::Client.new(
   engine: 'google',
   api_key: ENV['SERPAPI_KEY'],
   # HTTP client configuration
-  async: false, # non blocking HTTP request see: Search Asynchronous (default: false)
+  async: false, # non-blocking HTTP request see: Search Asynchronous (default: false)
   persistent: true, # leave socket connection open for faster response time see: Search at scale (default: true)
   timeout: 5, # HTTP timeout in seconds on the client side only. (default: 120s)
-  symbolize_names: true # turn on/off JSON keys to symbols (default: on more efficient)
+  symbolize_names: true # turn on/off JSON keys to symbols (default: on, more efficient)
 )
 
 # search query overview (more fields available depending on search engine)
 params = {
-  # overview of parameter for Google search engine which one of many search engine supported.
+  # overview of parameter for Google search engine which is one of many search engine supported.
   # select the search engine (full list: https://serpapi.com/)
   engine: "google",
   # actual search query
@@ -142,10 +141,48 @@ Search API enables `async` search.
  - Blocking (`async=false`) : it is easy to write the code but more compute-intensive when the parent process needs to hold many connections.
 
 Here is an example of asynchronous searches using Ruby 
-<%= snippet('ruby', 'demo/demo_async.rb', true) %>
+```ruby
+require 'serpapi'
 
-This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). 
-Each search takes a few seconds before completion by SerpApi service and the search engine. By the time the first element pops out of the queue. The search result might be already available in the archive. If not, the `search_archive` method blocks until the search results are available. 
+company_list = %w[meta amazon apple netflix google]
+client = SerpApi::Client.new(engine: 'google', async: true, persistent: true, api_key: ENV.fetch('SERPAPI_KEY', nil))
+schedule_search = Queue.new
+result = nil
+company_list.each do |company|
+  result = client.search({ q: company })
+  puts "#{company}: search results found in cache for: #{company}" if result[:search_metadata][:status] =~ /Cached/
+
+  schedule_search.push(result[:search_metadata][:id])
+end
+
+puts "Last search submited at: #{result[:search_metadata][:created_at]}"
+
+puts 'wait 10s for all requests to be completed '
+sleep(10)
+
+puts 'wait until all searches are cached or success'
+until schedule_search.empty?
+  search_id = schedule_search.pop
+
+  search_archived = client.search_archive(search_id)
+
+  company = search_archived[:search_parameters][:q]
+
+  if search_archived[:search_metadata][:status] =~ /Cached|Success/
+    puts "#{search_archived[:search_parameters][:q]}: search results found in archive for: #{company}"
+    next
+  end
+
+  schedule_search.push(result)
+end
+
+schedule_search.close
+puts 'done'
+```
+
+ * source code: [demo/demo_async.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_async.rb)
+
+This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). Each search may take up to few seconds to complete. By the time the first element pops out of the queue, the search results might already be available in the archive. If not, the `search_archive` method blocks until the search results are available.
 
 ### Search at scale
 The provided code snippet is a Ruby spec test case that demonstrates the use of thread pools to execute multiple HTTP requests concurrently.
@@ -186,7 +223,26 @@ benchmark: (demo/demo_thread_pool.rb)
 
 ### Real world search without persistency
 
-<%= snippet('ruby', 'demo/demo.rb', true) %>
+```ruby
+require 'serpapi'
+
+require 'pp'
+
+client = SerpApi::Client.new({api_key: ENV['SERPAPI_KEY']})
+params = {
+  q: 'coffee'
+}
+results = client.search(params)
+unless results[:organic_results]
+  puts 'organic results found'
+  exit 1
+end
+pp results[:organic_results]
+puts 'done'
+exit 0
+```
+
+ * source code: [demo/demo.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo.rb)
 
 ## APIs supported
 ### Location API
@@ -224,7 +280,7 @@ NOTE: api_key is not required for this endpoint.
 This API allows retrieving previous search results.
 To fetch earlier results from the search_id.
 
-First, you need to run a search and save the search id.
+First, you need to run a search and save the search ID.
 
 ```ruby
 require 'serpapi'
@@ -233,7 +289,7 @@ results = client.search(q: "Coffee", location: "Portland")
 search_id = results[:search_metadata][:id]
 ```
 
-Now we can retrieve the previous search results from the archive using the search id (free of charge).
+Now we can retrieve the previous search results from the archive using the search ID (free of charge).
 
 ```ruby
 require 'serpapi'
@@ -254,22 +310,22 @@ pp client.account
 It prints your account information as:
 ```ruby
 {
- account_id: "1234567890",
- api_key: "your_secret_key",
- account_email: "email@company.com",
- account_status: "Active",
- plan_id: "free",
- plan_name: "Free Plan",
- plan_monthly_price: 0.0,
- searches_per_month: 100,
- plan_searches_left: 0,
- extra_credits: 100,
- total_searches_left: 10,
- this_month_usage: 100,
- this_hour_searches: 0,
- last_hour_searches: 0,
- account_rate_limit_per_hour: 100
- } 
+  account_id: "1234567890",
+  api_key: "your_secret_key",
+  account_email: "email@company.com",
+  account_status: "Active",
+  plan_id: "free",
+  plan_name: "Free Plan",
+  plan_monthly_price: 0.0,
+  searches_per_month: 250,
+  plan_searches_left: 250,
+  extra_credits: 0,
+  total_searches_left: 250,
+  this_month_usage: 0,
+  this_hour_searches: 0,
+  last_hour_searches: 0,
+  account_rate_limit_per_hour: 250
+}
  ```
 
 ## Basic example per search engine
