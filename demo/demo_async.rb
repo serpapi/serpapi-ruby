@@ -32,7 +32,12 @@ require 'serpapi'
 
 # target MAANG companies
 company_list = %w[meta amazon apple netflix google]
-client = SerpApi::Client.new(engine: 'google', async: true, persistent: true, api_key: ENV.fetch('SERPAPI_KEY', nil))
+client = SerpApi::Client.new(
+  engine: 'google',
+  async: true,
+  persistent: true,
+  api_key: ENV['SERPAPI_KEY']
+)
 schedule_search = Queue.new
 result = nil
 company_list.each do |company|

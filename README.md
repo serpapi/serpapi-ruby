@@ -125,11 +125,11 @@ Here is an example of asynchronous searches using Ruby
 require 'serpapi'
 
 company_list = %w[meta amazon apple netflix google]
-client = SerpApi::Client.new(engine: 'google', async: true, persistent: true, api_key: ENV.fetch('SERPAPI_KEY', nil))
+client = SerpApi::Client.new(engine: 'google', async: true, persistent: true, api_key: ENV['SERPAPI_KEY'])
 schedule_search = Queue.new
 result = nil
 company_list.each do |company|
-  result = client.search({ q: company })
+  result = client.search(q: company)
   puts "#{company}: search results found in cache for: #{company}" if result[:search_metadata][:status] =~ /Cached/
 
   schedule_search.push(result[:search_metadata][:id])
@@ -208,7 +208,7 @@ require 'serpapi'
 
 require 'pp'
 
-client = SerpApi::Client.new({api_key: ENV['SERPAPI_KEY']})
+client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
 params = {
   q: 'coffee'
 }
@@ -229,7 +229,7 @@ exit 0
 
 ```ruby
 require 'serpapi'
-client = SerpApi::Client.new() 
+client = SerpApi::Client.new
 location_list = client.location(q: "Austin", limit: 3)
 puts "number of location: #{location_list.size}"
 pp location_list

@@ -60,7 +60,10 @@ n = 4
 runtime = Benchmark.measure do
   # create a thread pool of 4 threads with a persistent connection to serpapi.com
   pool = ConnectionPool.new(size: n, timeout: 5) do
-    SerpApi::Client.new(engine: 'google', api_key: ENV.fetch('SERPAPI_KEY', nil), timeout: 30, persistent: true)
+    SerpApi::Client.new(engine: 'google',
+                        api_key: ENV['SERPAPI_KEY'],
+                        timeout: 30,
+                        persistent: true)
   end
 
   # run user thread to search for your favorites coffee type
