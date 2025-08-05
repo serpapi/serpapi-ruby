@@ -37,7 +37,7 @@ RSpec::Core::RakeTask.new(:test) do |t|
   t.rspec_opts = '--format documentation'
 end
 
-desc 'valiate all the examples (comprehensive of tests)' 
+desc 'validate all the examples (comprehensive set of tests)' 
 RSpec::Core::RakeTask.new(:regression) do |t|
   t.pattern = Dir.glob('spec/serpapi/client/example/*_spec.rb')
   t.rspec_opts = '--format documentation'
@@ -68,7 +68,7 @@ task :build do
   sh 'gem build serpapi'
 end
 
-desc 'install serpapi library from the .gem'
+desc 'install serpapi library locally from the .gem'
 task :install do
   sh "gem install ./serpapi-#{SerpApi::VERSION}.gem"
 end
