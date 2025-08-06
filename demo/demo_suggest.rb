@@ -17,16 +17,16 @@ require 'pp'
 
 raise 'SERPAPI_KEY environment variable must be set' if ENV['SERPAPI_KEY'].nil?
 
-default_params = {
+# client initialization with default parameters for Google Autocomplete
+client = SerpApi::Client.new(
   engine: 'google_autocomplete',
   client: 'safari',
-  hl: 'en',
-  gl: 'us',
-  api_key: ENV.fetch('SERPAPI_KEY', nil),
+  hl: 'en', # language
+  gl: 'us', # country
+  api_key: ENV['SERPAPI_KEY'], # API key from environment variable
   persistent: false,
   timeout: 2
-}
-client = SerpApi::Client.new(default_params)
+)
 params = {
   q: 'coffee'
 }
