@@ -50,6 +50,7 @@ RSpec::Core::RakeTask.new(:benchmark) do |t|
 end
 
 RuboCop::RakeTask.new(:lint) do |t|
+  t.plugins << 'rubocop-rake'
   t.options = ['--display-cop-names']
 end
 
