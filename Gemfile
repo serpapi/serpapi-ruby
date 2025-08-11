@@ -12,7 +12,7 @@ group :test, :development do
   # documentation generation
   gem 'yard', '~>0.9.28'
   # linter for ruby
-  gem 'rubocop', '~>1.75.7'
+  gem 'rubocop'
   gem 'rubocop-rake', require: false # for rake tasks linting
   # test for ruby
   gem 'rspec', '~>3.11'
