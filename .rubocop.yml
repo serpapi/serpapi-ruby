@@ -1,6 +1,7 @@
 # Require rubocop-rake plugin
-require:
+plugins:
   - rubocop-rake
+
 # human should be able to read 200 chars per line
 Layout/LineLength:
   Max: 200
