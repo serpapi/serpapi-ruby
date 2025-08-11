@@ -11,12 +11,12 @@ jobs:
       matrix:
         ruby-version: ['2.7', '3.1.0','head'] # test only recommend Ruby version (and stable version on the gitaction server)
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Ruby ${{ matrix.ruby-version }}
-        uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby-version }}
-      - name: Install dependencies
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: install dependencies
         run: bundle install
       - name: lint
         run: bundle exec rake lint
@@ -24,7 +24,7 @@ jobs:
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
         run: bundle exec rake test
-      - name: oobt
+      - name: out of box testing
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
         run: bundle exec rake oobt
