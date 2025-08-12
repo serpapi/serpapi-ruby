@@ -10,7 +10,6 @@
 
 require 'rake'
 require 'rspec/core/rake_task'
-require 'rubocop/rake_task'
 require 'yard'
 require_relative 'lib/serpapi'
 
@@ -49,9 +48,9 @@ RSpec::Core::RakeTask.new(:benchmark) do |t|
   t.rspec_opts = '--format documentation'
 end
 
-RuboCop::RakeTask.new(:lint) do |t|
-  t.plugins << 'rubocop-rake'
-  t.options = ['--display-cop-names']
+desc 'run rubocop linter'
+task :lint do
+  sh('rubocop --display-cop-names')
 end
 
 desc "format ruby code using rubocop"

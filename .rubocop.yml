@@ -12,7 +12,7 @@ Metrics/AbcSize:
 
 # short clear method name 
 Metrics/MethodLength:
-  Max: 25
+  Max: 30
 
 # no performance implication
 Style/OptionalBooleanParameter:
@@ -29,10 +29,6 @@ Style/FrozenStringLiteralComment:
 # default complexity is low at 8
 Metrics/PerceivedComplexity:
   Max: 12
-
-# method length is not a problem
-MethodLength:
-  Max: 30
 
 # if works as well as safe navigation (&.)
 Style/SafeNavigation:
