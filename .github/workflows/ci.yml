@@ -9,13 +9,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby: ['2.7', '3.1.0','head'] # test only recommend Ruby version (and stable version on the gitaction server)
+        ruby: ['2.7.8', '3.1.0','head'] # test only recommend Ruby version (and stable version on the GitHub action server)
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
+      # Install Bundler 2.4.x for Ruby 2.7
+      - name: Install Bundler 2.4.x for Ruby 2.7
+        if: matrix.ruby == '2.7.8'
+        run: gem install bundler -v '~> 2.4'
       - name: install dependencies
         run: bundle install
       - name: lint
