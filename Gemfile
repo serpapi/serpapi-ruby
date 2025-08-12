@@ -13,7 +13,8 @@ group :test, :development do
   gem 'yard', '~>0.9.28'
   # linter for ruby
   gem 'rubocop'
-  gem 'rubocop-rake', require: false # for rake tasks linting
+  gem 'panolint'
+  #gem 'rubocop-rake', require: false # for rake tasks linting
   # test for ruby
   gem 'rspec', '~>3.11'
   # code coverage to monitor rspec tests
