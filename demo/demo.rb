@@ -9,6 +9,8 @@ raise 'SERPAPI_KEY environment variable must be set' if ENV['SERPAPI_KEY'].nil?
 require 'pp'
 require 'serpapi'
 
+puts "SerpApi Ruby Client Example with Ruby version: #{RUBY_VERSION}"
+
 # client initialization with default parameters
 client = SerpApi::Client.new(
   engine: 'google',

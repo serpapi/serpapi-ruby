@@ -9,12 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ['3.1.0','head'] # test only recommend Ruby version (and stable version on the gitaction server)
-     #   ruby-version: ['2.7.4','3.1.0','head']
+        # test only recommend Ruby version (and stable version on the gitaction server)
+        # GitHub action github.com/ruby/setup-ruby is pretty unstable with older Ruby version + dependencies
+        #  so, we only run a basic example with Ruby 2.7.8 after install the gem from the local build
+        ruby-version: ['3.1.0','head'] 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Ruby ${{ matrix.ruby-version }}
-        uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
       - name: Install dependencies
@@ -29,3 +31,11 @@ jobs:
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
         run: bundle exec rake oobt
+      - name: Run example with ruby 2.7.8
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7.8'
+      - name: Install and run demo 2.7.8
+        env:
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+        run: rake install && ruby demo/demo.rb
