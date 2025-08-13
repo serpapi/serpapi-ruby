@@ -38,4 +38,4 @@ jobs:
       - name: Install and run demo 2.7.8
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
-        run: rake install && ruby demo/demo.rb
+        run: gem install ./serpapi-*.gem && ruby demo/demo.rb
