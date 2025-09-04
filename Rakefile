@@ -26,7 +26,7 @@ task readme: ['README.md.erb'] do
 end
 
 YARD::Rake::YardocTask.new(:doc) do |t|
-  t.files   = ['lib/*/*.rb', 'README.md', 'LICENSE']
+  t.files   = ['lib/*/*.rb', 'LICENSE']
   t.options = ['--markup=markdown']
   t.stats_options = ['--list-undoc']
 end
