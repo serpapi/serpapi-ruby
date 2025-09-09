@@ -1016,9 +1016,9 @@ see: [https://serpapi.com/yelp-search-api](https://serpapi.com/yelp-search-api)
 
 The older library (google-search-results-ruby) was performing at 55 req/s on Ruby 2.7.8, which is 2x slower than the current version (serpapi-ruby) on Ruby 3.4.4.
 
-### Migration quick guide
+## Migration quick guide
 
-If you were already using (google-search-results-ruby gem)[https://github.com/serpapi/google-search-results-ruby], here are the changes.
+If you were already using [google-search-results-ruby gem](https://github.com/serpapi/google-search-results-ruby), here are the changes.
 
 ```
 # load library
