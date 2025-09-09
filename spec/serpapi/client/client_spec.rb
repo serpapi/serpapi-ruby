@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'set of client test to archieve full code coverage' do
   let(:client) do
-    client = SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'], timeout: 30)
+    SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'], timeout: 30)
   end
 
   it 'search for coffee in Austin, TX, returns symbolized Hash' do

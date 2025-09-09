@@ -117,7 +117,7 @@ params = {
 results = client.search(params)
 
 # search results as a raw HTML string
-raw_html = client.html(params) # Corrected parameter reference
+raw_html = client.html(params)
 ```
  → [SerpApi documentation](https://serpapi.com/search-api).
 
@@ -173,7 +173,7 @@ until schedule_search.empty?
     next
   end
 
-  schedule_search.push(result)
+  schedule_search.push(search_id)
 end
 
 schedule_search.close
@@ -193,7 +193,7 @@ require 'connection_pool'
 
 # create a thread pool of 4 threads with a persistent connection to serpapi.com
 pool = ConnectionPool.new(size: n, timeout: 5) do
-    SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'], timeout: 30, persistent: true)
+  SerpApi::Client.new(engine: 'google', api_key: ENV['SERPAPI_KEY'], timeout: 30, persistent: true)
 end
 
 # run user thread to search for your favorites coffee type
@@ -225,7 +225,6 @@ benchmark: (demo/demo_thread_pool.rb)
 
 ```ruby
 require 'serpapi'
-
 require 'pp'
 
 client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
@@ -234,7 +233,7 @@ params = {
 }
 results = client.search(params)
 unless results[:organic_results]
-  puts 'organic results found'
+  puts 'no organic results found'
   exit 1
 end
 pp results[:organic_results]
@@ -498,9 +497,9 @@ see: [https://serpapi.com/yelp-search-api](https://serpapi.com/yelp-search-api)
 
 The older library (google-search-results-ruby) was performing at 55 req/s on Ruby 2.7.8, which is 2x slower than the current version (serpapi-ruby) on Ruby 3.4.4.
 
-## Migration quick guide
+### Migration quick guide
 
-if you were already using (google-search-results-ruby gem)[https://github.com/serpapi/google-search-results-ruby], here are the changes.
+If you were already using (google-search-results-ruby gem)[https://github.com/serpapi/google-search-results-ruby], here are the changes.
 
 ```
 # load library
@@ -525,7 +524,7 @@ client = SerpApi::Client.new(default_parameter)
 search.params[:location] = "Portland,Oregon,United States"
 # new way
 # just provided the search call with the parameters.
-results = client.search({location: "Portland,Oregon,United States", q: "Coffe"})
+results = client.search({location: "Portland,Oregon,United States", q: "Coffee"})
 
 # search format return as raw html
 # old way
@@ -693,4 +692,4 @@ $ rake oobt
 
 Open ./Rakefile for more information.
 
-Contributions are welcome. Feel to submit a pull request!
+Contributions are welcome. Feel free to submit a pull request!

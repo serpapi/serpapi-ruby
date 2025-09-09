@@ -75,7 +75,7 @@ until schedule_search.empty?
 
   # add results back to the client queue
   #  if the search is still in progress
-  schedule_search.push(result)
+  schedule_search.push(search_id)
 end
 
 # destroy the queue
