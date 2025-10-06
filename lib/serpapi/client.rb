@@ -231,7 +231,7 @@ module SerpApi
           if data.instance_of?(Hash) && data.key?(:error)
             raise SerpApiError, "HTTP request failed with error: #{data[:error]} from url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}, response status: #{response.status} "
           elsif response.status != 200
-            raise SerpApiError, "HTTP request failed with response status: #{response.status} reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}"
+            raise SerpApiError, "HTTP request failed with response status: #{response.status} response: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}"
           end
         rescue JSON::ParserError
           raise SerpApiError, "JSON parse error: #{response.body} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}, response status: #{response.status}"
@@ -244,7 +244,7 @@ module SerpApi
       when :html
         # html decoder
         if response.status != 200
-          raise SerpApiError, "HTTP request failed with response status: #{response.status} reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}"
+          raise SerpApiError, "HTTP request failed with response status: #{response.status} response: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}"
         end
 
         response.body

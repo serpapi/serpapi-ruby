@@ -90,7 +90,7 @@ describe 'set of client test to archieve full code coverage' do
     begin
       client.send(:get, '/invalid', :html, {})
     rescue SerpApi::SerpApiError => e
-      expect(e.message).to include(/HTTP request failed with response status: 404 Not Found reponse/), "got #{e.message}"
+      expect(e.message).to include(/HTTP request failed with response status: 404 Not Found response/), "got #{e.message}"
     rescue => e
       raise("wrong exception: #{e}")
     end
