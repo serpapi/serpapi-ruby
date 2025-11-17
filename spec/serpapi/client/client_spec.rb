@@ -95,6 +95,25 @@ describe 'set of client test to archieve full code coverage' do
       raise("wrong exception: #{e}")
     end
   end
+
+  it 'should not expose api_key in to_s and inspect' do
+    str = client.to_s
+    expect(str).to include('SerpApi::Client(engine: google, api_key: ')
+    expect(str).to_not include(ENV['SERPAPI_KEY'])
+
+    inspect_str = client.inspect
+    expect(inspect_str).to include('SerpApi::Client(engine: google, api_key: ')
+    expect(inspect_str).to_not include(ENV['SERPAPI_KEY'])
+  end
+
+  it 'should gracefully handle api_key values shorter than 5 characters' do
+    short_key_client = SerpApi::Client.new(engine: 'google', api_key: 'abcd', timeout: 10)
+    str = short_key_client.to_s
+    expect(str).to include('SerpApi::Client(engine: google, api_key: abcd')
+
+    inspect_str = short_key_client.inspect
+    expect(inspect_str).to include('SerpApi::Client(engine: google, api_key: abcd')
+  end
 end
 
 describe 'SerpApi client with persitency enable' do
