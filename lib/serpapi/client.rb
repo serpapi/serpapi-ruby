@@ -183,7 +183,7 @@ module SerpApi
 
     def inspect
       masked_key = api_key && (api_key.length > 4 ? "#{api_key[..1]}****#{api_key[-2..]}" : '****')
-      "#<#{self.class} @engine=#{engine} @timeout=#{timeout} @persistent=#{persistent} api_key=#{masked_key}>"
+      "#<#{self.class}:#{'%#016x' % (object_id << 1)} @engine=#{engine} @timeout=#{timeout} @persistent=#{persistent} api_key=#{masked_key}>"
     end
 
     private
