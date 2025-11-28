@@ -181,6 +181,11 @@ module SerpApi
       @socket.close if @socket
     end
 
+    def inspect
+      masked_key = api_key && (api_key.length > 8 ? "#{api_key[..3]}****#{api_key[-4..]}" : '****')
+      "#<#{self.class} @engine=#{engine} @timeout=#{timeout} @persistent=#{persistent} api_key=#{masked_key}>"
+    end
+
     private
 
     # @param [Hash] params to merge with default parameters provided to the constructor.
