@@ -234,12 +234,31 @@ module SerpApi
           # parse JSON response with Ruby standard library
           data = JSON.parse(response.body, symbolize_names: symbolize_names)
           if data.instance_of?(Hash) && data.key?(:error)
-            raise SerpApiError, "HTTP request failed with error: #{data[:error]} from url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}, response status: #{response.status} "
+            raise SerpApiError.new("HTTP request failed with error: #{data[:error]} from url: " +
+                                   "https://#{BACKEND}#{endpoint}, params: #{params}, decoder: " +
+                                   "#{decoder}, response status: #{response.status}",
+                                   serpapi_error: data[:error],
+                                   search_params: params,
+                                   response_status: response.status,
+                                   search_id: data.dig(:search_metadata, :id),
+                                   decoder: decoder)
           elsif response.status != 200
-            raise SerpApiError, "HTTP request failed with response status: #{response.status} reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}"
+            raise SerpApiError.new("HTTP request failed with response status: #{response.status} " +
+                                   " reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, " +
+                                   "params: #{params}, decoder: #{decoder}",
+                                   serpapi_error: data[:error],
+                                   search_params: params,
+                                   response_status: response.status,
+                                   search_id: data.dig(:search_metadata, :id),
+                                   decoder: decoder)
           end
         rescue JSON::ParserError
-          raise SerpApiError, "JSON parse error: #{response.body} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}, response status: #{response.status}"
+            raise SerpApiError.new("JSON parse error: #{response.body} on get url: " +
+                                   "https://#{BACKEND}#{endpoint}, params: #{params}, " +
+                                   "decoder: #{decoder}, response status: #{response.status}",
+                                   search_params: params,
+                                   response_status: response.status,
+                                   decoder: decoder)
         end
 
         # discard response body
@@ -249,7 +268,12 @@ module SerpApi
       when :html
         # html decoder
         if response.status != 200
-          raise SerpApiError, "HTTP request failed with response status: #{response.status} reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}"
+          raise SerpApiError.new("HTTP request failed with response status: #{response.status} " +
+                                 "reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, " +
+                                 "params: #{params}, decoder: #{decoder}",
+                                search_params: params,
+                                response_status: response.status,
+                                decoder: decoder)
         end
 
         response.body

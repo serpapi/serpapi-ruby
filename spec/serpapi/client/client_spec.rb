@@ -134,6 +134,8 @@ describe 'SerpApi client with persitency enable' do
     expect { client.search(q: 'Invalid Query') }.to raise_error(SerpApi::SerpApiError)
   end
 
+
+
 end
 
 describe 'SerpApi client with persitency disabled' do
