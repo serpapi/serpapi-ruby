@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 module SerpApi
-  class Error < StandardError
+  class SerpApiError < StandardError
     attr_reader :serpapi_error, :search_params, :response_status, :search_id, :decoder
 
     # All attributes are optional keyword arguments.
@@ -25,7 +25,7 @@ module SerpApi
       @search_params  = freeze_hash(search_params)
       @response_status = validate_optional_integer(response_status, :response_status)
       @search_id = validate_optional_string(search_id, :search_id)
-      @decoder = validate_optional_string(decoder, :decoder)
+      @decoder = validate_optional_symbol(decoder, :decoder)
     end
 
     # Return a compact hash representation (omits nil values).
@@ -63,6 +63,14 @@ module SerpApi
       rescue ArgumentError, TypeError
         raise TypeError, "expected #{name || 'value'} to be an Integer (or integer-like), got #{value.inspect}"
       end
+    end
+
+    def validate_optional_symbol(value, name = nil)
+      return nil if value.nil?
+      unless value.is_a?(Symbol)
+        raise TypeError, "expected #{name || 'value'} to be a Symbol, got #{value.class}"
+      end
+      value.freeze
     end
 
     def freeze_hash(value)
