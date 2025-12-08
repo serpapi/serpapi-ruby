@@ -254,7 +254,7 @@ module SerpApi
     end
 
     def process_html_response(response, endpoint, params)
-      raise_http_error(response, nil, endpoint, params) if response.status != 200
+      raise_http_error(response, nil, endpoint, params, decoder: :html) if response.status != 200
       response.body
     end
 
@@ -269,7 +269,7 @@ module SerpApi
     end
 
     # Centralized error raising to clean up the logic methods
-    def raise_http_error(response, data, endpoint, params, explicit_error: nil)
+    def raise_http_error(response, data, endpoint, params, explicit_error: nil, decoder: :json)
       msg = "HTTP request failed with status: #{response.status}"
       msg += " error: #{explicit_error}" if explicit_error
 
@@ -279,7 +279,7 @@ module SerpApi
         search_params: params,
         response_status: response.status,
         search_id: data&.dig(:search_metadata, :id),
-        decoder: :json # Assuming JSON based on context of use in original code
+        decoder: decoder
       )
     end
 
