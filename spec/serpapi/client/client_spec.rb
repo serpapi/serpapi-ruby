@@ -73,7 +73,7 @@ describe 'set of client test to archieve full code coverage' do
   it 'get endpoint error' do
     expect { 
       client.send(:get, '/search', :json, {}) 
-    }.to raise_error(SerpApi::SerpApiError).with_message(/HTTP request failed with error: Missing query `q` parameter./)
+    }.to raise_error(SerpApi::SerpApiError).with_message(/HTTP request failed with status: 400.* error: Missing query `q` parameter./)
   end
 
   it 'get bad endpoint' do
@@ -90,7 +90,7 @@ describe 'set of client test to archieve full code coverage' do
     begin
       client.send(:get, '/invalid', :html, {})
     rescue SerpApi::SerpApiError => e
-      expect(e.message).to include(/HTTP request failed with response status: 404 Not Found reponse/), "got #{e.message}"
+      expect(e.message).to include("HTTP request failed with status: 404")
     rescue => e
       raise("wrong exception: #{e}")
     end
