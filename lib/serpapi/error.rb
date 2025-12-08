@@ -2,6 +2,15 @@
 # frozen_string_literal: true
 
 module SerpApi
+  # Custom error class for SerpApi-related errors.
+  # Inherits from StandardError.
+  # Includes optional attributes for detailed error context.
+  # Attributes:
+  # - serpapi_error: String error message from SerpApi (optional)
+  # - search_params: Hash of search parameters used (optional)
+  # - response_status: Integer HTTP or response status code (optional)
+  # - search_id: String id returned by the service for the search (optional)
+  # - decoder: Symbol representing the decoder/format used (optional) (e.g. :json)
   class SerpApiError < StandardError
     attr_reader :serpapi_error, :search_params, :response_status, :search_id, :decoder
 
@@ -22,7 +31,7 @@ module SerpApi
       super(message)
 
       @serpapi_error = validate_optional_string(serpapi_error, :serpapi_error)
-      @search_params  = freeze_hash(search_params)
+      @search_params = freeze_hash(search_params)
       @response_status = validate_optional_integer(response_status, :response_status)
       @search_id = validate_optional_string(search_id, :search_id)
       @decoder = validate_optional_symbol(decoder, :decoder)
@@ -46,9 +55,7 @@ module SerpApi
 
     def validate_optional_string(value, name = nil)
       return nil if value.nil?
-      unless value.is_a?(String)
-        raise TypeError, "expected #{name || 'value'} to be a String, got #{value.class}"
-      end
+      raise TypeError, "expected #{name || 'value'} to be a String, got #{value.class}" unless value.is_a?(String)
 
       value.freeze
     end
@@ -67,17 +74,14 @@ module SerpApi
 
     def validate_optional_symbol(value, name = nil)
       return nil if value.nil?
-      unless value.is_a?(Symbol)
-        raise TypeError, "expected #{name || 'value'} to be a Symbol, got #{value.class}"
-      end
+      raise TypeError, "expected #{name || 'value'} to be a Symbol, got #{value.class}" unless value.is_a?(Symbol)
+
       value.freeze
     end
 
     def freeze_hash(value)
       return nil if value.nil?
-      unless value.is_a?(Hash)
-        raise TypeError, "expected search_params to be a Hash, got #{value.class}"
-      end
+      raise TypeError, "expected search_params to be a Hash, got #{value.class}" unless value.is_a?(Hash)
 
       # duplicate and freeze to avoid accidental external mutation
       value.dup.freeze
