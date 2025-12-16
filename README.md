@@ -22,7 +22,7 @@ Other versions, such as Ruby 1.9, Ruby 2.x, and JRuby, are compatible with [lega
 
 ### Bundler
 ```ruby
-gem 'serpapi', '~> 1.0', '>= 1.0.2'
+gem 'serpapi', '~> 1.0', '>= 1.0.3'
 ```
 
 ### Gem 
