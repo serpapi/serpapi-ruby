@@ -44,6 +44,14 @@ Style/FetchEnvVar:
 Metrics/CyclomaticComplexity:
   Max: 12
 
+# There is a tradeoff between line length and line count.
+Metrics/ClassLength:
+  Max: 140
+
+# Keyword args are readable.
+Metrics/ParameterLists:
+  CountKeywordArgs: false
+
 # this rule doesn't always work well with Ruby
 Layout/FirstHashElementIndentation:
   Enabled: false
