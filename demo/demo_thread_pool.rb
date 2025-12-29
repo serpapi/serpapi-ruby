@@ -36,6 +36,9 @@
 # the `connection_pool` gem to create a thread pool of connections
 # and make concurrent HTTP requests.
 #
+# To instal the extra dependency:
+# ```gem install connection_pool``` 
+#
 # **Additional Notes:**
 #
 # * The number of threads created should be set to an appropriate
