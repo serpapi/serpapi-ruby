@@ -11,13 +11,11 @@ describe 'example: google_play search' do
     client = SerpApi::Client.new(engine: 'google_play', api_key: api_key)
     # run a search using serpapi service
     results = client.search({
-      q: 'kite',
-      store: 'apps'
     })
     expect(results[:organic_results]).not_to be_nil, "No organic results found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
     # pp results[:organic_results]
-    # doc: https://serpapi.com/google-play-api
+    # doc: http://serpapi.com/google-play-api
   end
 end

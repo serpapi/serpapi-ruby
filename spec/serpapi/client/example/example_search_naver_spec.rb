@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'example: naver search' do
-  it 'prints ads_results' do
+  it 'prints images_results' do
     # Confirm that the environment variable for SERPAPI_KEY has been set properly.
     #  Your SerpApi key can be obtained at this URL http://serpapi.com
     api_key = ENV['SERPAPI_KEY']
@@ -11,12 +11,13 @@ describe 'example: naver search' do
     client = SerpApi::Client.new(engine: 'naver', api_key: api_key)
     # run a search using serpapi service
     results = client.search({
-      query: 'coffee'
+      where: 'image',
+      query: 'Coffee'
     })
-    expect(results[:ads_results]).not_to be_nil, "No ads results found! keys available: #{results.keys}"
+    expect(results[:images_results]).not_to be_nil, "No images results found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
-    # pp results[:ads_results]
-    # doc: https://serpapi.com/naver-search-api
+    # pp results[:images_results]
+    # doc: http://serpapi.com/naver-search-api
   end
 end

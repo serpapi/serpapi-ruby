@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'example: youtube search' do
-  it 'prints video_results' do
+  it 'prints movie_results' do
     # Confirm that the environment variable for SERPAPI_KEY has been set properly.
     #  Your SerpApi key can be obtained at this URL http://serpapi.com
     api_key = ENV['SERPAPI_KEY']
@@ -11,12 +11,12 @@ describe 'example: youtube search' do
     client = SerpApi::Client.new(engine: 'youtube', api_key: api_key)
     # run a search using serpapi service
     results = client.search({
-      search_query: 'coffee'
+      search_query: 'star wars'
     })
-    expect(results[:video_results]).not_to be_nil, "No video results found! keys available: #{results.keys}"
+    expect(results[:movie_results]).not_to be_nil, "No movie results found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
-    # pp results[:video_results]
-    # doc: https://serpapi.com/youtube-search-api
+    # pp results[:movie_results]
+    # doc: http://serpapi.com/youtube-search-api
   end
 end

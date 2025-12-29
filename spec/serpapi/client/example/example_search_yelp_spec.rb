@@ -18,6 +18,6 @@ describe 'example: yelp search' do
 
     # print the output of the response in formatted JSON
     # pp results[:organic_results]
-    # doc: https://serpapi.com/yelp-search-api
+    # doc: http://serpapi.com/yelp-search-api
   end
 end

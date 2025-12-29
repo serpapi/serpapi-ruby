@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'example: google_finance search' do
-  it 'prints markets' do
+  it 'prints organic_results' do
     # Confirm that the environment variable for SERPAPI_KEY has been set properly.
     #  Your SerpApi key can be obtained at this URL http://serpapi.com
     api_key = ENV['SERPAPI_KEY']
@@ -11,12 +11,12 @@ describe 'example: google_finance search' do
     client = SerpApi::Client.new(engine: 'google_finance', api_key: api_key)
     # run a search using serpapi service
     results = client.search({
-      q: 'GOOG:NASDAQ'
+      q: 'GOOGL:NASDAQ'
     })
-    expect(results[:markets]).not_to be_nil, "No markets found! keys available: #{results.keys}"
+    expect(results[:organic_results]).not_to be_nil, "No organic results found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
-    # pp results[:markets]
-    # doc: https://serpapi.com/google-finance-api
+    # pp results[:organic_results]
+    # doc: http://serpapi.com/google-finance-api
   end
 end

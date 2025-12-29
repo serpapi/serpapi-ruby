@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'example: google_flights search' do
-  it 'prints best_flights' do
+  it 'prints price_insights' do
     # Confirm that the environment variable for SERPAPI_KEY has been set properly.
     #  Your SerpApi key can be obtained at this URL http://serpapi.com
     api_key = ENV['SERPAPI_KEY']
@@ -13,15 +13,14 @@ describe 'example: google_flights search' do
     results = client.search({
       departure_id: 'PEK',
       arrival_id: 'AUS',
-      outbound_date: '2025-05-26',
-      return_date: '2025-06-01',
       currency: 'USD',
-      hl: 'en'
+      hl: 'en',
+      booking_token: 'WyJDalJJYjJkRGNubFBWekpGVkhkQlFUazJTa0ZDUnkwdExTMHRMUzB0TFhCbVltWnhOa0ZCUVVGQlIxWm5UWE5SUlY5RU4wRkJFZ2RDUVRNeU9DTXhHZ3NJMTVJQkVBSWFBMVZUUkRnY2NOZVNBUT09IixbWyJDREciLCIyMDIzLTEyLTA1IiwiTEhSIixudWxsLCJCQSIsIjMwMyJdXSxbWyJMSFIiLCIyMDIzLTEyLTI4IiwiQ0RHIixudWxsLCJCQSIsIjMyOCJdXV0='
     })
-    expect(results[:best_flights]).not_to be_nil, "No best flights found! keys available: #{results.keys}"
+    expect(results[:price_insights]).not_to be_nil, "No price insights found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
-    # pp results[:best_flights]
-    # doc: https://serpapi.com/google-flights-api
+    # pp results[:price_insights]
+    # doc: http://serpapi.com/google-flights-api
   end
 end

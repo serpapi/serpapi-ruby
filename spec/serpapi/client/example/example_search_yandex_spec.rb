@@ -11,12 +11,14 @@ describe 'example: yandex search' do
     client = SerpApi::Client.new(engine: 'yandex', api_key: api_key)
     # run a search using serpapi service
     results = client.search({
-      text: 'coffee'
+      text: 'coffee',
+      yandex_domain: 'yandex.com',
+      lang: 'en'
     })
     expect(results[:organic_results]).not_to be_nil, "No organic results found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
     # pp results[:organic_results]
-    # doc: https://serpapi.com/yandex-search-api
+    # doc: http://serpapi.com/yandex-search-api
   end
 end

@@ -11,12 +11,15 @@ describe 'example: home_depot search' do
     client = SerpApi::Client.new(engine: 'home_depot', api_key: api_key)
     # run a search using serpapi service
     results = client.search({
-      q: 'table'
+      q: 'chair',
+      lowerbound: '450',
+      upperbound: '500',
+      hd_sort: 'top_rated'
     })
     expect(results[:products]).not_to be_nil, "No products found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
     # pp results[:products]
-    # doc: https://serpapi.com/home-depot-search-api
+    # doc: http://serpapi.com/home-depot-search-api
   end
 end

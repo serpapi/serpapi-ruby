@@ -11,12 +11,15 @@ describe 'example: amazon search' do
     client = SerpApi::Client.new(engine: 'amazon', api_key: api_key)
     # run a search using serpapi service
     results = client.search({
-      q: 'coffee'
+      k: 'air filter',
+      device: 'desktop',
+      rh: 'p_76:1249146011,p_90:8308921011',
+      dc: 'true'
     })
     expect(results[:organic_results]).not_to be_nil, "No organic results found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
     # pp results[:organic_results]
-    # doc: https://serpapi.com/amazon-search-api
+    # doc: http://serpapi.com/amazon-search-api
   end
 end

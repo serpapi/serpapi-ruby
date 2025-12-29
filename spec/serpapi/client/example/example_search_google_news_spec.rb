@@ -19,6 +19,6 @@ describe 'example: google_news search' do
 
     # print the output of the response in formatted JSON
     # pp results[:news_results]
-    # doc: https://serpapi.com/google-news-api
+    # doc: http://serpapi.com/google-news-api
   end
 end

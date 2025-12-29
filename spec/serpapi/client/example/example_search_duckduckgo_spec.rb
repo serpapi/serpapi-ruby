@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'example: duckduckgo search' do
-  it 'prints organic_results' do
+  it 'prints ads' do
     # Confirm that the environment variable for SERPAPI_KEY has been set properly.
     #  Your SerpApi key can be obtained at this URL http://serpapi.com
     api_key = ENV['SERPAPI_KEY']
@@ -11,12 +11,12 @@ describe 'example: duckduckgo search' do
     client = SerpApi::Client.new(engine: 'duckduckgo', api_key: api_key)
     # run a search using serpapi service
     results = client.search({
-      q: 'coffee'
+      q: 'bitcoin'
     })
-    expect(results[:organic_results]).not_to be_nil, "No organic results found! keys available: #{results.keys}"
+    expect(results[:ads]).not_to be_nil, "No ads found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
-    # pp results[:organic_results]
-    # doc: https://serpapi.com/duckduckgo-search-api
+    # pp results[:ads]
+    # doc: http://serpapi.com/duckduckgo-search-api
   end
 end

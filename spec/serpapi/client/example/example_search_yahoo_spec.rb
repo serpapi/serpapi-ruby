@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'example: yahoo search' do
-  it 'prints organic_results' do
+  it 'prints answer_box' do
     # Confirm that the environment variable for SERPAPI_KEY has been set properly.
     #  Your SerpApi key can be obtained at this URL http://serpapi.com
     api_key = ENV['SERPAPI_KEY']
@@ -11,12 +11,15 @@ describe 'example: yahoo search' do
     client = SerpApi::Client.new(engine: 'yahoo', api_key: api_key)
     # run a search using serpapi service
     results = client.search({
-      p: 'coffee'
+      p: 'current time',
+      query_key: 'p',
+      device: 'mobile',
+      yahoo_domain: 'hk'
     })
-    expect(results[:organic_results]).not_to be_nil, "No organic results found! keys available: #{results.keys}"
+    expect(results[:answer_box]).not_to be_nil, "No answer box found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
-    # pp results[:organic_results]
-    # doc: https://serpapi.com/yahoo-search-api
+    # pp results[:answer_box]
+    # doc: http://serpapi.com/yahoo-search-api
   end
 end

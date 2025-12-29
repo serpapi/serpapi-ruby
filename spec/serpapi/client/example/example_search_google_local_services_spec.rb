@@ -12,12 +12,15 @@ describe 'example: google_local_services search' do
     # run a search using serpapi service
     results = client.search({
       q: 'electrician',
-      data_cid: '6745062158417646970'
+      data_cid: '6745062158417646970',
+      cid: '317096294',
+      bid: '2516808434',
+      pid: '2520377103'
     })
     expect(results[:local_ads]).not_to be_nil, "No local ads found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
     # pp results[:local_ads]
-    # doc: https://serpapi.com/google-local-services-api
+    # doc: http://serpapi.com/google-local-services-api
   end
 end

@@ -12,12 +12,14 @@ describe 'example: google_trends search' do
     # run a search using serpapi service
     results = client.search({
       q: 'coffee,milk,bread,pasta,steak',
-      data_type: 'TIMESERIES'
+      data_type: 'TIMESERIES',
+      geo: 'FR',
+      hl: 'en'
     })
     expect(results[:interest_over_time]).not_to be_nil, "No interest over time found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
     # pp results[:interest_over_time]
-    # doc: https://serpapi.com/google-trends-api
+    # doc: http://serpapi.com/google-trends-api
   end
 end

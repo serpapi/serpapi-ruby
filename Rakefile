@@ -43,6 +43,10 @@ RSpec::Core::RakeTask.new(:regression) do |t|
   t.rspec_opts = '--format documentation'
 end
 
+# alias for regression
+desc 'run all the examples'
+task example: [:regression]
+
 desc 'run benchmark tests'
 RSpec::Core::RakeTask.new(:benchmark) do |t|
   t.pattern = Dir.glob('spec/serpapi/client/benchmark/*_spec.rb')

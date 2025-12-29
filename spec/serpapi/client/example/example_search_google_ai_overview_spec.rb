@@ -17,6 +17,6 @@ describe 'example: google_ai_overview search' do
 
     # print the output of the response in formatted JSON
     # pp results[:ai_overview]
-    # doc: https://serpapi.com/google-ai-overview-api
+    # doc: http://serpapi.com/google-ai-overview-api
   end
 end

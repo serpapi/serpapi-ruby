@@ -17,6 +17,6 @@ describe 'example: google_images_light search' do
 
     # print the output of the response in formatted JSON
     # pp results[:images_results]
-    # doc: https://serpapi.com/google-images-light-api
+    # doc: http://serpapi.com/google-images-light-api
   end
 end

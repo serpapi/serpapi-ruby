@@ -12,17 +12,17 @@ describe 'example: google_hotels search' do
     # run a search using serpapi service
     results = client.search({
       q: 'Bali Resorts',
-      check_in_date: '2025-05-26',
-      check_out_date: '2025-05-27',
       adults: '2',
       currency: 'USD',
       gl: 'us',
-      hl: 'en'
+      hl: 'en',
+      vacation_rentals: 'true',
+      property_token: 'ChcI9uq9hrWO2OtjGgsvZy8xMjJ0YzFteBAB'
     })
     expect(results[:properties]).not_to be_nil, "No properties found! keys available: #{results.keys}"
 
     # print the output of the response in formatted JSON
     # pp results[:properties]
-    # doc: https://serpapi.com/google-hotels-api
+    # doc: http://serpapi.com/google-hotels-api
   end
 end
