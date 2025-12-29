@@ -189,16 +189,29 @@ improve performance by executing multiple tasks concurrently. In
 this case, it makes multiple HTTP requests to an API endpoint using 
 a thread pool of persistent connections.
 
+Note: `gem install connection_pool` to run this example.
+
 **Benefits:**
 
-* Improved performance by avoiding the overhead of creating and 
-destroying connections for each request.
-* Efficient use of resources by sharing connections among multiple 
-threads.
-* Concurrency and parallelism, allowing multiple requests to be 
-processed simultaneously.
+* Improved performance by avoiding the overhead of creating and destroying connections for each request.
+* Efficient use of resources by sharing connections among multiple threads.
+* Concurrency and parallelism, allowing multiple requests to be processed simultaneously.
 
 benchmark: (demo/demo_thread_pool.rb)
+
+** Benchmark Ruby 3.4.8 vs Ruby 4.0.0 **
+
+benchmark: (demo/demo_thread_pool.rb)
+
+| ruby | runtime (s) | thread | time/thread (s) |
+|------|------------:|-------:|----------------:|
+| 3.4.8 | 0.018644 | 4 | 0.004661 |
+| 4.0.0 | 0.017302 | 4 | 0.004326 |
+
+Ruby 4.0.0 shows a slight improvement over Ruby 3.4.8, but the difference is not significant using thread. 
+Ractor could be considered for a more efficient use of resources but it's still in the experimental stage.
+
+Note: in this benchmark, `thread == HTTP connections`.
 
 ### Real world search without persistency
 
