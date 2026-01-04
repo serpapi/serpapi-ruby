@@ -37,6 +37,12 @@ RSpec::Core::RakeTask.new(:test) do |t|
   t.rspec_opts = '--format documentation'
 end
 
+desc 'run tests under spec/serpapi/client/ with coverage'
+RSpec::Core::RakeTask.new(:coverage) do |t|
+  t.pattern = Dir.glob('spec/serpapi/client/*_spec.rb')
+  t.rspec_opts = '--format documentation'
+end
+
 desc 'validate all the examples (comprehensive set of tests)' 
 RSpec::Core::RakeTask.new(:regression) do |t|
   t.pattern = Dir.glob('spec/serpapi/client/example/*_spec.rb')
