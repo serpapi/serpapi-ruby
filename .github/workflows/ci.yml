@@ -9,8 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ['3.4.0','4.0.0'] # test only recommend Ruby version (and stable version on the gitaction server)
-     #   ruby-version: ['2.7.4','3.1.0','head']
+        ruby-version: ['3.1.0'] # test only recommend Ruby version (and stable version on the gitaction server)
+     # ideally test with those versions, but gitaction are limited
+     #  2.7.4 is broken.
+     #  4.0.0 is not supported yet
+     #   ruby-version: ['2.7.4','3.1.0','4.0.0']
     steps:
       - uses: actions/checkout@v3
       - name: Set up Ruby ${{ matrix.ruby-version }}
