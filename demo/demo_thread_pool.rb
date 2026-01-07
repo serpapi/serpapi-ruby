@@ -37,7 +37,7 @@
 # and make concurrent HTTP requests.
 #
 # To instal the extra dependency:
-# ```gem install connection_pool``` 
+# ```gem install connection_pool```
 #
 # **Additional Notes:**
 #
