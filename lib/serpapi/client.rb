@@ -259,10 +259,8 @@ module SerpApi
     end
 
     def validate_json_content!(data, response, endpoint, params)
-      # Check for API-level error inside the JSON
       if data.is_a?(Hash) && data.key?(:error)
         raise_http_error(response, data, endpoint, params, explicit_error: data[:error])
-        # Check for HTTP-level error
       elsif response.status != 200
         raise_http_error(response, data, endpoint, params)
       end
@@ -275,10 +273,10 @@ module SerpApi
 
       raise SerpApiError.new(
         "#{msg} from url: https://#{BACKEND}#{endpoint}",
-        serpapi_error: explicit_error || (data ? data[:error] : nil),
+        serpapi_error: explicit_error || (data.is_a?(Hash) ? data[:error] : nil),
         search_params: params,
         response_status: response.status,
-        search_id: data&.dig(:search_metadata, :id),
+        search_id: data.is_a?(Hash) ? data&.dig(:search_metadata, :id) : nil,
         decoder: decoder
       )
     end

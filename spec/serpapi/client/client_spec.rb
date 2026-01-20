@@ -71,8 +71,8 @@ describe 'set of client test to archieve full code coverage' do
   end
 
   it 'get endpoint error' do
-    expect { 
-      client.send(:get, '/search', :json, {}) 
+    expect {
+      client.send(:get, '/search', :json, {})
     }.to raise_error(SerpApi::SerpApiError).with_message(/HTTP request failed with status: 400.* error: Missing query `q` parameter./)
   end
 
@@ -133,9 +133,6 @@ describe 'SerpApi client with persitency enable' do
     allow(client).to receive(:search).and_raise(SerpApi::SerpApiError)
     expect { client.search(q: 'Invalid Query') }.to raise_error(SerpApi::SerpApiError)
   end
-
-
-
 end
 
 describe 'SerpApi client with persitency disabled' do

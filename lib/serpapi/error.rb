@@ -21,7 +21,7 @@ module SerpApi
     # @param search_params [Hash, nil] optional hash of the search parameters used
     # @param response_status [Integer, nil] optional HTTP or response status code
     # @param search_id [String, nil] optional id returned by the service for the search
-    # @param decoder [String, nil] optional decoder/format used (e.g. "json")
+    # @param decoder [Symbol, nil] optional decoder/format used (e.g. :json)
     def initialize(message = nil,
                    serpapi_error: nil,
                    search_params: nil,
@@ -76,7 +76,7 @@ module SerpApi
       return nil if value.nil?
       raise TypeError, "expected #{name || 'value'} to be a Symbol, got #{value.class}" unless value.is_a?(Symbol)
 
-      value.freeze
+      value
     end
 
     def freeze_hash(value)
