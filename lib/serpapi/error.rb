@@ -31,7 +31,7 @@ module SerpApi
       super(message)
 
       @serpapi_error = validate_optional_string(serpapi_error, :serpapi_error)
-      @search_params = freeze_hash(search_params)
+      @search_params = search_params.dup
       @response_status = validate_optional_integer(response_status, :response_status)
       @search_id = validate_optional_string(search_id, :search_id)
       @decoder = validate_optional_symbol(decoder, :decoder)
@@ -44,7 +44,7 @@ module SerpApi
       {
         message: message,
         serpapi_error: serpapi_error,
-        search_params: search_params,
+        search_params: search_params.dup,
         response_status: response_status,
         search_id: search_id,
         decoder: decoder
@@ -77,14 +77,6 @@ module SerpApi
       raise TypeError, "expected #{name || 'value'} to be a Symbol, got #{value.class}" unless value.is_a?(Symbol)
 
       value
-    end
-
-    def freeze_hash(value)
-      return nil if value.nil?
-      raise TypeError, "expected search_params to be a Hash, got #{value.class}" unless value.is_a?(Hash)
-
-      # duplicate and freeze to avoid accidental external mutation
-      value.dup.freeze
     end
   end
 end
