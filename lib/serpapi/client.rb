@@ -215,47 +215,79 @@ module SerpApi
     # @param [Hash] params custom search inputs
     # @return [String|Hash] raw HTML or decoded response as JSON / Hash
     def get(endpoint, decoder = :json, params = {})
-      # execute get via open socket
-      response = if persistent?
-                   @socket.get(endpoint, params: query(params))
-                 else
-                   HTTP.timeout(timeout).get("https://#{BACKEND}#{endpoint}", params: query(params))
-                 end
+      response = execute_request(endpoint, params)
+      handle_response(response, decoder, endpoint, params)
+    end
 
-      # decode response using JSON native parser
+    def execute_request(endpoint, params)
+      if persistent?
+        @socket.get(endpoint, params: query(params))
+      else
+        url = "https://#{BACKEND}#{endpoint}"
+        HTTP.timeout(timeout).get(url, params: query(params))
+      end
+    end
+
+    def handle_response(response, decoder, endpoint, params)
       case decoder
       when :json
-        # read http response
-        begin
-          # user can turn on/off JSON keys to symbols
-          # this is more memory efficient, but not always needed
-          symbolize_names = params.key?(:symbolize_names) ? params[:symbolize_names] : true
-
-          # parse JSON response with Ruby standard library
-          data = JSON.parse(response.body, symbolize_names: symbolize_names)
-          if data.instance_of?(Hash) && data.key?(:error)
-            raise SerpApiError, "HTTP request failed with error: #{data[:error]} from url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}, response status: #{response.status} "
-          elsif response.status != 200
-            raise SerpApiError, "HTTP request failed with response status: #{response.status} reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}"
-          end
-        rescue JSON::ParserError
-          raise SerpApiError, "JSON parse error: #{response.body} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}, response status: #{response.status}"
-        end
-
-        # discard response body
-        response.flush if persistent?
-
-        data
+        process_json_response(response, endpoint, params)
       when :html
-        # html decoder
-        if response.status != 200
-          raise SerpApiError, "HTTP request failed with response status: #{response.status} reponse: #{data} on get url: https://#{BACKEND}#{endpoint}, params: #{params}, decoder: #{decoder}"
-        end
-
-        response.body
+        process_html_response(response, endpoint, params)
       else
         raise SerpApiError, "not supported decoder: #{decoder}, available: :json, :html"
       end
+    end
+
+    def process_json_response(response, endpoint, params)
+      symbolize = params.fetch(:symbolize_names, true)
+
+      begin
+        data = JSON.parse(response.body, symbolize_names: symbolize)
+        validate_json_content!(data, response, endpoint, params)
+      rescue JSON::ParserError
+        raise_parser_error(response, endpoint, params)
+      end
+
+      response.flush if persistent?
+      data
+    end
+
+    def process_html_response(response, endpoint, params)
+      raise_http_error(response, nil, endpoint, params, decoder: :html) if response.status != 200
+      response.body
+    end
+
+    def validate_json_content!(data, response, endpoint, params)
+      if data.is_a?(Hash) && data.key?(:error)
+        raise_http_error(response, data, endpoint, params, explicit_error: data[:error])
+      elsif response.status != 200
+        raise_http_error(response, data, endpoint, params)
+      end
+    end
+
+    # Centralized error raising to clean up the logic methods
+    def raise_http_error(response, data, endpoint, params, explicit_error: nil, decoder: :json)
+      msg = "HTTP request failed with status: #{response.status}"
+      msg += " error: #{explicit_error}" if explicit_error
+
+      raise SerpApiError.new(
+        "#{msg} from url: https://#{BACKEND}#{endpoint}",
+        serpapi_error: explicit_error || (data.is_a?(Hash) ? data[:error] : nil),
+        search_params: params,
+        response_status: response.status,
+        search_id: data.is_a?(Hash) ? data&.dig(:search_metadata, :id) : nil,
+        decoder: decoder
+      )
+    end
+
+    def raise_parser_error(response, endpoint, params)
+      raise SerpApiError.new(
+        "JSON parse error: #{response.body} on get url: https://#{BACKEND}#{endpoint}",
+        search_params: params,
+        response_status: response.status,
+        decoder: :json
+      )
     end
   end
 end
