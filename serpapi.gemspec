@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
 support for Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and more.
 Access a vast range of data, including web search results, local business listings, and product
 information.'
-  s.authors     = ['victor benarbia', 'Julien Khaleghy']
+  s.authors     = ['Victor Benarbia', 'Julien Khaleghy']
   s.email       = 'victor@serpapi.com'
   s.files       = Dir['{lib}/serpapi.rb'] + Dir['{lib}/serpapi/*.rb']
   s.require_paths = ['lib']
