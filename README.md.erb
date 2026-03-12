@@ -1,5 +1,5 @@
 <%-
-def snippet(format, path, demo = false) 
+def snippet(format, path, demo = false)
  lines = File.new(path).readlines
  if demo
   # skip comment
@@ -20,13 +20,13 @@ end
 -%>
 # SerpApi Ruby Library
 
-[![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml) [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi) 
+[![serpapi-ruby](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml/badge.svg)](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml) [![Gem Version](https://badge.fury.io/rb/serpapi.svg)](https://badge.fury.io/rb/serpapi)
 
-Integrate search data into your AI workflow, RAG / fine-tuning, or Ruby application using this official wrapper for [SerpApi](https://serpapi.com). 
+Integrate search data into your AI workflow, RAG / fine-tuning, or Ruby application using this official wrapper for [SerpApi](https://serpapi.com).
 
-SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and [more](https://serpapi.com). 
+SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBay, App Stores, and [more](https://serpapi.com).
 
-Query a vast range of data at scale, including web search results, flight schedules, stock market data, news headlines, and [more](https://serpapi.com). 
+Query a vast range of data at scale, including web search results, flight schedules, stock market data, news headlines, and [more](https://serpapi.com).
 
 ## Features
   * `persistent` → Keep socket connection open to save on SSL handshake / reconnection (2x faster).  [Search at scale](#Search-At-Scale)
@@ -45,7 +45,7 @@ Other versions, such as Ruby 1.9, Ruby 2.x, and JRuby, are compatible with [lega
 gem 'serpapi', '~> 1.0', '>= 1.0.3'
 ```
 
-### Gem 
+### Gem
 ```bash
 $ gem install serpapi
 ```
@@ -139,7 +139,7 @@ Search API enables `async` search.
  - Non-blocking (`async=true`) : the development is more complex, but this allows handling many simultaneous connections.
  - Blocking (`async=false`) : it is easy to write the code but more compute-intensive when the parent process needs to hold many connections.
 
-Here is an example of asynchronous searches using Ruby 
+Here is an example of asynchronous searches using Ruby
 ```ruby
 require 'serpapi'
 
@@ -204,9 +204,9 @@ end
 responses = threads.map(&:value)
 ```
 
-The code aims to demonstrate how thread pools can be used to 
-improve performance by executing multiple tasks concurrently. In 
-this case, it makes multiple HTTP requests to an API endpoint using 
+The code aims to demonstrate how thread pools can be used to
+improve performance by executing multiple tasks concurrently. In
+this case, it makes multiple HTTP requests to an API endpoint using
 a thread pool of persistent connections.
 
 Note: `gem install connection_pool` to run this example.
@@ -228,7 +228,7 @@ benchmark: (demo/demo_thread_pool.rb)
 | 3.4.8 | 0.018644 | 4 | 0.004661 |
 | 4.0.0 | 0.017302 | 4 | 0.004326 |
 
-Ruby 4.0.0 shows a slight improvement over Ruby 3.4.8, but the difference is not significant using thread. 
+Ruby 4.0.0 shows a slight improvement over Ruby 3.4.8, but the difference is not significant using thread.
 Ractor could be considered for a more efficient use of resources but it's still in the experimental stage.
 
 Note: in this benchmark, `thread == HTTP connections`.
@@ -508,9 +508,9 @@ see: [https://serpapi.com/yelp-search-api](https://serpapi.com/yelp-search-api)
 4. **SerpApi Optimization**: Shows consistent ~2.2x improvement with persistent connections regardless of Ruby version
 5. **Ruby 4.0.0 Performance**: Shows mixed results with some regressions compared to 3.4.4, particularly for HTTP.rb persistent connections. Ruby 4.0.0 was just released for Christmas 2025, and HTTP.rb has not been optimized for it yet.
 
-The older library (google-search-results-ruby) was performing at 55 req/s on Ruby 2.7.8, which is 2x slower than the current version (serpapi-ruby) on Ruby 3.4.4 or 4.0.0. 
+The older library (google-search-results-ruby) was performing at 55 req/s on Ruby 2.7.8, which is 2x slower than the current version (serpapi-ruby) on Ruby 3.4.4 or 4.0.0.
 
-**Context** This benchmark was performed on warmup search results using a MacBook Pro 2025 connected via Wi-Fi 6.0 home network on AT&T fiber from Austin, TX (no network optimization). 
+**Context** This benchmark was performed on warmup search results using a MacBook Pro 2025 connected via Wi-Fi 6.0 home network on AT&T fiber from Austin, TX (no network optimization).
 
 ## Migration quick guide
 
@@ -518,7 +518,7 @@ If you were already using [google-search-results-ruby gem](https://github.com/se
 
 ```
 # load library
-# old way 
+# old way
 require 'google_search_results'
 # new way
 require 'serpapi'
@@ -526,7 +526,7 @@ require 'serpapi'
 # define a search
 # old way to describe the search
 search = GoogleSearch.new(search_params)
-# new way 
+# new way
 default_parameter = {api_key: "secret_key", engine: "google"}
 client = SerpApi::Client.new(default_parameter)
 # an instance of the serpapi client is created
@@ -553,7 +553,7 @@ raw_html = client.html(params)
 hash_results = search.get_hash
 # new way
 results = client.search(params)
-# where params is the search parameters (override the default search parameters in the constructor). 
+# where params is the search parameters (override the default search parameters in the constructor).
 
 # search as raw JSON format
 # old way
@@ -585,86 +585,13 @@ Ruby versions validated by Github Actions:
  * [2025-07-18] 1.0.1 Add support for old Ruby versions (2.7, 3.0)
  * [2025-07-01] 1.0.0 Full API support
 
-## Developer Guide
-### Key goals
- - Brand centric instead of search engine based
-   - No hard-coded logic per search engine
- - Simple HTTP client (lightweight, reduced dependency)
-   - No magic default values
-   - Thread safe
- - Easy extension
- - Defensive code style (raise a custom exception)
- - TDD - Test driven development
- - Best API coding practice per platform
- - KiSS principles
-
-### Inspirations
-This project source code and coding style was inspired by the most awesome Ruby Gems:
- - [bcrypt](https://github.com/bcrypt-ruby/bcrypt-ruby)
- - [Nokogiri](https://nokogiri.org)
- - [Cloudfare](https://rubygems.org/gems/cloudflare/versions/2.1.0)
- - [rest-client](https://rubygems.org/gems/rest-client)
- - [stripe](https://rubygems.org/gems/stripe)
- 
-### Code quality expectations
- - 0 lint offense: `rake lint`
- - 100% tests passing: `rake test`
- - 100% code coverage: `rake coverage` (simple-cov)
-
-# Developer Guide
-## Design : UML diagram
-### Class diagram
-```mermaid
-classDiagram
-  Application *-- serpapi 
-  serpapi *-- Client
-  class Client {
-    engine String
-    api_key String
-    params Hash
-    search() Hash
-    html() String
-    location() String
-    search_archive() Hash
-    account() Hash
-  }
-  openuri <.. Client
-  json <.. Client
-  Ruby <.. openuri
-  Ruby <.. json
-```
-### search() : Sequence diagram
-```mermaid
-sequenceDiagram
-    Client->>SerpApi.com: search() : http request 
-    SerpApi.com-->>SerpApi.com: query search engine
-    SerpApi.com-->>SerpApi.com: parse HTML into JSON
-    SerpApi.com-->>Client: JSON string payload
-    Client-->>Client: decode JSON into Hash
-```
-where:
-  - The end user implements the application.
-  - Client refers to SerpApi:Client.
-  - SerpApi.com is the backend HTTP / REST service.
-  - Engine refers to Google, Baidu, Bing, and more.
-
-The SerpApi.com service (backend)
- - executes a scalable search on `engine: "google"` using the search query: `q: "coffee"`.
- - parses the messy HTML responses from Google on the backend.
- - returns a standardized JSON response.
-The class SerpApi::Client (client side / ruby):
- - Format the request to SerpApi.com server.
- - Execute HTTP Get request.
- - Parse JSON into Ruby Hash using a standard JSON library.
-Et voila!
-
 ## Continuous integration
-We love [continuous integration](https://en.wikipedia.org/wiki/Continuous_integration) (CI) and [Test-Driven Development](https://en.wikipedia.org/wiki/Test-driven_development) (TDD) at SerpApi. 
+We love [continuous integration](https://en.wikipedia.org/wiki/Continuous_integration) (CI) and [Test-Driven Development](https://en.wikipedia.org/wiki/Test-driven_development) (TDD) at SerpApi.
  We use RSpec and Github Actions to test our infrastructure around the clock, and that includes all changes to our clients.
 
 The directory spec/ includes specification which serves the dual purposes of examples and functional tests.
 
-Set your secret API key in your shell before running a test. 
+Set your secret API key in your shell before running a test.
  The SerpApi key can be obtained from [serpapi.com/signup](https://serpapi.com/users/sign_up?plan=free).
 ```bash
 export SERPAPI_KEY="your_secret_key"
