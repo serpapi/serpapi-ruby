@@ -16,7 +16,7 @@ Query a vast range of data at scale, including web search results, flight schedu
 
 ## Installation
 
-Ruby 2.7 and later are supported. To achieve an optimal performance, the latest version is recommended. Check 2.7.8 vs 3.4.4 [performance comparison](#Performance-Comparison).
+Ruby 2.7 and higher are supported. To achieve an optimal performance, the latest version is recommended. Check 2.7.8 vs 3.4.4 [performance comparison](#Performance-Comparison).
 
 Other versions, such as Ruby 1.9, Ruby 2.x, and JRuby, are compatible with [legacy SerpApi library](https://github.com/serpapi/google-search-results-ruby), which is still supported. To upgrade to the latest library, check our [migration guide](#Migration-quick-guide).
 
@@ -1093,11 +1093,9 @@ Most notable improvements:
  - Reduce logic complexity in our implementation. (faster performance)
  - Better documentation.
 
-## Supported Ruby version.
-Ruby versions validated by Github Actions:
- - 3.1
- - 3.4
- * doc: [Github Actions.](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
+## Supported Ruby versions
+
+Ruby 2.7 and higher is supported.
 
 ## Developer Guide
 ### Key goals
