@@ -1099,79 +1099,10 @@ Ruby versions validated by Github Actions:
  - 3.4
  * doc: [Github Actions.](https://github.com/serpapi/serpapi-ruby/actions/workflows/ci.yml)
 
-## Developer Guide
-### Key goals
- - Brand centric instead of search engine based
-   - No hard-coded logic per search engine
- - Simple HTTP client (lightweight, reduced dependency)
-   - No magic default values
-   - Thread safe
- - Easy extension
- - Defensive code style (raise a custom exception)
- - TDD - Test driven development
- - Best API coding practice per platform
- - KiSS principles
+## Development
 
-### Inspirations
-This project source code and coding style was inspired by the most awesome Ruby Gems:
- - [bcrypt](https://github.com/bcrypt-ruby/bcrypt-ruby)
- - [Nokogiri](https://nokogiri.org)
- - [Cloudfare](https://rubygems.org/gems/cloudflare/versions/2.1.0)
- - [rest-client](https://rubygems.org/gems/rest-client)
- - [stripe](https://rubygems.org/gems/stripe)
+Contributions are welcome. Make sure to read our [development guide](./DEVELOPMENT.md).
  
-### Code quality expectations
- - 0 lint offense: `rake lint`
- - 100% tests passing: `rake test`
- - 100% code coverage: `rake coverage` (simple-cov)
-
-# Developer Guide
-## Design : UML diagram
-### Class diagram
-```mermaid
-classDiagram
-  Application *-- serpapi 
-  serpapi *-- Client
-  class Client {
-    engine String
-    api_key String
-    params Hash
-    search() Hash
-    html() String
-    location() String
-    search_archive() Hash
-    account() Hash
-  }
-  openuri <.. Client
-  json <.. Client
-  Ruby <.. openuri
-  Ruby <.. json
-```
-### search() : Sequence diagram
-```mermaid
-sequenceDiagram
-    Client->>SerpApi.com: search() : http request 
-    SerpApi.com-->>SerpApi.com: query search engine
-    SerpApi.com-->>SerpApi.com: parse HTML into JSON
-    SerpApi.com-->>Client: JSON string payload
-    Client-->>Client: decode JSON into Hash
-```
-where:
-  - The end user implements the application.
-  - Client refers to SerpApi:Client.
-  - SerpApi.com is the backend HTTP / REST service.
-  - Engine refers to Google, Baidu, Bing, and more.
-
-The SerpApi.com service (backend)
- - executes a scalable search on `engine: "google"` using the search query: `q: "coffee"`.
- - parses the messy HTML responses from Google on the backend.
- - returns a standardized JSON response.
-The class SerpApi::Client (client side / ruby):
- - Format the request to SerpApi.com server.
- - Execute HTTP Get request.
- - Parse JSON into Ruby Hash using a standard JSON library.
-Et voila!
-
 ## Continuous integration
 We love [continuous integration](https://en.wikipedia.org/wiki/Continuous_integration) (CI) and [Test-Driven Development](https://en.wikipedia.org/wiki/Test-driven_development) (TDD) at SerpApi. 
  We use RSpec and Github Actions to test our infrastructure around the clock, and that includes all changes to our clients.
