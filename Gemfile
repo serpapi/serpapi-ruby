@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :production do
-  gem 'http', '~> 5.2'
+  gem 'http', '>= 5.2', '< 7.0'
 end
 
 group :test, :development do
@@ -15,6 +15,8 @@ group :test, :development do
   gem 'rubocop', '~>1.75.7'
   # test for ruby
   gem 'rspec', '~>3.11'
+  # stub HTTP in offline specs (no API key / network required)
+  gem 'webmock', '~> 3.0'
   # code coverage to monitor rspec tests
   gem 'simplecov'
   # save CSV files

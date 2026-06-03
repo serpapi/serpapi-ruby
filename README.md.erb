@@ -42,7 +42,7 @@ Other versions, such as Ruby 1.9, Ruby 2.x, and JRuby, are compatible with [lega
 
 ### Bundler
 ```ruby
-gem 'serpapi', '~> 1.0', '>= 1.0.3'
+gem 'serpapi', '~> 1.1', '>= 1.1.0'
 ```
 
 ### Gem
@@ -87,8 +87,9 @@ client = SerpApi::Client.new(
   # HTTP client configuration
   async: false, # non-blocking HTTP request see: Search Asynchronous (default: false)
   persistent: true, # leave socket connection open for faster response time see: Search at scale (default: true)
-  timeout: 5, # HTTP timeout in seconds on the client side only. (default: 120s)
-  symbolize_names: true # turn on/off JSON keys to symbols (default: on, more efficient)
+  timeout: 5, # HTTP timeout in seconds, applied in persistent and non-persistent mode. (default: 120s)
+  symbolize_names: true, # turn on/off JSON keys to symbols (default: on, more efficient)
+  raise_on_search_error: true # raise when a 200 response carries an `error` field (default: true; see Search Archive API)
 )
 
 # search query overview (more fields available depending on search engine)
@@ -310,6 +311,12 @@ pp results
 ```
 
 This code prints the search results from the archive. :)
+
+By default, `search_archive` returns the archived payload even when the original search recorded an `error` (for example a query that returned no results), so failed searches can still be inspected. Pass `raise_on_search_error: true` to raise a `SerpApiError` instead (see [issue #17](https://github.com/serpapi/serpapi-ruby/issues/17)):
+
+```ruby
+results = client.search_archive(search_id, raise_on_search_error: true)
+```
 
 ### Account API
 ```ruby

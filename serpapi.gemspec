@@ -16,12 +16,22 @@ information.'
   s.license     = 'MIT'
   s.required_ruby_version = '>= 2.7'
 
-  # faraday
-  s.add_dependency 'http', '~> 5.2'
+  s.metadata = {
+    'homepage_uri' => 'https://github.com/serpapi/serpapi-ruby',
+    'source_code_uri' => 'https://github.com/serpapi/serpapi-ruby',
+    'changelog_uri' => 'https://github.com/serpapi/serpapi-ruby/blob/master/CHANGELOG.md',
+    'bug_tracker_uri' => 'https://github.com/serpapi/serpapi-ruby/issues',
+    'documentation_uri' => 'https://rubydoc.info/github/serpapi/serpapi-ruby/master',
+    'rubygems_mfa_required' => 'true'
+  }
+
+  # runtime dependency: HTTP.rb (compatible with both 5.x and 6.x)
+  s.add_dependency 'http', '>= 5.2', '< 7.0'
 
   # development dependency
   s.add_development_dependency 'rake', '~> 13.2.1'
   s.add_development_dependency 'rspec', '~>3.11'
+  s.add_development_dependency 'webmock', '~> 3.0'
   s.add_development_dependency 'yard', '~>0.9.28'
   s.add_development_dependency 'rubocop', '~>1.75.7'
   s.add_development_dependency 'csv'

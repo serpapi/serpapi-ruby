@@ -1,5 +1,6 @@
 # Client implementation for SerpApi.com
-#
+# frozen_string_literal: true
+
 module SerpApi
   # Client for SerpApi.com
   # powered by HTTP.rb
@@ -14,7 +15,7 @@ module SerpApi
   #
   class Client
     # Backend service URL
-    BACKEND = 'serpapi.com'.freeze
+    BACKEND = 'serpapi.com'
 
     # HTTP timeout requests
     attr_reader :timeout,
@@ -22,6 +23,8 @@ module SerpApi
                 :params,
                 # HTTP persistent
                 :persistent,
+                # raise on search-level error (HTTP 200 with an `error` field)
+                :raise_on_search_error,
                 # HTTP.rb client
                 :socket
 
@@ -49,19 +52,24 @@ module SerpApi
     #
     # * `api_key`: [String] User secret API key.
     # * `engine`: [String] Search engine selected.
-    # * `persistent`: [Boolean] Keep socket connection open to save on SSL handshake / connection reconnectino (2x
+    # * `persistent`: [Boolean] Keep socket connection open to save on SSL handshake / connection reconnection (2x
     # faster). [default: true]
     # * `async`: [Boolean] Support non-blocking job submission. [default: false]
-    # * `timeout`: [Integer] HTTP get max timeout in seconds [default: 120s == 2m]
+    # * `timeout`: [Integer] HTTP get max timeout in seconds. Applied in both persistent and non-persistent
+    # mode. [default: 120s == 2m]
     # * `symbolize_names`: [Boolean] Convert JSON keys to symbols. [default: true]
+    # * `raise_on_search_error`: [Boolean] Raise a `SerpApiError` when the backend returns HTTP 200 with an
+    # `error` field (e.g. "no results"). When false, the error payload is returned to the caller instead.
+    # [default: true]
     #
-    # **Key:**kr
+    # **Key:**
     #
     # The `key` parameter can be either a symbol or a string.
     #
     # **Note:**
     #
     # * All parameters are optional.
+    # * The input hash is not mutated; a private copy is kept by the client.
     # * The `close` method should be called when the client is no longer needed.
     #
     # @param [Hash] params default for the search
@@ -70,25 +78,23 @@ module SerpApi
       raise SerpApiError, 'params cannot be nil' if params.nil?
       raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
 
+      # work on a private copy so the caller's hash is never mutated
+      options = params.dup
+
       # store client HTTP request timeout
-      @timeout = params[:timeout] || 120
-      @timeout.freeze
+      @timeout = options.delete(:timeout) || 120
 
-      # enable HTTP persistent mode
-      @persistent = true
-      @persistent = params[:persistent] if params.key?(:persistent)
-      @persistent.freeze
+      # enable HTTP persistent mode (default: true)
+      @persistent = options.key?(:persistent) ? options.delete(:persistent) : true
 
-      # delete this client only configuration keys
-      %i[timeout persistent].each do |option|
-        params.delete(option) if params.key?(option)
-      end
+      # raise on search-level errors by default (back-compatible)
+      @raise_on_search_error = options.key?(:raise_on_search_error) ? options.delete(:raise_on_search_error) : true
 
-      # set default query parameters
-      @params = params.clone || {}
+      # set default query parameters (timeout / persistent / raise_on_search_error are client options, not query params)
+      @params = options
 
       # track ruby library as a client for statistic purpose
-      @params[:source] = 'serpapi-ruby:' << SerpApi::VERSION
+      @params[:source] ||= "serpapi-ruby:#{SerpApi::VERSION}"
 
       # ensure default parameter would not be modified later
       @params.freeze
@@ -96,7 +102,9 @@ module SerpApi
       # create connection socket
       return unless persistent?
 
-      @socket = HTTP.persistent("https://#{BACKEND}")
+      # NOTE: the timeout must be set on the chain *before* `.persistent`,
+      #       otherwise it is silently ignored on the persistent connection.
+      @socket = HTTP.timeout(@timeout).persistent("https://#{BACKEND}")
     end
 
     # perform a search using SerpApi.com
@@ -105,7 +113,7 @@ module SerpApi
     #
     # note that the raw response
     #                 from the search engine is converted to JSON by SerpApi.com backend.
-    #                 thus, most of the compute power is on the backsdend and not on the client side.
+    #                 thus, most of the compute power is on the backend and not on the client side.
     # @param [Hash] params includes engine, api_key, search fields and more..
     #                this override the default params provided to the constructor.
     # @return [Hash] search results formatted as a Hash.
@@ -145,13 +153,19 @@ module SerpApi
     # example: spec/serpapi/client/search_archive_api_spec.rb
     # doc: https://serpapi.com/search-archive-api
     #
+    # By default a search that was archived *with* an `error` field (e.g. a query that
+    # returned no results) is returned as-is rather than raised, so the archived record
+    # can be inspected. Pass `raise_on_search_error: true` to restore the raising behavior.
+    # see: https://github.com/serpapi/serpapi-ruby/issues/17
+    #
     # @param [String|Integer] search_id from original search `results[:search_metadata][:id]`
     # @param [Symbol] format :json or :html [default: json, optional]
+    # @param [Boolean] raise_on_search_error raise on an archived search-level error [default: false]
     # @return [String|Hash] raw html or JSON / Hash
-    def search_archive(search_id, format = :json)
-      raise SerpApiError, 'format must be json or html' unless [:json, :html].include?(format)
+    def search_archive(search_id, format = :json, raise_on_search_error: false)
+      raise SerpApiError, 'format must be json or html' unless %i[json html].include?(format)
 
-      get("/searches/#{search_id}.#{format}", format)
+      get("/searches/#{search_id}.#{format}", format, { raise_on_search_error: raise_on_search_error })
     end
 
     # Get account information using Account API
@@ -193,19 +207,35 @@ module SerpApi
     def query(params)
       raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
 
-      # merge default params with custom params
-      q = @params.clone.merge(params)
+      # merge default params with custom params (merge returns a fresh hash; @params is left untouched)
+      q = @params.merge(params)
 
-      # do not pollute default params with custom params
-      q.delete(:symbolize_names) if q.key?(:symbolize_names)
+      # drop client-only options so they are never sent to the backend
+      q.delete(:symbolize_names)
+      q.delete(:raise_on_search_error)
 
-      # delete empty key/value
-      q.compact
+      # delete empty key/value in place (avoids a second hash allocation on the hot path)
+      q.compact!
+      q
     end
 
     # @return [Boolean] HTTP session persistent enabled
     def persistent?
       persistent
+    end
+
+    # Resolve the symbolize_names option with precedence: per-call > constructor default > true.
+    def symbolize_names?(params)
+      return params[:symbolize_names] if params.key?(:symbolize_names)
+
+      @params.fetch(:symbolize_names, true)
+    end
+
+    # Resolve the raise_on_search_error option with precedence: per-call > constructor default.
+    def raise_on_search_error?(params)
+      return params[:raise_on_search_error] if params.key?(:raise_on_search_error)
+
+      @raise_on_search_error
     end
 
     # Perform HTTP GET request to the SerpApi.com backend endpoint.
@@ -224,7 +254,7 @@ module SerpApi
         @socket.get(endpoint, params: query(params))
       else
         url = "https://#{BACKEND}#{endpoint}"
-        HTTP.timeout(timeout).get(url, params: query(params))
+        HTTP.timeout(@timeout).get(url, params: query(params))
       end
     end
 
@@ -240,10 +270,8 @@ module SerpApi
     end
 
     def process_json_response(response, endpoint, params)
-      symbolize = params.fetch(:symbolize_names, true)
-
       begin
-        data = JSON.parse(response.body, symbolize_names: symbolize)
+        data = JSON.parse(response.body.to_s, symbolize_names: symbolize_names?(params))
         validate_json_content!(data, response, endpoint, params)
       rescue JSON::ParserError
         raise_parser_error(response, endpoint, params)
@@ -255,15 +283,24 @@ module SerpApi
 
     def process_html_response(response, endpoint, params)
       raise_http_error(response, nil, endpoint, params, decoder: :html) if response.status != 200
-      response.body
+
+      # read the full body to a String *and* drain the socket so the persistent
+      # connection can be safely reused for the next request (parity with JSON).
+      body = response.body.to_s
+      response.flush if persistent?
+      body
     end
 
     def validate_json_content!(data, response, endpoint, params)
-      if data.is_a?(Hash) && data.key?(:error)
-        raise_http_error(response, data, endpoint, params, explicit_error: data[:error])
-      elsif response.status != 200
-        raise_http_error(response, data, endpoint, params)
-      end
+      explicit_error = data.is_a?(Hash) ? data[:error] : nil
+
+      # raise on a transport error (non-200), or on a search-level error
+      # (HTTP 200 with an `error` field) only when the caller opted in.
+      http_error = response.status != 200
+      search_error = explicit_error && raise_on_search_error?(params)
+      return unless http_error || search_error
+
+      raise_http_error(response, data, endpoint, params, explicit_error: explicit_error)
     end
 
     # Centralized error raising to clean up the logic methods

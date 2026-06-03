@@ -18,7 +18,7 @@ desc "run out of box testing using the local gem file pre-release"
 task oobt: %i[check readme doc build install demo]
 
 desc "execute all the steps except release"
-task default: %i[check dependency version readme doc build test oobt]
+task default: %i[check dependency version readme doc build offline test oobt]
 
 desc "update README.md from the template"
 task readme: ['README.md.erb'] do
@@ -34,6 +34,12 @@ end
 desc 'validate core client spec files'
 RSpec::Core::RakeTask.new(:test) do |t|
   t.pattern = Dir.glob('spec/serpapi/client/*_spec.rb') + Dir.glob('spec/serpapi/*_spec.rb')
+  t.rspec_opts = '--format documentation'
+end
+
+desc 'run offline unit tests (no SERPAPI_KEY / network required)'
+RSpec::Core::RakeTask.new(:offline) do |t|
+  t.pattern = Dir.glob('spec/offline/*_spec.rb')
   t.rspec_opts = '--format documentation'
 end
 
