@@ -151,7 +151,7 @@ module SerpApi
     def search_archive(search_id, format = :json)
       raise SerpApiError, 'format must be json or html' unless [:json, :html].include?(format)
 
-      get("/searches/#{search_id}.#{format}", format)
+      get("/searches/#{search_id}.#{format}", format, {}, allow_error_field: true)
     end
 
     # Get account information using Account API
@@ -214,9 +214,9 @@ module SerpApi
     # @param [Symbol] decoder type :json or :html
     # @param [Hash] params custom search inputs
     # @return [String|Hash] raw HTML or decoded response as JSON / Hash
-    def get(endpoint, decoder = :json, params = {})
+    def get(endpoint, decoder = :json, params = {}, allow_error_field: false)
       response = execute_request(endpoint, params)
-      handle_response(response, decoder, endpoint, params)
+      handle_response(response, decoder, endpoint, params, allow_error_field: allow_error_field)
     end
 
     def execute_request(endpoint, params)
@@ -228,10 +228,10 @@ module SerpApi
       end
     end
 
-    def handle_response(response, decoder, endpoint, params)
+    def handle_response(response, decoder, endpoint, params, allow_error_field: false)
       case decoder
       when :json
-        process_json_response(response, endpoint, params)
+        process_json_response(response, endpoint, params, allow_error_field: allow_error_field)
       when :html
         process_html_response(response, endpoint, params)
       else
@@ -239,12 +239,12 @@ module SerpApi
       end
     end
 
-    def process_json_response(response, endpoint, params)
+    def process_json_response(response, endpoint, params, allow_error_field: false)
       symbolize = params.fetch(:symbolize_names, true)
 
       begin
         data = JSON.parse(response.body, symbolize_names: symbolize)
-        validate_json_content!(data, response, endpoint, params)
+        validate_json_content!(data, response, endpoint, params, allow_error_field: allow_error_field)
       rescue JSON::ParserError
         raise_parser_error(response, endpoint, params)
       end
@@ -258,7 +258,10 @@ module SerpApi
       response.body
     end
 
-    def validate_json_content!(data, response, endpoint, params)
+    def validate_json_content!(data, response, endpoint, params, allow_error_field: false)
+      # Successful archive responses can contain an error field for the archived search itself.
+      return if allow_error_field && response.status == 200
+
       if data.is_a?(Hash) && data.key?(:error)
         raise_http_error(response, data, endpoint, params, explicit_error: data[:error])
       elsif response.status != 200
