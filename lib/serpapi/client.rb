@@ -7,7 +7,7 @@ module SerpApi
   #  features:
   #  * async non-block search
   #  * persistent HTTP connection
-  #  * search API
+  #  * search API with JSON, HTML, and Markdown output
   #  * location API
   #  * account API
   #  * search archive API
@@ -123,6 +123,15 @@ module SerpApi
       get('/search', :html, params)
     end
 
+    # Perform a search using SerpApi.com and return results optimized for LLMs and AI agents.
+    # The output contains Markdown tables, links, and YAML frontmatter.
+    #
+    # @param [Hash] params includes engine, api_key, search fields and more.
+    # @return [String] search results formatted as Markdown.
+    def markdown(params = {})
+      get('/search.md', :markdown, params)
+    end
+
     # Get location using Location API
     #
     # example: spec/serpapi/location_api_spec.rb
@@ -146,12 +155,13 @@ module SerpApi
     # doc: https://serpapi.com/search-archive-api
     #
     # @param [String|Integer] search_id from original search `results[:search_metadata][:id]`
-    # @param [Symbol] format :json or :html [default: json, optional]
-    # @return [String|Hash] raw html or JSON / Hash
+    # @param [Symbol] format :json, :html, or :markdown [default: json, optional]
+    # @return [String|Hash] raw HTML, Markdown, or JSON / Hash
     def search_archive(search_id, format = :json)
-      raise SerpApiError, 'format must be json or html' unless [:json, :html].include?(format)
+      raise SerpApiError, 'format must be json, html, or markdown' unless [:json, :html, :markdown].include?(format)
 
-      get("/searches/#{search_id}.#{format}", format)
+      extension = format == :markdown ? :md : format
+      get("/searches/#{search_id}.#{extension}", format)
     end
 
     # Get account information using Account API
@@ -211,9 +221,9 @@ module SerpApi
     # Perform HTTP GET request to the SerpApi.com backend endpoint.
     #
     # @param [String] endpoint HTTP service URI
-    # @param [Symbol] decoder type :json or :html
+    # @param [Symbol] decoder type :json, :html, or :markdown
     # @param [Hash] params custom search inputs
-    # @return [String|Hash] raw HTML or decoded response as JSON / Hash
+    # @return [String|Hash] raw text or decoded response as JSON / Hash
     def get(endpoint, decoder = :json, params = {})
       response = execute_request(endpoint, params)
       handle_response(response, decoder, endpoint, params)
@@ -234,8 +244,10 @@ module SerpApi
         process_json_response(response, endpoint, params)
       when :html
         process_html_response(response, endpoint, params)
+      when :markdown
+        process_markdown_response(response, endpoint, params)
       else
-        raise SerpApiError, "not supported decoder: #{decoder}, available: :json, :html"
+        raise SerpApiError, "not supported decoder: #{decoder}, available: :json, :html, :markdown"
       end
     end
 
@@ -256,6 +268,14 @@ module SerpApi
     def process_html_response(response, endpoint, params)
       raise_http_error(response, nil, endpoint, params, decoder: :html) if response.status != 200
       response.body
+    end
+
+    def process_markdown_response(response, endpoint, params)
+      raise_http_error(response, nil, endpoint, params, decoder: :markdown) if response.status != 200
+
+      data = response.body.to_s
+      response.flush if persistent?
+      data
     end
 
     def validate_json_content!(data, response, endpoint, params)

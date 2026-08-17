@@ -10,7 +10,7 @@ module SerpApi
   # - search_params: Hash of search parameters used (optional)
   # - response_status: Integer HTTP or response status code (optional)
   # - search_id: String id returned by the service for the search (optional)
-  # - decoder: Symbol representing the decoder/format used (optional) (e.g. :json)
+  # - decoder: Symbol representing the decoder/format used (optional) (e.g. :json or :markdown)
   class SerpApiError < StandardError
     attr_reader :serpapi_error, :search_params, :response_status, :search_id, :decoder
 
@@ -21,7 +21,7 @@ module SerpApi
     # @param search_params [Hash, nil] optional hash of the search parameters used
     # @param response_status [Integer, nil] optional HTTP or response status code
     # @param search_id [String, nil] optional id returned by the service for the search
-    # @param decoder [Symbol, nil] optional decoder/format used (e.g. :json)
+    # @param decoder [Symbol, nil] optional decoder/format used (e.g. :json or :markdown)
     def initialize(message = nil,
                    serpapi_error: nil,
                    search_params: nil,

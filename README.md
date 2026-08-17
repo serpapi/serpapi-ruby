@@ -9,6 +9,7 @@ SerpApi supports Google, Google Maps, Google Shopping, Baidu, Yandex, Yahoo, eBa
 Query a vast range of data at scale, including web search results, flight schedules, stock market data, news headlines, and [more](https://serpapi.com). 
 
 ## Features
+  * `markdown` → Return token-efficient Markdown output optimized for LLMs and AI agents
   * `persistent` → Keep socket connection open to save on SSL handshake / reconnection (2x faster).  [Search at scale](#Search-At-Scale)
   * `async` → Support non-blocking job submission. [Search Asynchronous](#Search-Asynchronous)
   * extensive documentation → easy to follow
@@ -42,6 +43,7 @@ pp results
  ```
 
 This example runs a search for "coffee" on Google. It then returns the results as a regular Ruby Hash.
+Use `client.markdown(q: "coffee")` to return the same search as a token-efficient Markdown string optimized for LLMs and AI agents.
  See the [playground](https://serpapi.com/playground) to generate your own code.
 
 The SerpApi key can be obtained from [serpapi.com/signup](https://serpapi.com/users/sign_up?plan=free).
@@ -94,6 +96,9 @@ params = {
 
 # search results as a symbolized Hash (per performance)
 results = client.search(params)
+
+# search results as a token-efficient Markdown string for LLMs and AI agents
+markdown = client.markdown(params)
 
 # search results as a raw HTML string
 raw_html = client.html(params)
@@ -287,6 +292,7 @@ Now we can retrieve the previous search results from the archive using the searc
 require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
 results = client.search_archive(search_id)
+markdown = client.search_archive(search_id, :markdown)
 pp results
 ```
 

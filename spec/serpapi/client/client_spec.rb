@@ -30,6 +30,32 @@ describe 'set of client test to archieve full code coverage' do
     expect(results).to match(/coffee/i)
   end
 
+  it 'search for coffee in Austin, TX and receive Markdown' do
+    results = client.markdown(q: 'Coffee', location: 'Austin, TX')
+
+    expect(results).to be_a(String)
+    expect(results).to start_with('---')
+    expect(results).to include('## Organic Results')
+  end
+
+  it 'requests the Markdown endpoint' do
+    response = double(status: 200, body: "---\n## Organic Results\n", flush: :clean)
+    expect(client.socket).to receive(:get)
+      .with('/search.md', params: hash_including(q: 'Coffee'))
+      .and_return(response)
+
+    expect(client.markdown(q: 'Coffee')).to start_with('---')
+  end
+
+  it 'reports Markdown HTTP errors with their decoder' do
+    response = double(status: 400, body: 'Invalid search')
+    allow(client.socket).to receive(:get).and_return(response)
+
+    expect {
+      client.markdown(q: 'Coffee')
+    }.to raise_error(SerpApi::SerpApiError) { |error| expect(error.decoder).to eq(:markdown) }
+  end
+
   it 'missing query' do
     begin
       client.search

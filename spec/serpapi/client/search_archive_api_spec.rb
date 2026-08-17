@@ -32,4 +32,16 @@ describe 'SerpApi Search Archive API' do
       expect(archive_search).to eq(results)
     end
   end
+
+  it 'fetches an archived search as Markdown' do
+    client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'], engine: 'google')
+    response = double(status: 200, body: "---\n## Organic Results\n", flush: :clean)
+
+    expect(client.socket).to receive(:get)
+      .with('/searches/search-id.md', params: hash_including(api_key: ENV['SERPAPI_KEY']))
+      .and_return(response)
+
+    results = client.search_archive('search-id', :markdown)
+    expect(results).to eq("---\n## Organic Results\n")
+  end
 end
