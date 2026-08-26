@@ -123,8 +123,8 @@ Search API features non-blocking search using the option: `async=true`.
  - Blocking - async=false - many processes must be forked and synchronized to handle concurrent searches. This strategy is I/O usage because each client would hold a network connection.
 
 Search API enables `async` search.
- - Non-blocking (`async=true`) : the development is more complex, but this allows handling many simultaneous connections.
- - Blocking (`async=false`) : it is easy to write the code but more compute-intensive when the parent process needs to hold many connections.
+ - Non-blocking (`async=true`): the development is more complex, but this allows handling many simultaneous connections.
+ - Blocking (`async=false`): it is easy to write the code, but more compute-intensive when the parent process needs to hold many connections.
 
 Here is an example of asynchronous searches using Ruby
 ```ruby
@@ -146,7 +146,7 @@ puts "Last search submited at: #{result[:search_metadata][:created_at]}"
 puts 'wait 10s for all requests to be completed '
 sleep(10)
 
-puts 'wait until all searches are cached or success'
+puts 'wait until all searches are cached or successful'
 until schedule_search.empty?
   search_id = schedule_search.pop
 
@@ -168,7 +168,7 @@ puts 'done'
 
  * source code: [demo/demo_async.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_async.rb)
 
-This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). Each search may take up to few seconds to complete. By the time the first element pops out of the queue, the search results might already be available in the archive. If not, the `search_archive` method blocks until the search results are available.
+This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). Each search may take up to a few seconds to complete. By the time the first element pops out of the queue, the search results might already be available in the archive. If not, the `search_archive` method blocks until the search results are available.
 
 ## Examples
 
@@ -352,7 +352,7 @@ Additional SDK resources:
 
 The older library (google-search-results-ruby) was performing at 55 req/s on Ruby 2.7.8, which is 2x slower than the current version (serpapi-ruby) on Ruby 3.4.4 or 4.0.0.
 
-**Context** This benchmark was performed on warmup search results using a MacBook Pro 2025 connected via Wi-Fi 6.0 home network on AT&T fiber from Austin, TX (no network optimization).
+**Context** This benchmark was performed on warm-up search results using a MacBook Pro 2025 connected via Wi-Fi 6.0 home network on AT&T fiber from Austin, TX (no network optimization).
 
 ## Contributing
 
