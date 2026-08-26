@@ -123,8 +123,8 @@ Search API features non-blocking search using the option: `async=true`.
  - Blocking - async=false - many processes must be forked and synchronized to handle concurrent searches. This strategy is I/O usage because each client would hold a network connection.
 
 Search API enables `async` search.
- - Non-blocking (`async=true`) : the development is more complex, but this allows handling many simultaneous connections.
- - Blocking (`async=false`) : it is easy to write the code but more compute-intensive when the parent process needs to hold many connections.
+ - Non-blocking (`async=true`): the development is more complex, but this allows handling many simultaneous connections.
+ - Blocking (`async=false`): it is easy to write the code, but more compute-intensive when the parent process needs to hold many connections.
 
 Here is an example of asynchronous searches using Ruby
 ```ruby
@@ -146,7 +146,7 @@ puts "Last search submited at: #{result[:search_metadata][:created_at]}"
 puts 'wait 10s for all requests to be completed '
 sleep(10)
 
-puts 'wait until all searches are cached or success'
+puts 'wait until all searches are cached or successful'
 until schedule_search.empty?
   search_id = schedule_search.pop
 
