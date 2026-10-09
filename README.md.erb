@@ -26,7 +26,7 @@ Then install it with Bundler:
 bundle install
 ```
 
-## Quickstart
+## Quick start
 
 [Create a SerpApi account](https://serpapi.com/users/sign_up?plan=free) to get your API key, then store it in an environment variable:
 
@@ -116,7 +116,7 @@ results = client.search(
 
 Search-engine-specific parameters can also be supplied when creating the client or calling `search`. Parameters passed to `search` override client defaults.
 
-### Search Asynchronous
+### Asynchronous searches
 
 Search API features non-blocking search using the option: `async=true`.
  - Non-blocking - async=true - a single parent process can handle unlimited concurrent searches.
@@ -210,7 +210,7 @@ pp results[:images_results]
 
 A [light variant](https://serpapi.com/google-images-light-api) engine called `google_images_light` is also available for faster, lower-cost image searches.
 
-### Google Lens with File Upload
+### Google Lens with file upload
 
 Upload an image with the Image API, then use its image ID in a Google Lens search. Uploaded image IDs expire after 10 minutes.
 
@@ -358,16 +358,9 @@ Additional SDK resources:
 | **HTTP.rb Non-Persistent** | 270.62 req/s | 294.01 req/s | 319.81 req/s | **+8.6%** | **+8.8%** |
 | **HTTP.rb Persistent** | 347.04 req/s | 570.95 req/s | 456.93 req/s | **+64.5%** | **-20.0%** |
 
-### Key Takeaways
-1. **Upgrade to Ruby 3.4.4**: Clear performance benefits across all scenarios
-2. **Use Persistent Connections**: 2x+ performance improvement in most cases
-3. **HTTP.rb Performance**: Particularly benefits from Ruby 3.4.4 with persistent connections
-4. **SerpApi Optimization**: Shows consistent ~2.2x improvement with persistent connections regardless of Ruby version
-5. **Ruby 4.0.0 Performance**: Shows mixed results with some regressions compared to 3.4.4, particularly for HTTP.rb persistent connections. Ruby 4.0.0 was just released for Christmas 2025, and HTTP.rb has not been optimized for it yet.
-
 The older library (google-search-results-ruby) was performing at 55 req/s on Ruby 2.7.8, which is 2x slower than the current version (serpapi-ruby) on Ruby 3.4.4 or 4.0.0.
 
-**Context** This benchmark was performed on warmup search results using a MacBook Pro 2025 connected via Wi-Fi 6.0 home network on AT&T fiber from Austin, TX (no network optimization).
+This benchmark was performed on warmup search results using a MacBook Pro 2025 connected via Wi-Fi 6.0 home network on AT&T fiber from Austin, TX (no network optimization).
 
 ## Contributing
 
