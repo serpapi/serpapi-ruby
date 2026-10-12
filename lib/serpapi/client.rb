@@ -100,7 +100,7 @@ module SerpApi
       # create connection socket
       return unless persistent?
 
-      @socket = HTTP.persistent("https://#{BACKEND}")
+      @socket = HTTP.timeout(timeout).persistent("https://#{BACKEND}")
     end
 
     # perform a search using SerpApi.com
