@@ -20,11 +20,6 @@ task oobt: %i[check readme doc build install demo]
 desc "execute all the steps except release"
 task default: %i[check dependency version readme doc build test oobt]
 
-desc "update README.md from the template"
-task readme: ['README.md.erb'] do
-  `erb -T '-' README.md.erb > README.md`
-end
-
 YARD::Rake::YardocTask.new(:doc) do |t|
   t.files   = ['lib/*/*.rb', 'LICENSE']
   t.options = ['--markup=markdown']
