@@ -56,7 +56,7 @@ client.close
 - [Asynchronous searches](./demo/demo_async.rb) for submitting non-blocking jobs and retrieving completed results from the Search Archive API.
 - [Persistent connections and connection pooling](./demo/demo_thread_pool.rb) for reusing HTTP connections across searches.
 - Search results as Ruby hashes with `search`, token-efficient Markdown with `md`, or raw search-engine HTML with `html`.
-- SDK methods for the [Image API](https://serpapi.com/image-api), [Location API](https://serpapi.com/locations-api), [Search Archive API](https://serpapi.com/search-archive-api), and [Account API](https://serpapi.com/account-api).
+- SDK methods for the [Extract API](https://serpapi.com/extract-api), [Image API](https://serpapi.com/image-api), [Location API](https://serpapi.com/locations-api), [Search Archive API](https://serpapi.com/search-archive-api), and [Account API](https://serpapi.com/account-api).
 - Configurable HTTP timeouts and symbolized or string JSON keys.
 
 ## Response formats
@@ -173,6 +173,46 @@ This code shows a simple solution to batch searches asynchronously into a [queue
 ## Examples
 
 Here are some examples for some of our most popular APIs. You can find the full list of supported engines and parameters in our [documentation](https://serpapi.com/search-engine-apis).
+
+### Extract API
+
+Turn any public web page into a fully structured JSON document: page information, meta tags, structured data (Open Graph, Twitter Card, JSON-LD, microdata), headings, inline links, images, media, lists, tables, forms, price offers, and normalized text content.
+
+```ruby
+require 'serpapi'
+
+client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
+results = client.extract(url: 'https://example.com/')
+pp results[:page_information]
+```
+
+The same method exposes two additional modes:
+
+- `map` performs fast same-origin URL discovery via page links, `robots.txt`, and `sitemap.xml`, and returns a `urls` array.
+- `crawl` crawls pages on the same website up to `max_pages` / `max_depth` and returns a fully parsed JSON document for every visited page in a `pages` array.
+
+```ruby
+# discover URLs of a website
+results = client.extract(url: 'https://example.com/', mode: 'map')
+pp results[:urls]
+
+# crawl a website and parse every visited page
+results = client.extract(url: 'https://books.toscrape.com/', mode: 'crawl', max_pages: 3, max_depth: 1)
+pp results[:pages]
+```
+
+Items carrying a navigable page URL (such as `inline_links`, `breadcrumbs`, `price_offers`, `urls`, and `pages`) are enriched with a `serpapi_extract_link`. Use `extract_link` to chain extractions without rebuilding the query:
+
+```ruby
+results = client.extract(url: 'https://example.com/')
+linked_page = client.extract_link(results[:inline_links].first[:serpapi_extract_link])
+```
+
+ * source code: [demo/demo_extract.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_extract.rb)
+
+> **Note:** URLs matching a website already covered by a dedicated SerpApi engine (such as Google, Bing, eBay, or Walmart search pages) are automatically redirected to that engine, and the response follows the matched engine's JSON structure.
+
+[See documentation](https://serpapi.com/extract-api)
 
 ### Google Shopping
 

@@ -46,7 +46,7 @@ Metrics/CyclomaticComplexity:
 
 # There is a tradeoff between line length and line count.
 Metrics/ClassLength:
-  Max: 160
+  Max: 170
 
 # Keyword args are readable.
 Metrics/ParameterLists:

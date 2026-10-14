@@ -10,6 +10,9 @@ require 'http'
 # load
 require 'json'
 
+# parse serpapi_extract_link URLs
+require 'uri'
+
 # implementation
 require_relative 'serpapi/version'
 require_relative 'serpapi/error'
