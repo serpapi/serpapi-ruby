@@ -176,7 +176,9 @@ module SerpApi
       raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
       raise SerpApiError, 'url parameter is required by the extract API' if params[:url].to_s.empty? && params['url'].to_s.empty?
 
-      search(params.merge(engine: 'extract'))
+      # also drop string-keyed engines; 'engine' => nil removes one inherited
+      # from the client defaults, since query compacts nil values
+      search(params.reject { |key, _| key.to_s == 'engine' }.merge('engine' => nil, engine: 'extract'))
     end
 
     # Follow a `serpapi_extract_link` returned by the Extract API.
@@ -210,7 +212,7 @@ module SerpApi
       # never let a link (possibly from scraped content) choose the account
       link_params = link_params.reject { |key, _| key == :api_key }
 
-      search(link_params.merge(params))
+      extract(link_params.merge(params.transform_keys(&:to_sym)))
     end
 
     # Get location using Location API
