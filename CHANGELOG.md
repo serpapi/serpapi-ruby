@@ -1,4 +1,5 @@
 # Changelog
+ * [Unreleased] Add native Extract API support via `extract` and `extract_link` methods
  * [Unreleased] Add Image API support
  * [Unreleased] Add Markdown search and archive output support
  * [Unreleased] Raise `SerpApiError` for non-200 text responses, including 404 responses from `get('/invalid')`

@@ -136,6 +136,85 @@ module SerpApi
       get('/search', :md, force_output(params, 'md'))
     end
 
+    # Extract structured data from any public web page using the Extract API.
+    #
+    # The Extract API turns a URL into a fully structured JSON document:
+    # page information, meta tags, Open Graph / Twitter Card / Dublin Core,
+    # JSON-LD, microdata, breadcrumbs, headings, inline links / images / videos,
+    # scripts, stylesheets, feeds, lists, tables, forms, sections, price offers,
+    # and normalized text content.
+    #
+    # Modes (via the `mode` parameter):
+    # * `scrape` (default): extract a single page.
+    # * `map`: fast same-origin URL discovery, returns a `urls` array.
+    # * `crawl`: crawl the website up to `max_pages` / `max_depth`, returns a `pages` array.
+    #
+    # **Example:**
+    #
+    # ```ruby
+    # client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
+    #
+    # # scrape a single page
+    # result = client.extract(url: 'https://example.com/')
+    # pp result[:page_information]
+    #
+    # # crawl a website
+    # result = client.extract(url: 'https://books.toscrape.com/', mode: 'crawl', max_pages: 3, max_depth: 1)
+    # pp result[:pages]
+    # ```
+    #
+    # doc: https://serpapi.com/extract-api
+    #
+    # @param [Hash] params Extract API parameters, must include :url
+    #                (target absolute http(s) URL). Optional parameters:
+    #                mode, max_pages, max_depth, include_subdomains,
+    #                include_sitemap, device, prefetch_delay, timeout,
+    #                include_tags, exclude_tags, include_markdown,
+    #                include_inline_assets.
+    # @return [Hash] extraction results formatted as a Hash.
+    def extract(params = {})
+      raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
+      raise SerpApiError, 'url parameter is required by the extract API' if params[:url].to_s.empty? && params['url'].to_s.empty?
+
+      # also drop string-keyed engines; 'engine' => nil removes one inherited
+      # from the client defaults, since query compacts nil values
+      search(params.reject { |key, _| key.to_s == 'engine' }.merge('engine' => nil, engine: 'extract'))
+    end
+
+    # Follow a `serpapi_extract_link` returned by the Extract API.
+    #
+    # Extract API results enrich items carrying a navigable page URL
+    # (inline_links, breadcrumbs, price_offers, urls, pages, ...) with a
+    # `serpapi_extract_link` so extractions can be chained without rebuilding
+    # the query. This method re-issues that link through the client,
+    # applying the client `api_key` and default parameters. An `api_key`
+    # embedded in the link is ignored.
+    #
+    # **Example:**
+    #
+    # ```ruby
+    # result = client.extract(url: 'https://example.com/')
+    # link = result[:inline_links].first[:serpapi_extract_link]
+    # linked_page = client.extract_link(link)
+    # ```
+    #
+    # @param [String] link `serpapi_extract_link` URL from a previous extraction.
+    # @param [Hash] params optional parameter overrides.
+    # @return [Hash] extraction results formatted as a Hash.
+    def extract_link(link, params = {})
+      raise SerpApiError, 'link must be a serpapi.com URL' unless link.to_s.match?(%r{\Ahttps://serpapi\.com/}i)
+
+      link_params = URI.decode_www_form(URI.parse(link).query.to_s)
+                       .to_h
+                       .transform_keys(&:to_sym)
+      raise SerpApiError, "link does not target the extract engine: #{link}" if link_params[:engine] != 'extract'
+
+      # never let a link (possibly from scraped content) choose the account
+      link_params = link_params.reject { |key, _| key == :api_key }
+
+      extract(link_params.merge(params.transform_keys(&:to_sym)))
+    end
+
     # Get location using Location API
     #
     # example: spec/serpapi/location_api_spec.rb
