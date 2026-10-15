@@ -3,6 +3,20 @@ require 'spec_helper'
 describe 'Extract API' do
   let(:client) { SerpApi::Client.new(api_key: 'dummy_secret_key', persistent: false) }
 
+  # Returns the query parameters sent over HTTP, after merging client defaults.
+  def sent_params
+    http = double
+    response = double(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+    sent = nil
+    allow(HTTP).to receive(:timeout).and_return(http)
+    allow(http).to receive(:get) do |_url, params:|
+      sent = params
+      response
+    end
+    yield
+    sent
+  end
+
   describe '#extract' do
     it 'forces the extract engine and passes the url' do
       expect(client).to receive(:search).with(hash_including(engine: 'extract', url: 'https://example.com/'))
@@ -56,6 +70,12 @@ describe 'Extract API' do
     it 'applies parameter overrides' do
       expect(client).to receive(:search).with(hash_including(device: 'mobile'))
       client.extract_link(link, device: 'mobile')
+    end
+
+    it 'ignores an api_key embedded in the link' do
+      params = sent_params { client.extract_link("#{link}&api_key=link_key") }
+      expect(params[:api_key]).to eq('dummy_secret_key')
+      expect(params.keys.map(&:to_s).count('api_key')).to eq(1)
     end
 
     it 'rejects non serpapi.com links' do

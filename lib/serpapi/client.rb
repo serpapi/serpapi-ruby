@@ -185,7 +185,8 @@ module SerpApi
     # (inline_links, breadcrumbs, price_offers, urls, pages, ...) with a
     # `serpapi_extract_link` so extractions can be chained without rebuilding
     # the query. This method re-issues that link through the client,
-    # applying the client `api_key` and default parameters.
+    # applying the client `api_key` and default parameters. An `api_key`
+    # embedded in the link is ignored.
     #
     # **Example:**
     #
@@ -205,6 +206,9 @@ module SerpApi
                        .to_h
                        .transform_keys(&:to_sym)
       raise SerpApiError, "link does not target the extract engine: #{link}" if link_params[:engine] != 'extract'
+
+      # never let a link (possibly from scraped content) choose the account
+      link_params = link_params.reject { |key, _| key == :api_key }
 
       search(link_params.merge(params))
     end
