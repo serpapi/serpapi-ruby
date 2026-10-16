@@ -13,7 +13,7 @@ describe 'Image API' do
   let(:client) { SerpApi::Client.new(api_key: api_key) }
 
   before do
-    allow(HTTP).to receive(:persistent).and_return(socket)
+    allow(HTTP).to receive(:timeout).and_return(double(persistent: socket))
     allow(response).to receive(:flush)
   end
 

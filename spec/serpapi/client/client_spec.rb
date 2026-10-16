@@ -159,6 +159,10 @@ describe 'SerpApi client with persitency enable' do
     expect(client.persistent).to be true
   end
 
+  it 'applies the timeout to the persistent socket' do
+    expect(client.socket.default_options.timeout_options).to eq(global_timeout: 10)
+  end
+
   it 'makes a search request with valid parameters' do
     results = client.search(q: 'Coffee', location: 'Austin, TX')
     expect(results.size).to be > 5

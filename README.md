@@ -110,7 +110,7 @@ results = client.search(
 | `api_key` | None | Your SerpApi API key. Use an environment variable rather than committing it to source control. |
 | `engine` | None | The search engine used by default, such as `google` or `google_maps`. |
 | `persistent` | `true` | Reuses the HTTP connection between requests. Call `client.close` when finished. |
-| `timeout` | `120` | Timeout in seconds for non-persistent HTTP requests. |
+| `timeout` | `120` | Timeout in seconds for HTTP requests. |
 | `async` | `false` | Submits searches without waiting for them to complete. It can be set on the client or per search. |
 | `symbolize_names` | `true` | Returns JSON object keys as symbols. Pass `false` to a search to receive string keys. |
 
