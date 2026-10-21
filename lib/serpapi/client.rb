@@ -176,7 +176,9 @@ module SerpApi
       raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
       raise SerpApiError, 'url parameter is required by the extract API' if params[:url].to_s.empty? && params['url'].to_s.empty?
 
-      search(params.merge(engine: 'extract'))
+      # also drop string-keyed engines; 'engine' => nil removes one inherited
+      # from the client defaults, since query compacts nil values
+      search(params.reject { |key, _| key.to_s == 'engine' }.merge('engine' => nil, engine: 'extract'))
     end
 
     # Get location using Location API
