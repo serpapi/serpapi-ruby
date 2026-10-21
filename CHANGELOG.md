@@ -1,4 +1,5 @@
 # Changelog
+ * [Unreleased] Add native Extract API support via the `extract` method
  * [Unreleased] Apply the `timeout` option to persistent connections
  * [Unreleased] Add Image API support
  * [Unreleased] Add Markdown search and archive output support
