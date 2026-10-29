@@ -15,7 +15,7 @@ describe 'example: extract' do
 
   it 'maps same-origin urls of a website' do
     client = SerpApi::Client.new(api_key: api_key)
-    results = client.extract(url: 'https://example.com/', mode: 'map')
+    results = client.extract(url: 'https://books.toscrape.com/', mode: 'map')
     expect(results[:urls]).not_to be_nil, "No urls found! keys available: #{results.keys}"
   end
 

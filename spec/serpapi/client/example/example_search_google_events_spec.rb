@@ -6,7 +6,7 @@ describe 'example: google_events search' do
     client = SerpApi::Client.new(engine: 'google_events', api_key: api_key)
     # run a search using serpapi service
     results = client.search(
-      q: 'coffee'
+      q: 'Events in Austin'
     )
     expect(results[:events_results]).not_to be_nil, "No events results found! keys available: #{results.keys}"
 
