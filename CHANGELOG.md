@@ -1,4 +1,5 @@
 # Changelog
+ * [Unreleased] Stop `Client.new` from modifying the params hash passed in, and accept frozen hashes
  * [Unreleased] Add native Extract API support via the `extract` method
  * [Unreleased] Apply the `timeout` option to persistent connections
  * [Unreleased] Add Image API support
