@@ -136,18 +136,22 @@ module SerpApi
       get('/search', :md, force_output(params, 'md'))
     end
 
-    # Extract structured data from any public web page using the Extract API.
+    # Extract the content of any public web page using the Extract API.
     #
-    # The Extract API turns a URL into a fully structured JSON document:
+    # The Extract API returns the page's main content as Markdown, along with
     # page information, meta tags, Open Graph / Twitter Card / Dublin Core,
-    # JSON-LD, microdata, breadcrumbs, headings, inline links / images / videos,
-    # scripts, stylesheets, feeds, lists, tables, forms, sections, price offers,
-    # and normalized text content.
+    # JSON-LD, microdata, inline links / images / videos / audios, and feeds.
+    # URLs covered by a dedicated SerpApi engine (such as Google or Bing search
+    # pages) are redirected to that engine and return its results.
     #
     # Modes (via the `mode` parameter):
     # * `scrape` (default): extract a single page.
-    # * `map`: fast same-origin URL discovery, returns a `urls` array.
-    # * `crawl`: crawl the website up to `max_pages` / `max_depth`, returns a `pages` array.
+    # * `map`: list the website's URLs from page links and sitemaps, returns a `urls` array.
+    # * `crawl`: follow links on the same website up to `max_pages` / `max_depth`,
+    #   returns a `pages` array. Consumes one search credit per extracted page.
+    #
+    # The `timeout` parameter is the Extract API fetch timeout in milliseconds.
+    # The client HTTP timeout is set in seconds with `SerpApi::Client.new(timeout: ...)`.
     #
     # **Example:**
     #
@@ -156,7 +160,10 @@ module SerpApi
     #
     # # scrape a single page
     # result = client.extract(url: 'https://example.com/')
-    # pp result[:page_information]
+    # puts result[:markdown]
+    #
+    # # get only the page's Markdown as a String
+    # markdown = client.extract(url: 'https://example.com/', output: 'md')
     #
     # # crawl a website
     # result = client.extract(url: 'https://books.toscrape.com/', mode: 'crawl', max_pages: 3, max_depth: 1)
@@ -168,10 +175,10 @@ module SerpApi
     # @param [Hash] params Extract API parameters, must include :url
     #                (target absolute http(s) URL). Optional parameters:
     #                mode, max_pages, max_depth, include_subdomains,
-    #                include_sitemap, device, prefetch_delay, timeout,
-    #                include_tags, exclude_tags, include_markdown,
-    #                include_inline_assets.
-    # @return [Hash] extraction results formatted as a Hash.
+    #                include_sitemap, prefetch_delay, timeout, include_tags,
+    #                exclude_tags, include_markdown, device, no_cache, async,
+    #                zero_trace, output, json_restrictor.
+    # @return [Hash|String] extraction results as a Hash, or a String for `output: 'md'` or `'html'`.
     def extract(params = {})
       raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
       raise SerpApiError, 'url parameter is required by the extract API' if params[:url].to_s.empty? && params['url'].to_s.empty?

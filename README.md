@@ -176,7 +176,7 @@ Here are some examples for some of our most popular APIs. You can find the full 
 
 ### Extract API
 
-Turn any public web page into a fully structured JSON document: page information, meta tags, structured data (Open Graph, Twitter Card, JSON-LD, microdata), headings, inline links, images, media, lists, tables, forms, price offers, and normalized text content.
+Get the main content of any public web page as Markdown, along with page information, meta tags, structured data (Open Graph, Twitter Card, Dublin Core, JSON-LD, microdata), inline links, images, videos, audios, and feeds.
 
 ```ruby
 require 'serpapi'
@@ -184,21 +184,35 @@ require 'serpapi'
 client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
 results = client.extract(url: 'https://example.com/')
 pp results[:page_information]
+puts results[:markdown]
+```
+
+Use `output: 'md'` to get only the page's Markdown as a `String`:
+
+```ruby
+markdown = client.extract(url: 'https://example.com/', output: 'md')
 ```
 
 The same method exposes two additional modes:
 
-- `map` performs fast same-origin URL discovery via page links, `robots.txt`, and `sitemap.xml`, and returns a `urls` array.
-- `crawl` crawls pages on the same website up to `max_pages` / `max_depth` and returns a fully parsed JSON document for every visited page in a `pages` array.
+- `map` lists the website's URLs from page links and sitemaps, and returns a `urls` array.
+- `crawl` follows links on the same website up to `max_pages` / `max_depth` and returns the extracted pages in a `pages` array. Crawl mode consumes one search credit per successfully extracted page, including the starting page.
 
 ```ruby
-# discover URLs of a website
-results = client.extract(url: 'https://example.com/', mode: 'map')
+# list the URLs of a website
+results = client.extract(url: 'https://books.toscrape.com/', mode: 'map')
 pp results[:urls]
 
-# crawl a website and parse every visited page
+# crawl a website and extract every visited page
 results = client.extract(url: 'https://books.toscrape.com/', mode: 'crawl', max_pages: 3, max_depth: 1)
 pp results[:pages]
+```
+
+A `timeout` passed to `extract` is the Extract API fetch timeout in milliseconds. The client `timeout` is the HTTP timeout in seconds for the whole request, so raise it as well for slow pages or crawls:
+
+```ruby
+client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'], timeout: 180)
+results = client.extract(url: 'https://example.com/', timeout: 60_000)
 ```
 
 To extract a page found in the results, pass its URL to `extract` again. Settings such as `device` or `include_tags` are not carried over, so pass them again if needed:
@@ -210,7 +224,7 @@ linked_page = client.extract(url: results[:inline_links].first[:link])
 
  * source code: [demo/demo_extract.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_extract.rb)
 
-> **Note:** URLs matching a website already covered by a dedicated SerpApi engine (such as Google, Bing, eBay, or Walmart search pages) are automatically redirected to that engine, and the response follows the matched engine's JSON structure.
+> **Note:** URLs of pages covered by a dedicated SerpApi engine (such as Google, Bing, eBay, or Walmart search pages) are redirected to that engine and return its results.
 
 [See documentation](https://serpapi.com/extract-api)
 
