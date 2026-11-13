@@ -110,9 +110,13 @@ module SerpApi
     # note that the raw response
     #                 from the search engine is converted to JSON by SerpApi.com backend.
     #                 thus, most of the compute power is on the backsdend and not on the client side.
+    # A search that completed with empty results (e.g. "Google hasn't returned any results for this query.")
+    # is successful: it is returned with a top-level `error` key instead of raising.
+    #
     # @param [Hash] params includes engine, api_key, search fields and more..
     #                this override the default params provided to the constructor.
     # @return [Hash|String] search results formatted as a Hash or raw text.
+    # @raise [SerpApiError] if the HTTP status is not 200 or `search_metadata.status` is `Error`.
     def search(params = {})
       get('/search', :json, params)
     end
@@ -222,9 +226,12 @@ module SerpApi
     # example: spec/serpapi/client/search_archive_api_spec.rb
     # doc: https://serpapi.com/search-archive-api
     #
+    # Archived searches with empty results are returned with a top-level `error` key instead of raising.
+    #
     # @param [String|Integer] search_id from original search `results[:search_metadata][:id]`
     # @param [Symbol] format :json, :html, or :md [default: json, optional]
     # @return [String|Hash] raw HTML, Markdown, or JSON / Hash
+    # @raise [SerpApiError] if the HTTP status is not 200 or `search_metadata.status` is `Error`.
     def search_archive(search_id, format = :json)
       raise SerpApiError, 'format must be json, html, or md' unless [:json, :html, :md].include?(format)
 
@@ -359,27 +366,36 @@ module SerpApi
       response.body.to_s
     end
 
+    # A top-level `error` key alone does not mean the request failed: SerpApi returns
+    # HTTP 200 with `search_metadata.status: Success` and an `error` message for searches
+    # with empty results. Failed searches have a non-200 status or `search_metadata.status: Error`.
+    # see: https://serpapi.com/api-status-and-error-codes
     def validate_json_content!(data, response, endpoint, params)
-      if data.is_a?(Hash) && data.key?(:error)
-        raise_http_error(response, data, endpoint, params, explicit_error: data[:error])
-      elsif response.status != 200
-        raise_http_error(response, data, endpoint, params)
+      if response.status != 200
+        raise_http_error(response, data, endpoint, params, explicit_error: json_value(data, :error))
+      elsif json_value(json_value(data, :search_metadata), :status) == 'Error'
+        raise_http_error(response, data, endpoint, params, explicit_error: json_value(data, :error), failure: 'Search failed with status: Error')
       end
     end
 
     # Centralized error raising to clean up the logic methods
-    def raise_http_error(response, data, endpoint, params, explicit_error: nil, decoder: :json)
-      msg = "HTTP request failed with status: #{response.status}"
+    def raise_http_error(response, data, endpoint, params, explicit_error: nil, decoder: :json, failure: nil)
+      msg = failure || "HTTP request failed with status: #{response.status}"
       msg += " error: #{explicit_error}" if explicit_error
 
       raise SerpApiError.new(
         "#{msg} from url: https://#{BACKEND}#{endpoint}",
-        serpapi_error: explicit_error || (data.is_a?(Hash) ? data[:error] : nil),
+        serpapi_error: explicit_error || json_value(data, :error),
         search_params: params,
         response_status: response.status,
-        search_id: data.is_a?(Hash) ? data&.dig(:search_metadata, :id) : nil,
+        search_id: json_value(json_value(data, :search_metadata), :id),
         decoder: decoder
       )
+    end
+
+    # Read a JSON value whether keys were symbolized or not (`symbolize_names: false`).
+    def json_value(data, key)
+      data.fetch(key) { data[key.to_s] } if data.is_a?(Hash)
     end
 
     def raise_parser_error(response, endpoint, params)

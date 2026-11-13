@@ -170,6 +170,34 @@ puts 'done'
 
 This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). Each search may take up to a few seconds to complete. By the time the first element pops out of the queue, the search results might already be available in the archive. If not, the `search_archive` method blocks until the search results are available.
 
+## Error handling
+
+`SerpApi::SerpApiError` is raised when a request fails: the HTTP status is not `200` (for example, an invalid API key, a missing parameter, or no searches left) or the search finished with `search_metadata.status` set to `Error`. The error includes the details returned by SerpApi:
+
+```ruby
+begin
+  results = client.search(q: "coffee")
+rescue SerpApi::SerpApiError => e
+  e.serpapi_error   # => "Invalid API key. Your API key should be here: https://serpapi.com/manage-api-key"
+  e.response_status # => 401
+  e.search_id       # => ID of the failed search, when SerpApi created one
+end
+```
+
+A search with no results from the search engine is still successful, so it is returned like any other search, with the message in `results[:error]`:
+
+```ruby
+results = client.search(q: "a query without results")
+results[:search_metadata][:status] # => "Success"
+results[:error]                    # => "Google hasn't returned any results for this query."
+```
+
+The same applies to `search_archive`, so you can retrieve the metadata of archived searches with empty results.
+
+> **Breaking change:** version 1.0.3 and earlier raised `SerpApiError` for any response with an `error` key, including searches with empty results. If you rescued `SerpApiError` to detect empty results, check `results[:error]` instead.
+
+See [Status and Error Codes](https://serpapi.com/api-status-and-error-codes) for the full list of statuses.
+
 ## Examples
 
 Here are some examples for some of our most popular APIs. You can find the full list of supported engines and parameters in our [documentation](https://serpapi.com/search-engine-apis).
