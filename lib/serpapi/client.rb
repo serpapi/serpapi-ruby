@@ -149,6 +149,7 @@ module SerpApi
     # * `map`: list the website's URLs from page links and sitemaps, returns a `urls` array.
     # * `crawl`: follow links on the same website up to `max_pages` / `max_depth`,
     #   returns a `pages` array. Consumes one search credit per extracted page.
+    #   `max_pages` defaults to 10 (maximum 100), including the starting page.
     #
     # The `timeout` parameter is the Extract API fetch timeout in milliseconds.
     # The client HTTP timeout is set in seconds with `SerpApi::Client.new(timeout: ...)`.
