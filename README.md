@@ -195,12 +195,16 @@ markdown = client.extract(url: 'https://example.com/', output: 'md')
 
 The same method exposes two additional modes:
 
-- `map` lists the website's URLs from page links and sitemaps, and returns a `urls` array.
+- `map` lists the website's URLs from page links and sitemaps, and returns a `urls` array. Set `include_sitemap: false` to skip the sitemaps and list only URLs linked from the page. Set `include_subdomains: true` to include other subdomains, such as `blog.example.com` when starting from `www.example.com`; this also applies to crawl mode.
 - `crawl` follows links on the same website up to `max_pages` / `max_depth` and returns the extracted pages in a `pages` array. Crawl mode consumes one search credit per successfully extracted page, including the starting page. `max_pages` defaults to `10` (maximum `100`), so a crawl without it can consume up to 10 credits.
 
 ```ruby
 # list the URLs of a website
 results = client.extract(url: 'https://books.toscrape.com/', mode: 'map')
+pp results[:urls]
+
+# list only the URLs linked from the page, including other subdomains
+results = client.extract(url: 'https://books.toscrape.com/', mode: 'map', include_sitemap: false, include_subdomains: true)
 pp results[:urls]
 
 # crawl a website and extract every visited page

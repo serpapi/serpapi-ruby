@@ -147,6 +147,8 @@ module SerpApi
     # Modes (via the `mode` parameter):
     # * `scrape` (default): extract a single page.
     # * `map`: list the website's URLs from page links and sitemaps, returns a `urls` array.
+    #   Set `include_sitemap: false` to list only URLs linked from the page.
+    #   Set `include_subdomains: true` to include other subdomains (also in `crawl` mode).
     # * `crawl`: follow links on the same website up to `max_pages` / `max_depth`,
     #   returns a `pages` array. Consumes one search credit per extracted page.
     #   `max_pages` defaults to 10 (maximum 100), including the starting page.
