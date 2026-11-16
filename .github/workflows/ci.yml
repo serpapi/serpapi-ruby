@@ -9,15 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ['3.1.0'] # test only recommend Ruby version (and stable version on the gitaction server)
-     # ideally test with those versions, but gitaction are limited
-     #  2.7.4 is broken.
-     #  4.0.0 is not supported yet
-     #   ruby-version: ['2.7.4','3.1.0','4.0.0']
+        # Ruby series in normal maintenance. Tests call the live SerpApi API,
+        # so each added version uses more search credits.
+        ruby-version: ['3.4', '4.0']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
       - name: Set up Ruby ${{ matrix.ruby-version }}
-        uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
+        uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
         with:
           ruby-version: ${{ matrix.ruby-version }}
       - name: Install dependencies
