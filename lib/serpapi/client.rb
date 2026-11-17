@@ -74,22 +74,20 @@ module SerpApi
       raise SerpApiError, 'params cannot be nil' if params.nil?
       raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
 
+      # work on a copy so the caller's hash is never modified
+      # (dup, unlike clone, also returns an unfrozen copy of a frozen hash)
+      config = params.dup
+
       # store client HTTP request timeout
-      @timeout = params[:timeout] || 120
+      @timeout = config.delete(:timeout) || 120
       @timeout.freeze
 
       # enable HTTP persistent mode
-      @persistent = true
-      @persistent = params[:persistent] if params.key?(:persistent)
+      @persistent = config.key?(:persistent) ? config.delete(:persistent) : true
       @persistent.freeze
 
-      # delete this client only configuration keys
-      %i[timeout persistent].each do |option|
-        params.delete(option) if params.key?(option)
-      end
-
       # set default query parameters
-      @params = params.clone || {}
+      @params = config
 
       # track ruby library as a client for statistic purpose
       @params[:source] = 'serpapi-ruby:' << SerpApi::VERSION
