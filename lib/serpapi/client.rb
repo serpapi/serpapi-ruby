@@ -287,7 +287,10 @@ module SerpApi
       raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
 
       # merge default params with custom params
-      q = @params.clone.merge(params)
+      defaults = @params.reject do |key, _|
+        (key.is_a?(Symbol) && params.key?(key.to_s)) || (key.is_a?(String) && params.key?(key.to_sym))
+      end
+      q = defaults.merge(params)
       q.delete('output') if params.key?(:output)
       q.delete(:output) if params.key?('output') && !params.key?(:output)
 
