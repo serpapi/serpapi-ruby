@@ -1,4 +1,5 @@
 # Changelog
+ * [Unreleased] Honor constructor `symbolize_names` defaults when decoding JSON responses
  * [Unreleased] Add native Extract API support via the `extract` method
  * [Unreleased] Apply the `timeout` option to persistent connections
  * [Unreleased] Add Image API support
