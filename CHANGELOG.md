@@ -1,4 +1,5 @@
 # Changelog
+ * [Unreleased] Override client query defaults consistently across String and Symbol keys
  * [Unreleased] Add native Extract API support via the `extract` method
  * [Unreleased] Apply the `timeout` option to persistent connections
  * [Unreleased] Add Image API support
