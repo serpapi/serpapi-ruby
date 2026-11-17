@@ -351,7 +351,7 @@ module SerpApi
     end
 
     def process_json_response(response, endpoint, params)
-      symbolize = params.fetch(:symbolize_names, true)
+      symbolize = params.fetch(:symbolize_names) { @params.fetch(:symbolize_names, true) }
 
       begin
         data = JSON.parse(response.body, symbolize_names: symbolize)
