@@ -170,6 +170,34 @@ puts 'done'
 
 This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). Each search may take up to a few seconds to complete. By the time the first element pops out of the queue, the search results might already be available in the archive. If not, the `search_archive` method blocks until the search results are available.
 
+## Error handling
+
+`SerpApi::SerpApiError` is raised when a request fails, that is when the HTTP status is not `200` (for example, an invalid API key, a missing parameter, or no searches left), or when a successful JSON response can't be parsed. The error includes the details returned by SerpApi:
+
+```ruby
+begin
+  results = client.search(q: "coffee")
+rescue SerpApi::SerpApiError => e
+  e.serpapi_error   # => "Invalid API key. Your API key should be here: https://serpapi.com/manage-api-key"
+  e.response_status # => 401
+  e.search_id       # => ID of the failed search, when SerpApi created one
+end
+```
+
+A search with no results from the search engine is still successful, so it is returned like any other search, with the message in `results[:error]`:
+
+```ruby
+results = client.search(q: "a query without results")
+results[:search_metadata][:status] # => "Success"
+results[:error]                    # => "Google hasn't returned any results for this query."
+```
+
+The same applies to `search_archive`, so you can retrieve the metadata of archived searches with empty results. `extract` also returns a page that can't be extracted instead of raising, with the reason in `results[:error]` (see [Extract API](#extract-api)).
+
+> **Breaking change:** with the default symbol keys, version 1.0.3 and earlier raised `SerpApiError` for any response with an `error` key, including searches with empty results. If you rescued `SerpApiError` to detect empty results, check `results[:error]` instead. With `symbolize_names: false`, searches with empty results were already returned, with the message in `results["error"]`.
+
+See [Status and Error Codes](https://serpapi.com/api-status-and-error-codes) for the full list of statuses.
+
 ## Examples
 
 Here are some examples for some of our most popular APIs. You can find the full list of supported engines and parameters in our [documentation](https://serpapi.com/search-engine-apis).
@@ -183,9 +211,15 @@ require 'serpapi'
 
 client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
 results = client.extract(url: 'https://example.com/')
-pp results[:page_information]
-puts results[:markdown]
+if results[:error]
+  puts "Nothing extracted: #{results[:error]}"
+else
+  pp results[:page_information]
+  puts results[:markdown]
+end
 ```
+
+A page that can't be extracted, for example because the URL doesn't return an HTML document, is still a successful request. It is returned with the reason in `results[:error]` and no `markdown`.
 
 Use `output: 'md'` to get only the page's Markdown as a `String`:
 
