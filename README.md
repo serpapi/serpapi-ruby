@@ -172,7 +172,7 @@ This code shows a simple solution to batch searches asynchronously into a [queue
 
 ## Error handling
 
-`SerpApi::SerpApiError` is raised when a request fails: the HTTP status is not `200` (for example, an invalid API key, a missing parameter, or no searches left) or the search finished with `search_metadata.status` set to `Error`. The error includes the details returned by SerpApi:
+`SerpApi::SerpApiError` is raised when a request fails, that is when the HTTP status is not `200` (for example, an invalid API key, a missing parameter, or no searches left), or when the response body is not valid JSON. The error includes the details returned by SerpApi:
 
 ```ruby
 begin
@@ -194,7 +194,7 @@ results[:error]                    # => "Google hasn't returned any results for 
 
 The same applies to `search_archive`, so you can retrieve the metadata of archived searches with empty results. `extract` also returns a page that can't be extracted instead of raising, with the reason in `results[:error]` (see [Extract API](#extract-api)).
 
-> **Breaking change:** version 1.0.3 and earlier raised `SerpApiError` for any response with an `error` key, including searches with empty results. If you rescued `SerpApiError` to detect empty results, check `results[:error]` instead.
+> **Breaking change:** with the default symbol keys, version 1.0.3 and earlier raised `SerpApiError` for any response with an `error` key, including searches with empty results. If you rescued `SerpApiError` to detect empty results, check `results[:error]` instead. With `symbolize_names: false`, searches with empty results were already returned, with the message in `results["error"]`.
 
 See [Status and Error Codes](https://serpapi.com/api-status-and-error-codes) for the full list of statuses.
 

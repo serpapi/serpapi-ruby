@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-# SerpApi returns searches with empty results and pages that can't be extracted as HTTP 200 with
-# `search_metadata.status: Success` and a top-level `error` message. Only non-200 responses and
-# `search_metadata.status: Error` are failures.
+# SerpApi returns searches with empty results and pages that can't be extracted as HTTP 200
+# with a top-level `error` message. Only the HTTP status decides whether a request failed,
+# so the client raises only for non-200 responses.
 # see: https://serpapi.com/api-status-and-error-codes
 describe 'JSON error handling' do
   let(:socket) { double }
@@ -79,33 +79,27 @@ describe 'JSON error handling' do
     end
   end
 
-  describe 'failed searches' do
-    it 'raises when search_metadata.status is Error with HTTP 200' do
+  describe 'HTTP 200 responses with search_metadata.status Error' do
+    it 'returns them instead of raising' do
       allow(socket).to receive(:get)
         .with('/searches/64c32cfeb68f8bc186aaa013.json', anything)
         .and_return(json_response(200, failed_search))
 
-      expect {
-        client.search_archive('64c32cfeb68f8bc186aaa013')
-      }.to raise_error(SerpApi::SerpApiError, /\ASearch failed with status: Error error: We couldn't get valid results/) do |error|
-        expect(error.serpapi_error).to eq(failed_search[:error])
-        expect(error.search_id).to eq('64c32cfeb68f8bc186aaa013')
-        expect(error.response_status).to eq(200)
-      end
+      expect(client.search_archive('64c32cfeb68f8bc186aaa013')).to eq(failed_search)
     end
 
-    it 'raises when search_metadata.status is Error with string keys' do
+    it 'returns them with string keys' do
       allow(socket).to receive(:get).with('/search', anything).and_return(json_response(200, failed_search))
 
-      expect {
-        client.search(q: 'coffee', symbolize_names: false)
-      }.to raise_error(SerpApi::SerpApiError) do |error|
-        expect(error.serpapi_error).to eq(failed_search[:error])
-        expect(error.search_id).to eq('64c32cfeb68f8bc186aaa013')
-      end
-    end
+      results = client.search(q: 'coffee', symbolize_names: false)
 
-    it 'raises for non-200 responses' do
+      expect(results['search_metadata']['status']).to eq('Error')
+      expect(results['error']).to eq(failed_search[:error])
+    end
+  end
+
+  describe 'non-200 responses' do
+    it 'raises with the error details' do
       allow(socket).to receive(:get).with('/search', anything).and_return(json_response(503, failed_search))
 
       expect {
@@ -117,7 +111,30 @@ describe 'JSON error handling' do
       end
     end
 
-    it 'raises for non-200 responses without an error key' do
+    it 'raises with the error details with string keys' do
+      allow(socket).to receive(:get).with('/search', anything).and_return(json_response(503, failed_search))
+
+      expect {
+        client.search(q: 'coffee', symbolize_names: false)
+      }.to raise_error(SerpApi::SerpApiError) do |error|
+        expect(error.serpapi_error).to eq(failed_search[:error])
+        expect(error.search_id).to eq('64c32cfeb68f8bc186aaa013')
+      end
+    end
+
+    it 'raises SerpApiError when the error and search id are not strings' do
+      body = { search_metadata: { id: 123 }, error: { code: 500, message: 'boom' } }
+      allow(socket).to receive(:get).with('/search', anything).and_return(json_response(500, body))
+
+      expect {
+        client.search(q: 'coffee')
+      }.to raise_error(SerpApi::SerpApiError) do |error|
+        expect(error.serpapi_error).to include('boom')
+        expect(error.search_id).to eq('123')
+      end
+    end
+
+    it 'raises without an error key' do
       allow(socket).to receive(:get).with('/account', anything).and_return(json_response(500, {}))
 
       expect {

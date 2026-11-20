@@ -116,7 +116,7 @@ module SerpApi
     # @param [Hash] params includes engine, api_key, search fields and more..
     #                this override the default params provided to the constructor.
     # @return [Hash|String] search results formatted as a Hash or raw text.
-    # @raise [SerpApiError] if the HTTP status is not 200 or `search_metadata.status` is `Error`.
+    # @raise [SerpApiError] if the HTTP status is not 200.
     def search(params = {})
       get('/search', :json, params)
     end
@@ -190,7 +190,7 @@ module SerpApi
     #                exclude_tags, include_markdown, device, no_cache, async,
     #                zero_trace, output, json_restrictor.
     # @return [Hash|String] extraction results as a Hash, or a String for `output: 'md'` or `'html'`.
-    # @raise [SerpApiError] if `url` is missing, the HTTP status is not 200, or `search_metadata.status` is `Error`.
+    # @raise [SerpApiError] if `url` is missing or the HTTP status is not 200.
     def extract(params = {})
       raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
       raise SerpApiError, 'url parameter is required by the extract API' if params[:url].to_s.empty? && params['url'].to_s.empty?
@@ -246,7 +246,7 @@ module SerpApi
     # @param [String|Integer] search_id from original search `results[:search_metadata][:id]`
     # @param [Symbol] format :json, :html, or :md [default: json, optional]
     # @return [String|Hash] raw HTML, Markdown, or JSON / Hash
-    # @raise [SerpApiError] if the HTTP status is not 200 or `search_metadata.status` is `Error`.
+    # @raise [SerpApiError] if the HTTP status is not 200.
     def search_archive(search_id, format = :json)
       raise SerpApiError, 'format must be json, html, or md' unless [:json, :html, :md].include?(format)
 
@@ -381,29 +381,28 @@ module SerpApi
       response.body.to_s
     end
 
-    # A top-level `error` key alone does not mean the request failed: SerpApi returns
-    # HTTP 200 with `search_metadata.status: Success` and an `error` message for searches
-    # with empty results. Failed searches have a non-200 status or `search_metadata.status: Error`.
+    # Only the HTTP status decides whether a request failed. A top-level `error` key alone
+    # does not: SerpApi returns HTTP 200 with an `error` message for searches with empty
+    # results, and failed searches come with a non-200 status.
     # see: https://serpapi.com/api-status-and-error-codes
     def validate_json_content!(data, response, endpoint, params)
-      if response.status != 200
-        raise_http_error(response, data, endpoint, params, explicit_error: json_value(data, :error))
-      elsif json_value(json_value(data, :search_metadata), :status) == 'Error'
-        raise_http_error(response, data, endpoint, params, explicit_error: json_value(data, :error), failure: 'Search failed with status: Error')
-      end
+      return if response.status == 200
+
+      raise_http_error(response, data, endpoint, params, explicit_error: json_value(data, :error))
     end
 
     # Centralized error raising to clean up the logic methods
-    def raise_http_error(response, data, endpoint, params, explicit_error: nil, decoder: :json, failure: nil)
-      msg = failure || "HTTP request failed with status: #{response.status}"
+    def raise_http_error(response, data, endpoint, params, explicit_error: nil, decoder: :json)
+      msg = "HTTP request failed with status: #{response.status}"
       msg += " error: #{explicit_error}" if explicit_error
 
       raise SerpApiError.new(
         "#{msg} from url: https://#{BACKEND}#{endpoint}",
-        serpapi_error: explicit_error || json_value(data, :error),
+        # SerpApiError requires Strings; a malformed body must not turn this into a TypeError
+        serpapi_error: (explicit_error || json_value(data, :error))&.to_s,
         search_params: params,
         response_status: response.status,
-        search_id: json_value(json_value(data, :search_metadata), :id),
+        search_id: json_value(json_value(data, :search_metadata), :id)&.to_s,
         decoder: decoder
       )
     end
