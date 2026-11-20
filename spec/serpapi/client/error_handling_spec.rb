@@ -1,7 +1,8 @@
 require 'spec_helper'
 
-# SerpApi returns searches with empty results as HTTP 200 with `search_metadata.status: Success`
-# and a top-level `error` message. Only non-200 responses and `search_metadata.status: Error` are failures.
+# SerpApi returns searches with empty results and pages that can't be extracted as HTTP 200 with
+# `search_metadata.status: Success` and a top-level `error` message. Only non-200 responses and
+# `search_metadata.status: Error` are failures.
 # see: https://serpapi.com/api-status-and-error-codes
 describe 'JSON error handling' do
   let(:socket) { double }
@@ -59,6 +60,22 @@ describe 'JSON error handling' do
       results = client.search(q: 'no results', symbolize_names: false)
 
       expect(results['error']).to eq("Google hasn't returned any results for this query.")
+    end
+  end
+
+  describe 'extractions without content' do
+    let(:failed_extraction) do
+      {
+        search_metadata: { id: '6afd930b40fad414752692cc', status: 'Success' },
+        search_parameters: { engine: 'extract', url: 'https://httpbin.org/status/404', device: 'desktop' },
+        error: 'Unsupported content: the URL did not return an HTML document.'
+      }
+    end
+
+    it 'returns extraction results with the error key instead of raising' do
+      allow(socket).to receive(:get).with('/search', anything).and_return(json_response(200, failed_extraction))
+
+      expect(client.extract(url: 'https://httpbin.org/status/404')).to eq(failed_extraction)
     end
   end
 

@@ -192,7 +192,7 @@ results[:search_metadata][:status] # => "Success"
 results[:error]                    # => "Google hasn't returned any results for this query."
 ```
 
-The same applies to `search_archive`, so you can retrieve the metadata of archived searches with empty results.
+The same applies to `search_archive`, so you can retrieve the metadata of archived searches with empty results. `extract` also returns a page that can't be extracted instead of raising, with the reason in `results[:error]` (see [Extract API](#extract-api)).
 
 > **Breaking change:** version 1.0.3 and earlier raised `SerpApiError` for any response with an `error` key, including searches with empty results. If you rescued `SerpApiError` to detect empty results, check `results[:error]` instead.
 
@@ -211,9 +211,15 @@ require 'serpapi'
 
 client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
 results = client.extract(url: 'https://example.com/')
-pp results[:page_information]
-puts results[:markdown]
+if results[:error]
+  puts "Nothing extracted: #{results[:error]}"
+else
+  pp results[:page_information]
+  puts results[:markdown]
+end
 ```
+
+A page that can't be extracted, for example because the URL doesn't return an HTML document, is still a successful request. It is returned with the reason in `results[:error]` and no `markdown`.
 
 Use `output: 'md'` to get only the page's Markdown as a `String`:
 

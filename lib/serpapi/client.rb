@@ -160,6 +160,10 @@ module SerpApi
     # The `timeout` parameter is the Extract API fetch timeout in milliseconds.
     # The client HTTP timeout is set in seconds with `SerpApi::Client.new(timeout: ...)`.
     #
+    # A page that could not be extracted (e.g. the URL does not return an HTML document)
+    # is returned like the API returns it: with a top-level `error` key and no `markdown`,
+    # instead of raising.
+    #
     # **Example:**
     #
     # ```ruby
@@ -186,6 +190,7 @@ module SerpApi
     #                exclude_tags, include_markdown, device, no_cache, async,
     #                zero_trace, output, json_restrictor.
     # @return [Hash|String] extraction results as a Hash, or a String for `output: 'md'` or `'html'`.
+    # @raise [SerpApiError] if `url` is missing, the HTTP status is not 200, or `search_metadata.status` is `Error`.
     def extract(params = {})
       raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
       raise SerpApiError, 'url parameter is required by the extract API' if params[:url].to_s.empty? && params['url'].to_s.empty?
