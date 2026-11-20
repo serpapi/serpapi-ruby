@@ -49,7 +49,7 @@ company_list.each do |company|
   schedule_search.push(result[:search_metadata][:id])
 end
 
-puts "Last search submited at: #{result[:search_metadata][:created_at]}"
+puts "Last search submitted at: #{result[:search_metadata][:created_at]}"
 
 # wait for all requests to be completed
 puts 'wait 10s for all requests to be completed '
