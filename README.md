@@ -172,7 +172,7 @@ This code shows a simple solution to batch searches asynchronously into a [queue
 
 ## Error handling
 
-`SerpApi::SerpApiError` is raised when a request fails, that is when the HTTP status is not `200` (for example, an invalid API key, a missing parameter, or no searches left), or when the response body is not valid JSON. The error includes the details returned by SerpApi:
+`SerpApi::SerpApiError` is raised when a request fails, that is when the HTTP status is not `200` (for example, an invalid API key, a missing parameter, or no searches left), or when a successful JSON response can't be parsed. The error includes the details returned by SerpApi:
 
 ```ruby
 begin

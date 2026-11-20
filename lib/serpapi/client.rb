@@ -17,7 +17,7 @@ module SerpApi
     # Backend service URL
     BACKEND = 'serpapi.com'.freeze
     # SerpApi errors are JSON even when HTML or Markdown output was requested.
-    # Decode the actual Content-Type so structured errors and successful JSON responses become Hashes.
+    # Decode the actual Content-Type so JSON responses become Hashes.
     CONTENT_TYPE_DECODERS = { 'application/json' => :json, 'text/html' => :html, 'text/markdown' => :md }.freeze
 
     # HTTP timeout requests
@@ -352,43 +352,42 @@ module SerpApi
     end
 
     def handle_response(response, decoder, endpoint, params)
+      # Check the status before decoding: an error body may not be JSON.
+      raise_for_status!(response, decoder, endpoint, params)
+
       case decoder
       when :json
-        process_json_response(response, endpoint, params)
+        parse_json(response, endpoint, params)
       when :html, :md
-        process_text_response(response, endpoint, params, decoder)
+        response.body.to_s
       else
         raise SerpApiError, "not supported decoder: #{decoder}, available: :json, :html, :md"
       end
-    end
-
-    def process_json_response(response, endpoint, params)
-      symbolize = params.fetch(:symbolize_names, true)
-
-      begin
-        data = JSON.parse(response.body, symbolize_names: symbolize)
-        validate_json_content!(data, response, endpoint, params)
-      rescue JSON::ParserError
-        raise_parser_error(response, endpoint, params)
-      end
-
-      data
-    end
-
-    def process_text_response(response, endpoint, params, decoder)
-      raise_http_error(response, nil, endpoint, params, decoder: decoder) if response.status != 200
-
-      response.body.to_s
     end
 
     # Only the HTTP status decides whether a request failed. A top-level `error` key alone
     # does not: SerpApi returns HTTP 200 with an `error` message for searches with empty
     # results, and failed searches come with a non-200 status.
     # see: https://serpapi.com/api-status-and-error-codes
-    def validate_json_content!(data, response, endpoint, params)
+    def raise_for_status!(response, decoder, endpoint, params)
       return if response.status == 200
 
-      raise_http_error(response, data, endpoint, params, explicit_error: json_value(data, :error))
+      details = error_details(response)
+      raise_http_error(response, details, endpoint, params, explicit_error: json_value(details, :error), decoder: decoder)
+    end
+
+    # SerpApi errors are JSON whatever the requested output. A body that isn't JSON, such as
+    # a Cloudflare error page, has no SerpApi error message, so only the status is reported.
+    def error_details(response)
+      JSON.parse(response.body)
+    rescue JSON::ParserError
+      nil
+    end
+
+    def parse_json(response, endpoint, params)
+      JSON.parse(response.body, symbolize_names: params.fetch(:symbolize_names, true))
+    rescue JSON::ParserError
+      raise_parser_error(response, endpoint, params)
     end
 
     # Centralized error raising to clean up the logic methods

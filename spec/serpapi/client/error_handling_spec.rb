@@ -24,12 +24,11 @@ describe 'JSON error handling' do
   end
 
   def json_response(status, body)
-    double(
-      status: status,
-      body: JSON.generate(body),
-      headers: { 'Content-Type' => 'application/json; charset=utf-8' },
-      flush: nil
-    )
+    raw_response(status, JSON.generate(body), 'application/json; charset=utf-8')
+  end
+
+  def raw_response(status, body, content_type)
+    double(status: status, body: body, headers: { 'Content-Type' => content_type }, flush: nil)
   end
 
   before do
@@ -98,6 +97,20 @@ describe 'JSON error handling' do
     end
   end
 
+  describe 'HTTP 200 responses that are not valid JSON' do
+    it 'raises a JSON parse error' do
+      allow(socket).to receive(:get).with('/search', anything)
+        .and_return(raw_response(200, '{"search_metadata": {"id": "6935c0b9a0cb1015d74ef919"', 'application/json; charset=utf-8'))
+
+      expect {
+        client.search(q: 'coffee')
+      }.to raise_error(SerpApi::SerpApiError, /\AJSON parse error: /) do |error|
+        expect(error.response_status).to eq(200)
+        expect(error.decoder).to eq(:json)
+      end
+    end
+  end
+
   describe 'non-200 responses' do
     it 'raises with the error details' do
       allow(socket).to receive(:get).with('/search', anything).and_return(json_response(503, failed_search))
@@ -131,6 +144,19 @@ describe 'JSON error handling' do
       }.to raise_error(SerpApi::SerpApiError) do |error|
         expect(error.serpapi_error).to include('boom')
         expect(error.search_id).to eq('123')
+      end
+    end
+
+    # e.g. an error page from Cloudflare, in front of SerpApi
+    it 'raises with the status when the body is not JSON' do
+      allow(socket).to receive(:get).with('/search', anything)
+        .and_return(raw_response(502, 'error code: 502', 'text/plain; charset=UTF-8'))
+
+      expect {
+        client.search(q: 'coffee')
+      }.to raise_error(SerpApi::SerpApiError, %r{\AHTTP request failed with status: 502 from url: https://serpapi.com/search\z}) do |error|
+        expect(error.serpapi_error).to be_nil
+        expect(error.response_status).to eq(502)
       end
     end
 
