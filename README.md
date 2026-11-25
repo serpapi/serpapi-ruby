@@ -120,7 +120,7 @@ Search-engine-specific parameters can also be supplied when creating the client 
 
 Search API enables `async` search.
  - Non-blocking (`async=true`): the development is more complex, but a single parent process can handle many simultaneous searches.
- - Blocking (`async=false`): it is easy to write the code, but each client holds a network connection, so many processes must be forked and synchronized to handle concurrent searches.
+ - Blocking (`async=false`): it is easy to write the code, but each client holds a network connection, so many threads or processes are needed to handle concurrent searches.
 
 Here is an example of asynchronous searches using Ruby
 ```ruby
