@@ -3,6 +3,7 @@
  * [Unreleased] Set `SerpApiError#serpapi_error` and `#search_id` when using `symbolize_names: false`
  * [Unreleased] Raise `SerpApiError` instead of `TypeError` for non-200 responses whose `error` or `search_metadata.id` is not a String
  * [Unreleased] Report the HTTP status instead of a JSON parse error for non-200 responses whose body is not JSON, such as a Cloudflare error page
+ * [Unreleased] Raise `SerpApiError` instead of an `EncodingError` for responses whose body doesn't match the charset in their Content-Type
  * [Unreleased] Add native Extract API support via the `extract` method
  * [Unreleased] Apply the `timeout` option to persistent connections
  * [Unreleased] Add Image API support

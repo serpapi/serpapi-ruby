@@ -378,15 +378,17 @@ module SerpApi
 
     # SerpApi errors are JSON whatever the requested output. A body that isn't JSON, such as
     # a Cloudflare error page, has no SerpApi error message, so only the status is reported.
+    # JSON.parse converts the body to UTF-8 from the charset in Content-Type, which raises
+    # an EncodingError when the bytes don't match that charset.
     def error_details(response)
       JSON.parse(response.body)
-    rescue JSON::ParserError
+    rescue JSON::ParserError, EncodingError
       nil
     end
 
     def parse_json(response, endpoint, params)
       JSON.parse(response.body, symbolize_names: params.fetch(:symbolize_names, true))
-    rescue JSON::ParserError
+    rescue JSON::ParserError, EncodingError
       raise_parser_error(response, endpoint, params)
     end
 

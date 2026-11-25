@@ -109,6 +109,15 @@ describe 'JSON error handling' do
         expect(error.decoder).to eq(:json)
       end
     end
+
+    it 'raises a JSON parse error when the body does not match its charset' do
+      body = String.new(JSON.generate(error: "We\u2019re having trouble"), encoding: Encoding::US_ASCII)
+      allow(socket).to receive(:get).with('/search', anything).and_return(raw_response(200, body, 'application/json; charset=us-ascii'))
+
+      expect {
+        client.search(q: 'coffee')
+      }.to raise_error(SerpApi::SerpApiError, /\AJSON parse error: /)
+    end
   end
 
   describe 'non-200 responses' do
@@ -157,6 +166,18 @@ describe 'JSON error handling' do
       }.to raise_error(SerpApi::SerpApiError, %r{\AHTTP request failed with status: 502 from url: https://serpapi.com/search\z}) do |error|
         expect(error.serpapi_error).to be_nil
         expect(error.response_status).to eq(502)
+      end
+    end
+
+    # HTTP.rb tags the body with the charset from Content-Type, and JSON.parse converts it to UTF-8
+    it 'raises with the status when the body does not match its charset' do
+      body = String.new("<html>We\u2019re having trouble</html>", encoding: Encoding::US_ASCII)
+      allow(socket).to receive(:get).with('/search', anything).and_return(raw_response(502, body, 'text/html; charset=us-ascii'))
+
+      expect {
+        client.search(q: 'coffee')
+      }.to raise_error(SerpApi::SerpApiError, %r{\AHTTP request failed with status: 502 from url: https://serpapi.com/search\z}) do |error|
+        expect(error.serpapi_error).to be_nil
       end
     end
 
