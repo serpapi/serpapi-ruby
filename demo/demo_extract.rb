@@ -26,8 +26,13 @@ client = SerpApi::Client.new(api_key: ENV['SERPAPI_KEY'])
 # 1. scrape a single page (default mode)
 puts '--- scrape: https://example.com/'
 results = client.extract(url: 'https://example.com/')
-pp results[:page_information]
-puts results[:markdown]
+# a page that can't be extracted is returned with the reason in results[:error]
+if results[:error]
+  puts "nothing extracted: #{results[:error]}"
+else
+  pp results[:page_information]
+  puts results[:markdown]
+end
 
 # 2. get only the page's Markdown as a String
 puts '--- markdown output: https://example.com/'

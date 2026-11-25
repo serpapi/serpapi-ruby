@@ -17,7 +17,7 @@ module SerpApi
     # Backend service URL
     BACKEND = 'serpapi.com'.freeze
     # SerpApi errors are JSON even when HTML or Markdown output was requested.
-    # Decode the actual Content-Type so structured errors and successful JSON responses become Hashes.
+    # Decode the actual Content-Type so JSON responses become Hashes.
     CONTENT_TYPE_DECODERS = { 'application/json' => :json, 'text/html' => :html, 'text/markdown' => :md }.freeze
 
     # HTTP timeout requests
@@ -110,9 +110,13 @@ module SerpApi
     # note that the raw response
     #                 from the search engine is converted to JSON by SerpApi.com backend.
     #                 thus, most of the compute power is on the backsdend and not on the client side.
+    # A search that completed with empty results (e.g. "Google hasn't returned any results for this query.")
+    # is successful: it is returned with a top-level `error` key instead of raising.
+    #
     # @param [Hash] params includes engine, api_key, search fields and more..
     #                this override the default params provided to the constructor.
     # @return [Hash|String] search results formatted as a Hash or raw text.
+    # @raise [SerpApiError] if the HTTP status is not 200.
     def search(params = {})
       get('/search', :json, params)
     end
@@ -156,6 +160,10 @@ module SerpApi
     # The `timeout` parameter is the Extract API fetch timeout in milliseconds.
     # The client HTTP timeout is set in seconds with `SerpApi::Client.new(timeout: ...)`.
     #
+    # A page that could not be extracted (e.g. the URL does not return an HTML document)
+    # is returned like the API returns it: with a top-level `error` key and no `markdown`,
+    # instead of raising.
+    #
     # **Example:**
     #
     # ```ruby
@@ -182,6 +190,7 @@ module SerpApi
     #                exclude_tags, include_markdown, device, no_cache, async,
     #                zero_trace, output, json_restrictor.
     # @return [Hash|String] extraction results as a Hash, or a String for `output: 'md'` or `'html'`.
+    # @raise [SerpApiError] if `url` is missing or the HTTP status is not 200.
     def extract(params = {})
       raise SerpApiError, "params must be hash, not: #{params.class}" unless params.instance_of?(Hash)
       raise SerpApiError, 'url parameter is required by the extract API' if params[:url].to_s.empty? && params['url'].to_s.empty?
@@ -232,9 +241,12 @@ module SerpApi
     # example: spec/serpapi/client/search_archive_api_spec.rb
     # doc: https://serpapi.com/search-archive-api
     #
+    # Archived searches with empty results are returned with a top-level `error` key instead of raising.
+    #
     # @param [String|Integer] search_id from original search `results[:search_metadata][:id]`
     # @param [Symbol] format :json, :html, or :md [default: json, optional]
     # @return [String|Hash] raw HTML, Markdown, or JSON / Hash
+    # @raise [SerpApiError] if the HTTP status is not 200.
     def search_archive(search_id, format = :json)
       raise SerpApiError, 'format must be json, html, or md' unless [:json, :html, :md].include?(format)
 
@@ -340,41 +352,44 @@ module SerpApi
     end
 
     def handle_response(response, decoder, endpoint, params)
+      # Check the status before decoding: an error body may not be JSON.
+      raise_for_status!(response, decoder, endpoint, params)
+
       case decoder
       when :json
-        process_json_response(response, endpoint, params)
+        parse_json(response, endpoint, params)
       when :html, :md
-        process_text_response(response, endpoint, params, decoder)
+        response.body.to_s
       else
         raise SerpApiError, "not supported decoder: #{decoder}, available: :json, :html, :md"
       end
     end
 
-    def process_json_response(response, endpoint, params)
-      symbolize = params.fetch(:symbolize_names, true)
+    # Only the HTTP status decides whether a request failed. A top-level `error` key alone
+    # does not: SerpApi returns HTTP 200 with an `error` message for searches with empty
+    # results, and failed searches come with a non-200 status.
+    # see: https://serpapi.com/api-status-and-error-codes
+    def raise_for_status!(response, decoder, endpoint, params)
+      return if response.status == 200
 
-      begin
-        data = JSON.parse(response.body, symbolize_names: symbolize)
-        validate_json_content!(data, response, endpoint, params)
-      rescue JSON::ParserError
-        raise_parser_error(response, endpoint, params)
-      end
-
-      data
+      details = error_details(response)
+      raise_http_error(response, details, endpoint, params, explicit_error: json_value(details, :error), decoder: decoder)
     end
 
-    def process_text_response(response, endpoint, params, decoder)
-      raise_http_error(response, nil, endpoint, params, decoder: decoder) if response.status != 200
-
-      response.body.to_s
+    # SerpApi errors are JSON whatever the requested output. A body that isn't JSON, such as
+    # a Cloudflare error page, has no SerpApi error message, so only the status is reported.
+    # JSON.parse converts the body to UTF-8 from the charset in Content-Type, which raises
+    # an EncodingError when the bytes don't match that charset.
+    def error_details(response)
+      JSON.parse(response.body)
+    rescue JSON::ParserError, EncodingError
+      nil
     end
 
-    def validate_json_content!(data, response, endpoint, params)
-      if data.is_a?(Hash) && data.key?(:error)
-        raise_http_error(response, data, endpoint, params, explicit_error: data[:error])
-      elsif response.status != 200
-        raise_http_error(response, data, endpoint, params)
-      end
+    def parse_json(response, endpoint, params)
+      JSON.parse(response.body, symbolize_names: params.fetch(:symbolize_names, true))
+    rescue JSON::ParserError, EncodingError
+      raise_parser_error(response, endpoint, params)
     end
 
     # Centralized error raising to clean up the logic methods
@@ -384,12 +399,18 @@ module SerpApi
 
       raise SerpApiError.new(
         "#{msg} from url: https://#{BACKEND}#{endpoint}",
-        serpapi_error: explicit_error || (data.is_a?(Hash) ? data[:error] : nil),
+        # SerpApiError requires Strings; a malformed body must not turn this into a TypeError
+        serpapi_error: (explicit_error || json_value(data, :error))&.to_s,
         search_params: params,
         response_status: response.status,
-        search_id: data.is_a?(Hash) ? data&.dig(:search_metadata, :id) : nil,
+        search_id: json_value(json_value(data, :search_metadata), :id)&.to_s,
         decoder: decoder
       )
+    end
+
+    # Read a JSON value whether keys were symbolized or not (`symbolize_names: false`).
+    def json_value(data, key)
+      data.fetch(key) { data[key.to_s] } if data.is_a?(Hash)
     end
 
     def raise_parser_error(response, endpoint, params)
