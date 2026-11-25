@@ -164,7 +164,7 @@ puts 'done'
 
  * source code: [demo/demo_async.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_async.rb)
 
-This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). Each search may take up to a few seconds to complete. By the time the first element pops out of the queue, the search results might already be available in the archive. If not, `search_archive` returns the search's current status, and the search ID is pushed back onto the queue to be checked again.
+This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). Each search may take up to a few seconds to complete. By the time the first element pops out of the queue, the search results might already be available in the archive. If not, `search_archive` returns the search with its current status (e.g. `Processing`), and the search ID is pushed back onto the queue to be checked again.
 
 ## Error handling
 
