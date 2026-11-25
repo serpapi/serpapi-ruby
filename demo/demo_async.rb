@@ -61,7 +61,7 @@ until schedule_search.empty?
   # extract client id
   search_id = schedule_search.pop
 
-  # retrieve client from the archive - blocker
+  # retrieve the search from the archive - returns immediately, even if the search is not finished
   search_archived = client.search_archive(search_id)
 
   # read original company name from the search parameters
