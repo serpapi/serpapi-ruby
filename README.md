@@ -118,13 +118,9 @@ Search-engine-specific parameters can also be supplied when creating the client 
 
 ### Asynchronous searches
 
-Search API features non-blocking search using the option: `async=true`.
- - Non-blocking - async=true - a single parent process can handle unlimited concurrent searches.
- - Blocking - async=false - many processes must be forked and synchronized to handle concurrent searches. This strategy is I/O usage because each client would hold a network connection.
-
 Search API enables `async` search.
- - Non-blocking (`async=true`): the development is more complex, but this allows handling many simultaneous connections.
- - Blocking (`async=false`): it is easy to write the code, but more compute-intensive when the parent process needs to hold many connections.
+ - Non-blocking (`async=true`): the development is more complex, but a single parent process can handle many simultaneous searches.
+ - Blocking (`async=false`): it is easy to write the code, but each client holds a network connection, so many processes must be forked and synchronized to handle concurrent searches.
 
 Here is an example of asynchronous searches using Ruby
 ```ruby
@@ -141,7 +137,7 @@ company_list.each do |company|
   schedule_search.push(result[:search_metadata][:id])
 end
 
-puts "Last search submited at: #{result[:search_metadata][:created_at]}"
+puts "Last search submitted at: #{result[:search_metadata][:created_at]}"
 
 puts 'wait 10s for all requests to be completed '
 sleep(10)
@@ -168,7 +164,7 @@ puts 'done'
 
  * source code: [demo/demo_async.rb](https://github.com/serpapi/serpapi-ruby/blob/master/demo/demo_async.rb)
 
-This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). Each search may take up to a few seconds to complete. By the time the first element pops out of the queue, the search results might already be available in the archive. If not, the `search_archive` method blocks until the search results are available.
+This code shows a simple solution to batch searches asynchronously into a [queue](https://en.wikipedia.org/wiki/Queue_(abstract_data_type)). Each search may take up to a few seconds to complete. By the time the first element pops out of the queue, the search results might already be available in the archive. If not, `search_archive` returns the search's current status, and the search ID is pushed back onto the queue to be checked again.
 
 ## Error handling
 
