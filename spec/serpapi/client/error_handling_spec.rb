@@ -32,7 +32,7 @@ describe 'JSON error handling' do
   end
 
   before do
-    allow(HTTP).to receive(:timeout).and_return(double(persistent: socket))
+    allow(HTTP).to receive(:timeout).and_return(double(headers: double(persistent: socket)))
   end
 
   describe 'searches with empty results' do

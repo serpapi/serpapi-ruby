@@ -29,6 +29,13 @@ module SerpApi
                 # HTTP.rb client
                 :socket
 
+    # User-Agent sent with every request so SerpApi can report library usage by version, Ruby runtime, and platform.
+    #
+    # @return [String] e.g. "serpapi-ruby/1.0.3 ruby/3.4.1 (darwin; arm64)"
+    def self.user_agent
+      "serpapi-ruby/#{SerpApi::VERSION} #{RUBY_ENGINE}/#{RUBY_ENGINE_VERSION} (#{Gem::Platform.local.os}; #{Gem::Platform.local.cpu})"
+    end
+
     # Constructor
     # The `Serpapi::Client` constructor takes a hash of options as input.
     #
@@ -91,16 +98,13 @@ module SerpApi
       # set default query parameters
       @params = params.clone || {}
 
-      # track ruby library as a client for statistic purpose
-      @params[:source] = 'serpapi-ruby:' << SerpApi::VERSION
-
       # ensure default parameter would not be modified later
       @params.freeze
 
       # create connection socket
       return unless persistent?
 
-      @socket = HTTP.timeout(timeout).persistent("https://#{BACKEND}")
+      @socket = http_client.persistent("https://#{BACKEND}")
     end
 
     # perform a search using SerpApi.com
@@ -341,9 +345,14 @@ module SerpApi
     end
 
     def execute_request(method, endpoint, options)
-      client = persistent? ? @socket : HTTP.timeout(timeout)
+      client = persistent? ? @socket : http_client
       url = persistent? ? endpoint : "https://#{BACKEND}#{endpoint}"
       client.public_send(method, url, **options)
+    end
+
+    # @return [HTTP::Client] HTTP client with the request timeout and the library User-Agent
+    def http_client
+      HTTP.timeout(timeout).headers('User-Agent' => self.class.user_agent)
     end
 
     def response_decoder(response, default)

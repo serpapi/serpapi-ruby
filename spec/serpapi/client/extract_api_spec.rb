@@ -8,7 +8,7 @@ describe 'Extract API' do
     http = double
     response = double(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
     sent = nil
-    allow(HTTP).to receive(:timeout).and_return(http)
+    allow(HTTP).to receive(:timeout).and_return(double(headers: http))
     allow(http).to receive(:get) do |_url, params:|
       sent = params
       response

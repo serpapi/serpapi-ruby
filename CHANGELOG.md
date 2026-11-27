@@ -1,4 +1,5 @@
 # Changelog
+ * [Unreleased] Identify the library, Ruby runtime, and platform in the `User-Agent` header (e.g. `serpapi-ruby/1.0.3 ruby/3.4.1 (darwin; arm64)`) instead of the `source` query parameter
  * [Unreleased] **BREAKING:** JSON responses with HTTP 200 and a top-level `error` key no longer raise `SerpApiError`. SerpApi returns searches with empty results this way (e.g. "Google hasn't returned any results for this query."), so `search`, `search_archive`, and `extract` now return them as a Hash with the message in `results[:error]`. `SerpApiError` is raised only for non-200 responses. Code that rescued `SerpApiError` to detect empty results must check `results[:error]` instead. With `symbolize_names: false`, these responses were already returned, with the message in `results["error"]` #17
  * [Unreleased] Set `SerpApiError#serpapi_error` and `#search_id` when using `symbolize_names: false`
  * [Unreleased] Raise `SerpApiError` instead of `TypeError` for non-200 responses whose `error` or `search_metadata.id` is not a String
